@@ -360,7 +360,7 @@ z"/>
           {/* Routine Section (RIGHT COLUMN) */}
           <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold text-[#E9A96A]">Your Hair Care Routine</h2>
+            <h2 className="text-3xl font-bold text-[#C87726]">Your Hair Care Routine</h2>
             <div className="text-right">
               <div className="text-sm text-gray-500">Total Time</div>
               <div className="text-2xl font-bold text-purple-600">{data.routine.totalTime}</div>
@@ -377,11 +377,11 @@ z"/>
                   </div>
                 </div>
                 <div className="flex-grow">
-                  <h3 className="text-xl font-bold text-[#E9A96A] mb-2 pr-20">{step.action}</h3>
-                  <p className="text-[#E9A96A] mb-2">{step.instructions}</p>
+                  <h3 className="text-xl font-bold text-[#C87726] mb-2 pr-20">{step.action}</h3>
+                  <p className="text-[#C87726] mb-2">{step.instructions}</p>
                   {step.productName && (
                     <div className="text-sm">
-                      <span className="text-[#CA9158]">🧴 {step.productName}</span>
+                      <span className="text-[#C87726]">🧴 {step.productName}</span>
                     </div>
                   )}
                 </div>
