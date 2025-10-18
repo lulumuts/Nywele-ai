@@ -1,9 +1,32 @@
 # Nywele.ai - AI-Powered Hair Care for African Hair
-# Nywele.ai
 
-AI-powered hair care recommendations for African hair types, featuring multi-AI architecture with GPT-4o and Gemini Nano Banana.
+## Addressing AI Bias in African Hair Care through Culturally-Informed, Precision-Engineered Hair Routine Generation
+
+AI-powered hair care recommendations for African hair types, featuring multi-AI architecture with GPT-4o and Gemini 2.5 Flash Image.
 
 **Live Demo:** [https://nywele-ai.netlify.app](https://nywele-ai.netlify.app)
+
+---
+
+## The Problem
+
+African hair is beautifully diverse, encompassing a wide spectrum of textures, curl patterns, and care needs—yet AI systems often fail to accurately represent or provide relevant guidance for African hairstyles and hair care.
+
+Current AI models frequently demonstrate bias when addressing African hair, offering generic advice that ignores the unique characteristics of Type 4 hair (coily/kinky textures), protective styling needs, moisture retention challenges, and culturally significant hair practices. This gap leaves millions of women without access to AI-powered tools that truly understand their hair care needs.
+
+## Our Solution
+
+We've created an optimized prompting framework that tackles the critical issue of AI bias by generating accurate, culturally-informed hair care routines specifically tailored for African women.
+
+**Our Framework Includes:**
+
+✓ **Proper Terminology** - Incorporates accurate classifications for African hair textures (4A, 4B, 4C) and accounts for porosity, density, and strand thickness variations
+
+✓ **Protective Styling Recognition** - Recognizes protective styling methods (braids, twists, locs, bantu knots) and their unique maintenance requirements
+
+✓ **Specific Concern Targeting** - Addresses shrinkage, breakage prevention, moisture retention, scalp health, and growth challenges specific to African hair
+
+✓ **Cultural Authenticity** - Integrates cultural practices and product recommendations relevant to the African diaspora
 
 ---
 
@@ -168,7 +191,7 @@ const generateStyleImage = async (styleData) => {
 
 ---
 
-## Gemini Nano Banana Integration
+## Gemini 2.5 Flash Image Integration
 
 ### Model
 
@@ -400,10 +423,28 @@ All prompts explicitly specify ethnicity, texture, and viewing angles to counter
 
 ---
 
+## Impact
+
+By correcting these biases at the prompt level and implementing culturally-informed AI architecture, we're making AI more inclusive and useful for African women worldwide. 
+
+**Our hybrid approach ensures:**
+- Technology serves all communities equitably
+- Accurate representation of the beauty and complexity of African hair  
+- Privacy and data security through Supabase integration
+- Fast, personalized guidance with GPT-4o + Gemini 2.5 Flash Image
+
+**Key Metrics:**
+- **150+ lines** of bias-countering prompt engineering code
+- **12 hair types** supported (1a-4c classifications)
+- **2 AI models** working in harmony for accuracy
+- **Documented AI bias** proving the need for specialized tools
+
+---
+
 ## Built For
 
 This project addresses the lack of culturally-specific AI tools for African hair care. By combining advanced prompt engineering with multi-AI orchestration, it delivers personalized recommendations that respect and celebrate natural African hair textures.
 
-**Tech Stack:** Next.js + GPT-4o + Gemini Nano Banana
+**Tech Stack:** Next.js + GPT-4o + Gemini 2.5 Flash Image
 **Deployment:** Netlify
 **License:** MIT

@@ -96,10 +96,49 @@ export default function HowItWorks() {
           <h1 className="text-5xl font-bold text-[#C87726] mb-4">
             How Nywele.ai Works
           </h1>
-          <p className="text-xl text-[#C87726] max-w-2xl mx-auto">
-            A sophisticated multi-AI system built specifically for African hair care, 
-            combining GPT-4o and Gemini Nano Banana.
+          <p className="text-xl text-[#C87726] max-w-3xl mx-auto mb-6">
+            Addressing AI Bias in African Hair Care through Culturally-Informed, Precision-Engineered Hair Routine Generation
           </p>
+          <p className="text-lg text-[#C87726] max-w-4xl mx-auto">
+            A sophisticated multi-AI system built specifically for African hair care, combining GPT-4o and Gemini 2.5 Flash Image to tackle the critical issue of AI bias by generating accurate, culturally-informed recommendations tailored for African women's unique hair needs.
+          </p>
+        </div>
+
+        {/* The Problem Section */}
+        <div className="mb-20 bg-white/60 backdrop-blur-sm rounded-3xl border-2 border-[#E9A96A] shadow-lg p-10">
+          <h2 className="text-3xl font-bold text-[#C87726] mb-6">The Problem</h2>
+          <p className="text-lg text-[#C87726] mb-4">
+            Current AI models frequently demonstrate bias when addressing African hair, offering generic advice that ignores the unique characteristics of Type 4 hair (coily/kinky textures), protective styling needs, moisture retention challenges, and culturally significant hair practices.
+          </p>
+          <p className="text-lg text-[#C87726]">
+            This gap leaves millions of women without access to AI-powered tools that truly understand their hair care needs—particularly for textures like 4A, 4B, and 4C that require specialized knowledge about shrinkage, breakage prevention, and moisture retention.
+          </p>
+        </div>
+
+        {/* Our Solution Section */}
+        <div className="mb-20 bg-white/60 backdrop-blur-sm rounded-3xl border-2 border-[#E9A96A] shadow-lg p-10">
+          <h2 className="text-3xl font-bold text-[#C87726] mb-6">Our Solution</h2>
+          <p className="text-lg text-[#C87726] mb-6">
+            We've created an optimized prompting framework that addresses these biases through:
+          </p>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-purple-50 rounded-xl p-6">
+              <h3 className="font-bold text-[#C87726] mb-3">✓ Proper Hair Classification</h3>
+              <p className="text-[#C87726]">Incorporates accurate terminology for African hair textures (4A, 4B, 4C classifications) and accounts for porosity, density, and strand thickness variations</p>
+            </div>
+            <div className="bg-purple-50 rounded-xl p-6">
+              <h3 className="font-bold text-[#C87726] mb-3">✓ Protective Styling Recognition</h3>
+              <p className="text-[#C87726]">Recognizes protective styling methods including braids, twists, locs, bantu knots, and their unique maintenance requirements</p>
+            </div>
+            <div className="bg-purple-50 rounded-xl p-6">
+              <h3 className="font-bold text-[#C87726] mb-3">✓ Specific Concern Targeting</h3>
+              <p className="text-[#C87726]">Addresses shrinkage, breakage prevention, moisture retention, scalp health, and growth challenges specific to African hair</p>
+            </div>
+            <div className="bg-purple-50 rounded-xl p-6">
+              <h3 className="font-bold text-[#C87726] mb-3">✓ Cultural Authenticity</h3>
+              <p className="text-[#C87726]">Integrates cultural practices and product recommendations relevant to the African diaspora and community hair care traditions</p>
+            </div>
+          </div>
         </div>
 
         {/* Tech Stack Cards */}
@@ -220,21 +259,24 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        {/* Impact Stats */}
-        <div className="text-center mb-20">
-          <h2 className="text-3xl font-bold mb-12 text-[#C87726]">Built for Real Impact</h2>
+        {/* Impact Section */}
+        <div className="mb-20 bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl border-2 border-[#E9A96A] shadow-lg p-10">
+          <h2 className="text-3xl font-bold text-[#C87726] mb-6 text-center">Our Impact</h2>
+          <p className="text-lg text-[#C87726] text-center max-w-4xl mx-auto mb-8">
+            By correcting these biases at the prompt level and implementing culturally-informed AI architecture, we're making AI more inclusive and useful for African women worldwide. Our hybrid approach—combining GPT-4o for recommendations, Gemini 2.5 Flash Image for visualizations, and Supabase for secure data management—ensures that technology serves all communities equitably and accurately represents the beauty and complexity of African hair.
+          </p>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 border-[#E9A96A] shadow-lg p-8">
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 border-[#E9A96A] shadow-lg p-8 text-center">
+              <div className="text-4xl font-bold text-[#C87726] mb-2">150+</div>
+              <p className="text-[#E9A96A]">Lines of Bias-Countering Code</p>
+            </div>
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 border-[#E9A96A] shadow-lg p-8 text-center">
+              <div className="text-4xl font-bold text-[#C87726] mb-2">12 Types</div>
+              <p className="text-[#E9A96A]">Hair Textures Supported (1a-4c)</p>
+            </div>
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 border-[#E9A96A] shadow-lg p-8 text-center">
               <div className="text-4xl font-bold text-[#C87726] mb-2">2 AI Models</div>
-              <p className="text-[#E9A96A]">Working together for accuracy</p>
-            </div>
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 border-[#E9A96A] shadow-lg p-8">
-              <div className="text-4xl font-bold text-[#C87726] mb-2">Type 1a-4c</div>
-              <p className="text-[#E9A96A]">All hair textures supported</p>
-            </div>
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 border-[#E9A96A] shadow-lg p-8">
-              <div className="text-4xl font-bold text-[#C87726] mb-2">150+ Lines</div>
-              <p className="text-[#E9A96A]">Of prompt engineering logic</p>
+              <p className="text-[#E9A96A]">GPT-4o + Gemini 2.5 Flash Image</p>
             </div>
           </div>
         </div>
