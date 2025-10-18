@@ -517,8 +517,8 @@ z"/>
             {/* Progress Bar */}
             <div className="mb-8">
           <div className="flex justify-between mb-2">
-            <span className="text-sm font-medium text-[#C87726]">Step {step} of 4</span>
-            <span className="text-sm text-[#C87726]">{Math.round((step / 4) * 100)}% Complete</span>
+            <span className="text-sm font-medium text-purple-600">Step {step} of 4</span>
+            <span className="text-sm text-purple-600">{Math.round((step / 4) * 100)}% Complete</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
@@ -548,7 +548,7 @@ z"/>
                       key={type.code}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, hairType: type.code }))}
-                      className={`p-4 rounded-xl border-2 text-left transition-all ${
+                      className={`p-4 rounded-full border-2 text-left transition-all ${
                         formData.hairType === type.code
                           ? 'border-[#FED9B4] bg-purple-50'
                           : 'border-[#FED9B4] hover:border-[#FED9B4]'
@@ -577,7 +577,7 @@ z"/>
                       key={option.level}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, porosity: option.level }))}
-                      className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+                      className={`w-full p-4 rounded-full border-2 text-left transition-all ${
                         formData.porosity === option.level
                           ? 'border-[#FED9B4] bg-purple-50'
                           : 'border-[#FED9B4] hover:border-[#FED9B4]'
@@ -602,7 +602,7 @@ z"/>
                       key={option.value}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, length: option.value }))}
-                      className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
+                      className={`w-full p-3 rounded-full border-2 text-left transition-all ${
                         formData.length === option.value
                           ? 'border-[#FED9B4] bg-purple-50'
                           : 'border-[#FED9B4] hover:border-[#FED9B4]'
@@ -636,7 +636,7 @@ z"/>
                     type="button"
                     onClick={() => handleConcernToggle(concern.id)}
                     disabled={!formData.concerns.includes(concern.id) && formData.concerns.length >= 3}
-                    className={`p-4 rounded-xl border-2 text-left transition-all ${
+                    className={`p-4 rounded-full border-2 text-left transition-all ${
                       formData.concerns.includes(concern.id)
                         ? 'border-[#FED9B4] bg-purple-50'
                         : formData.concerns.length >= 3
@@ -680,7 +680,7 @@ z"/>
                           desiredStyle: style.name,
                           duration: style.duration 
                         }))}
-                        className={`p-4 rounded-xl border-2 text-left transition-all ${
+                        className={`p-4 rounded-full border-2 text-left transition-all ${
                           formData.desiredStyle === style.name
                             ? 'border-[#FED9B4] bg-purple-50'
                             : 'border-[#FED9B4] hover:border-[#FED9B4]'
@@ -712,7 +712,7 @@ z"/>
                     key={vibe.id}
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, vibe: vibe.id }))}
-                    className={`w-full p-5 rounded-xl border-2 text-left transition-all ${
+                    className={`w-full p-5 rounded-full border-2 text-left transition-all ${
                       formData.vibe === vibe.id
                         ? 'border-[#FED9B4] bg-purple-50'
                         : 'border-[#FED9B4] hover:border-[#FED9B4]'
