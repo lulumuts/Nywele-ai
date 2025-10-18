@@ -348,13 +348,7 @@ export default function Results() {
 
         {/* Salons Who Can Do It */}
         <div className="mt-12 bg-white rounded-3xl shadow-2xl p-8">
-          <div className="mb-6">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Salons Who Can Do This Style</h2>
-            <p className="text-gray-600">
-              Trusted specialists in Nairobi for {sessionStorage.getItem('desiredStyle') || 'your desired style'}
-              {' '}• Powered by Braiding Nairobi
-            </p>
-          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">Salons Who Can Do This Style</h2>
 
           {loadingSalons ? (
             <div className="text-center py-12">
@@ -362,69 +356,66 @@ export default function Results() {
               <p className="text-gray-600">Finding salons near you...</p>
             </div>
           ) : salons.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {salons.map((salon) => (
                 <div 
                   key={salon.id}
-                  className="border-2 border-gray-100 rounded-2xl overflow-hidden hover:border-purple-300 hover:shadow-lg transition-all"
+                  className="border-2 border-gray-100 rounded-2xl p-6 hover:border-purple-300 hover:shadow-lg transition-all"
                 >
-                  {/* Salon Image */}
-                  <div className="relative h-48 overflow-hidden">
-                    <img 
-                      src={salon.image_url} 
-                      alt={salon.name}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute bottom-3 left-3 flex items-center gap-2">
-                      <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold text-gray-900">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">{salon.name}</h3>
+                      <div className="flex items-center text-gray-600 text-sm mt-1">
+                        <span className="mr-1">📍</span>
+                        <span>{salon.area}</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-bold">
                         ⭐ {salon.rating.toFixed(1)}
                       </span>
-                      <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold text-gray-900">
+                      <span className="text-gray-600 font-semibold text-sm">
                         {salon.price_range}
                       </span>
                     </div>
                   </div>
 
-                  {/* Salon Info */}
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">{salon.name}</h3>
-                    <div className="flex items-center text-gray-600 text-sm mb-3">
-                      <span className="mr-1">📍</span>
-                      <span>{salon.area}</span>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                    {salon.description}
+                  </p>
+
+                  {/* Services */}
+                  <div className="mb-4">
+                    <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Specializes In</p>
+                    <div className="flex flex-wrap gap-2">
+                      {salon.services.slice(0, 3).map((service, idx) => (
+                        <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+                          {service}
+                        </span>
+                      ))}
+                      {salon.services.length > 3 && (
+                        <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+                          +{salon.services.length - 3} more
+                        </span>
+                      )}
                     </div>
-
-                    <p className="text-gray-700 text-sm mb-4 line-clamp-2">
-                      {salon.description}
-                    </p>
-
-                    {/* Services */}
-                    <div className="mb-4">
-                      <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Services</p>
-                      <div className="flex flex-wrap gap-2">
-                        {salon.services.slice(0, 3).map((service, idx) => (
-                          <span key={idx} className="px-2 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-medium">
-                            {service}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* CTA Button */}
-                    <a
-                      href={`tel:${salon.phone}`}
-                      onClick={() => {
-                        trackSalonView({
-                          salonName: salon.name,
-                          location: salon.area,
-                          services: salon.services,
-                          hairType: sessionStorage.getItem('hairType') || undefined,
-                        });
-                      }}
-                      className="block w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold text-center hover:shadow-lg transition-all"
-                    >
-                      📞 Call to Book
-                    </a>
                   </div>
+
+                  {/* CTA Button */}
+                  <a
+                    href={`tel:${salon.phone}`}
+                    onClick={() => {
+                      trackSalonView({
+                        salonName: salon.name,
+                        location: salon.area,
+                        services: salon.services,
+                        hairType: sessionStorage.getItem('hairType') || undefined,
+                      });
+                    }}
+                    className="block w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold text-center hover:shadow-lg transition-all"
+                  >
+                    📞 Call to Book
+                  </a>
                 </div>
               ))}
             </div>
@@ -433,14 +424,6 @@ export default function Results() {
               <div className="text-5xl mb-4">💈</div>
               <p className="text-gray-600">
                 Salon recommendations will appear here after you complete the form
-              </p>
-            </div>
-          )}
-
-          {salons.length > 0 && (
-            <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-purple-100">
-              <p className="text-center text-purple-900 font-semibold">
-                ✨ These salons specialize in {sessionStorage.getItem('desiredStyle') || 'your style'} and {sessionStorage.getItem('hairType') || 'your hair type'}
               </p>
             </div>
           )}
