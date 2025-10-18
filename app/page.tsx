@@ -539,8 +539,8 @@ z"/>
 
               {/* Hair Type */}
               <div>
-                <label className="block text-lg font-semibold text-[#C87726] mb-3">
-                  Hair Type
+                <label className="block text-lg font-bold text-[#C87726] mb-3">
+                  1. Hair Type
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   {hairTypes.map(type => (
@@ -564,8 +564,8 @@ z"/>
 
               {/* Porosity */}
               <div>
-                <label className="block text-lg font-semibold text-[#C87726] mb-1">
-                  Hair Porosity
+                <label className="block text-lg font-bold text-[#C87726] mb-1">
+                  2. Hair Porosity
                 </label>
                 <div className="flex items-center gap-2 mb-3 text-xs text-[#C87726]">
                   <Info className="w-4 h-4" />
@@ -593,8 +593,8 @@ z"/>
 
               {/* Length */}
               <div>
-                <label className="block text-lg font-semibold text-[#C87726] mb-3">
-                  Current Length (Stretched)
+                <label className="block text-lg font-bold text-[#C87726] mb-3">
+                  3. Current Length (Stretched)
                 </label>
                 <div className="space-y-2">
                   {lengthOptions.map(option => (
