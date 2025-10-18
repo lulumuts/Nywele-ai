@@ -370,9 +370,9 @@ z"/>
 
           <div className="space-y-6">
             {data.routine.steps.map((step, index) => (
-              <div key={index} className="relative flex gap-6 p-6 border-2 border-[#E9A96A] rounded-2xl bg-transparent">
+              <div key={index} className="relative flex gap-4 p-6 border-2 border-[#E9A96A] rounded-2xl bg-transparent">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 border-2 border-[#E9A96A] rounded-full flex items-center justify-center text-[#E9A96A] font-bold text-xl bg-transparent">
+                  <div className="w-8 h-8 border-2 border-[#E9A96A] rounded-full flex items-center justify-center text-[#E9A96A] font-bold text-sm bg-transparent">
                     {step.stepNumber}
                   </div>
                 </div>
@@ -381,7 +381,7 @@ z"/>
                   <p className="text-[#E9A96A] mb-2">{step.instructions}</p>
                   {step.productName && (
                     <div className="text-sm">
-                      <span className="text-gray-600">🧴 {step.productName}</span>
+                      <span className="text-[#CA9158]">🧴 {step.productName}</span>
                     </div>
                   )}
                 </div>
@@ -400,7 +400,7 @@ z"/>
           <h2 className="text-3xl font-bold text-[#E9A96A] mb-6">Recommended Products</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {data.products.map((product, index) => (
-              <div key={index} className="border-2 border-gray-100 rounded-2xl p-6 hover:border-purple-300 hover:shadow-lg transition-all">
+              <div key={index} className="border-2 border-[#E9A96A] rounded-2xl p-6 hover:border-purple-300 hover:shadow-lg transition-all">
                 {product.imageUrl && (
                   <img
                     src={product.imageUrl}
@@ -451,7 +451,7 @@ z"/>
               {salons.map((salon) => (
                 <div 
                   key={salon.id}
-                  className="border-2 border-gray-100 rounded-2xl p-6 hover:border-purple-300 hover:shadow-lg transition-all"
+                  className="border-2 border-[#E9A96A] rounded-2xl p-6 hover:border-purple-300 hover:shadow-lg transition-all"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
