@@ -534,8 +534,8 @@ z"/>
                       onClick={() => setFormData(prev => ({ ...prev, hairType: type.code }))}
                       className={`p-4 rounded-xl border-2 text-left transition-all ${
                         formData.hairType === type.code
-                          ? 'border-purple-600 bg-purple-50'
-                          : 'border-gray-200 hover:border-purple-300'
+                          ? 'border-[#FFEBC2] bg-purple-50'
+                          : 'border-[#FFEBC2] hover:border-[#FFEBC2]'
                       }`}
                     >
                       <div className="text-2xl mb-1">{type.visual}</div>
@@ -563,8 +563,8 @@ z"/>
                       onClick={() => setFormData(prev => ({ ...prev, porosity: option.level }))}
                       className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
                         formData.porosity === option.level
-                          ? 'border-purple-600 bg-purple-50'
-                          : 'border-gray-200 hover:border-purple-300'
+                          ? 'border-[#FFEBC2] bg-purple-50'
+                          : 'border-[#FFEBC2] hover:border-[#FFEBC2]'
                       }`}
                     >
                       <div className="font-semibold text-gray-800">{option.name}</div>
@@ -588,8 +588,8 @@ z"/>
                       onClick={() => setFormData(prev => ({ ...prev, length: option.value }))}
                       className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
                         formData.length === option.value
-                          ? 'border-purple-600 bg-purple-50'
-                          : 'border-gray-200 hover:border-purple-300'
+                          ? 'border-[#FFEBC2] bg-purple-50'
+                          : 'border-[#FFEBC2] hover:border-[#FFEBC2]'
                       }`}
                     >
                       <div className="flex justify-between items-center">
@@ -622,10 +622,10 @@ z"/>
                     disabled={!formData.concerns.includes(concern.id) && formData.concerns.length >= 3}
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
                       formData.concerns.includes(concern.id)
-                        ? 'border-purple-600 bg-purple-50'
+                        ? 'border-[#FFEBC2] bg-purple-50'
                         : formData.concerns.length >= 3
-                        ? 'border-gray-200 opacity-50 cursor-not-allowed'
-                        : 'border-gray-200 hover:border-purple-300'
+                        ? 'border-[#FFEBC2] opacity-50 cursor-not-allowed'
+                        : 'border-[#FFEBC2] hover:border-[#FFEBC2]'
                     }`}
                   >
                     <div className="text-2xl mb-2">{concern.icon}</div>
@@ -666,8 +666,8 @@ z"/>
                         }))}
                         className={`p-4 rounded-xl border-2 text-left transition-all ${
                           formData.desiredStyle === style.name
-                            ? 'border-purple-600 bg-purple-50'
-                            : 'border-gray-200 hover:border-purple-300'
+                            ? 'border-[#FFEBC2] bg-purple-50'
+                            : 'border-[#FFEBC2] hover:border-[#FFEBC2]'
                         }`}
                       >
                         <div className="font-semibold text-gray-800">{style.name}</div>
@@ -698,8 +698,8 @@ z"/>
                     onClick={() => setFormData(prev => ({ ...prev, vibe: vibe.id }))}
                     className={`w-full p-5 rounded-xl border-2 text-left transition-all ${
                       formData.vibe === vibe.id
-                        ? 'border-purple-600 bg-purple-50'
-                        : 'border-gray-200 hover:border-purple-300'
+                        ? 'border-[#FFEBC2] bg-purple-50'
+                        : 'border-[#FFEBC2] hover:border-[#FFEBC2]'
                     }`}
                   >
                     <div className="flex items-center gap-4">
