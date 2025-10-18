@@ -44,6 +44,130 @@ Results Page
 
 ---
 
+## API Documentation
+
+Nywele.ai exposes two REST APIs that can be integrated into external services:
+
+### 1. Hair Care Recommendation API
+
+**Endpoint:** `POST https://nywele-ai.netlify.app/api/recommend`
+
+**Description:** Get personalized hair care routines powered by GPT-4o
+
+**Request Body:**
+```json
+{
+  "hairType": "4c",
+  "porosity": "high",
+  "goals": ["Moisturize", "Grow Length"],
+  "concerns": ["Dryness", "Breakage"],
+  "currentStyle": "Twist Out",
+  "desiredStyle": "Box Braids",
+  "durationPreference": "30 minutes"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "routine": {
+      "steps": [
+        {
+          "stepNumber": 1,
+          "action": "Cleanse",
+          "instructions": "Apply moisturizing shampoo...",
+          "duration": "5 minutes",
+          "productName": "Shea Moisture Curl & Shine Shampoo"
+        }
+      ],
+      "totalTime": "30 minutes",
+      "frequency": "Weekly"
+    },
+    "products": [
+      {
+        "name": "Curl & Shine Shampoo",
+        "brand": "Shea Moisture",
+        "reason": "Specifically formulated for high porosity 4C hair..."
+      }
+    ],
+    "stylistTip": "For high porosity hair, use the LOC method..."
+  }
+}
+```
+
+### 2. Style Image Generation API
+
+**Endpoint:** `POST https://nywele-ai.netlify.app/api/style`
+
+**Description:** Generate hairstyle visualizations using Gemini 2.5 Flash Image
+
+**Request Body:**
+```json
+{
+  "hairType": "4c",
+  "styleName": "Box Braids",
+  "ethnicity": "Black Woman",
+  "length": "Shoulder-Length",
+  "vibe": "Professional Studio Portrait"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "imageUrl": "data:image/png;base64,...",
+    "description": "Full prompt used for generation",
+    "hairType": "4c",
+    "styleName": "Box Braids",
+    "prompt": "Detailed bias-countering prompt...",
+    "generatedBy": "gemini-nano-banana",
+    "aiGenerated": true
+  }
+}
+```
+
+### API Usage Example
+
+```javascript
+// Example: Get hair care recommendations
+const getRecommendations = async (profile) => {
+  const response = await fetch('https://nywele-ai.netlify.app/api/recommend', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(profile)
+  });
+  
+  const result = await response.json();
+  return result.data;
+};
+
+// Example: Generate style image
+const generateStyleImage = async (styleData) => {
+  const response = await fetch('https://nywele-ai.netlify.app/api/style', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(styleData)
+  });
+  
+  const result = await response.json();
+  return result.data.imageUrl;
+};
+```
+
+### Integration Use Cases
+
+- **Salon booking platforms:** Integrate AI recommendations for client consultations
+- **E-commerce sites:** Suggest products based on hair analysis
+- **Mobile apps:** Embed hair care guidance into beauty apps
+- **Hair care brands:** Power personalized product recommendations
+- **Educational platforms:** Provide AI-powered hair care education
+
+---
+
 ## Gemini Nano Banana Integration
 
 ### Model
