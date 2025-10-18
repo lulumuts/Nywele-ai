@@ -501,8 +501,8 @@ z"/>
             {/* Progress Bar */}
             <div className="mb-8">
           <div className="flex justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">Step {step} of 4</span>
-            <span className="text-sm text-gray-500">{Math.round((step / 4) * 100)}% Complete</span>
+            <span className="text-sm font-medium text-[#D7AC81]">Step {step} of 4</span>
+            <span className="text-sm text-[#D7AC81]">{Math.round((step / 4) * 100)}% Complete</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
@@ -517,13 +517,13 @@ z"/>
           {step === 1 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">Your Hair Profile</h2>
-                <p className="text-gray-600">Let's understand your beautiful texture</p>
+                <h2 className="text-3xl font-bold text-[#D7AC81] mb-2">Your Hair Profile</h2>
+                <p className="text-[#D7AC81]">Let's understand your beautiful texture</p>
               </div>
 
               {/* Hair Type */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                <label className="block text-sm font-semibold text-[#D7AC81] mb-3">
                   Hair Type
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -534,13 +534,13 @@ z"/>
                       onClick={() => setFormData(prev => ({ ...prev, hairType: type.code }))}
                       className={`p-4 rounded-xl border-2 text-left transition-all ${
                         formData.hairType === type.code
-                          ? 'border-[#FCE1C7] bg-purple-50'
-                          : 'border-[#FCE1C7] hover:border-[#FCE1C7]'
+                          ? 'border-[#FED9B4] bg-purple-50'
+                          : 'border-[#FED9B4] hover:border-[#FED9B4]'
                       }`}
                     >
                       <div className="text-2xl mb-1">{type.visual}</div>
-                      <div className="font-semibold text-gray-800">{type.name}</div>
-                      <div className="text-xs text-gray-600 mt-1">{type.description}</div>
+                      <div className="font-semibold text-[#D7AC81]">{type.name}</div>
+                      <div className="text-xs text-[#D7AC81] mt-1">{type.description}</div>
                     </button>
                   ))}
                 </div>
@@ -548,10 +548,10 @@ z"/>
 
               {/* Porosity */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-[#D7AC81] mb-1">
                   Hair Porosity
                 </label>
-                <div className="flex items-center gap-2 mb-3 text-xs text-gray-600">
+                <div className="flex items-center gap-2 mb-3 text-xs text-[#D7AC81]">
                   <Info className="w-4 h-4" />
                   <span>How well your hair absorbs and retains moisture</span>
                 </div>
@@ -563,13 +563,13 @@ z"/>
                       onClick={() => setFormData(prev => ({ ...prev, porosity: option.level }))}
                       className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
                         formData.porosity === option.level
-                          ? 'border-[#FCE1C7] bg-purple-50'
-                          : 'border-[#FCE1C7] hover:border-[#FCE1C7]'
+                          ? 'border-[#FED9B4] bg-purple-50'
+                          : 'border-[#FED9B4] hover:border-[#FED9B4]'
                       }`}
                     >
-                      <div className="font-semibold text-gray-800">{option.name}</div>
-                      <div className="text-sm text-gray-600 mt-1">{option.description}</div>
-                      <div className="text-xs text-purple-600 mt-2">{option.tip}</div>
+                      <div className="font-semibold text-[#D7AC81]">{option.name}</div>
+                      <div className="text-sm text-[#D7AC81] mt-1">{option.description}</div>
+                      <div className="text-xs text-[#D7AC81] mt-2">{option.tip}</div>
                     </button>
                   ))}
                 </div>
@@ -577,7 +577,7 @@ z"/>
 
               {/* Length */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                <label className="block text-sm font-semibold text-[#D7AC81] mb-3">
                   Current Length (Stretched)
                 </label>
                 <div className="space-y-2">
@@ -588,14 +588,14 @@ z"/>
                       onClick={() => setFormData(prev => ({ ...prev, length: option.value }))}
                       className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
                         formData.length === option.value
-                          ? 'border-[#FCE1C7] bg-purple-50'
-                          : 'border-[#FCE1C7] hover:border-[#FCE1C7]'
+                          ? 'border-[#FED9B4] bg-purple-50'
+                          : 'border-[#FED9B4] hover:border-[#FED9B4]'
                       }`}
                     >
                       <div className="flex justify-between items-center">
                         <div>
-                          <div className="font-semibold text-gray-800">{option.label}</div>
-                          <div className="text-xs text-gray-500">{option.stretched} stretched • {option.shrunken}</div>
+                          <div className="font-semibold text-[#D7AC81]">{option.label}</div>
+                          <div className="text-xs text-[#D7AC81]">{option.stretched} stretched • {option.shrunken}</div>
                         </div>
                       </div>
                     </button>
@@ -609,8 +609,8 @@ z"/>
           {step === 2 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">What Are Your Goals?</h2>
-                <p className="text-gray-600">Select up to 3 main concerns</p>
+                <h2 className="text-3xl font-bold text-[#D7AC81] mb-2">What Are Your Goals?</h2>
+                <p className="text-[#D7AC81]">Select up to 3 main concerns</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -622,19 +622,19 @@ z"/>
                     disabled={!formData.concerns.includes(concern.id) && formData.concerns.length >= 3}
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
                       formData.concerns.includes(concern.id)
-                        ? 'border-[#FCE1C7] bg-purple-50'
+                        ? 'border-[#FED9B4] bg-purple-50'
                         : formData.concerns.length >= 3
-                        ? 'border-[#FCE1C7] opacity-50 cursor-not-allowed'
-                        : 'border-[#FCE1C7] hover:border-[#FCE1C7]'
+                        ? 'border-[#FED9B4] opacity-50 cursor-not-allowed'
+                        : 'border-[#FED9B4] hover:border-[#FED9B4]'
                     }`}
                   >
                     <div className="text-2xl mb-2">{concern.icon}</div>
-                    <div className="font-semibold text-sm text-gray-800">{concern.label}</div>
+                    <div className="font-semibold text-sm text-[#D7AC81]">{concern.label}</div>
                   </button>
                 ))}
               </div>
 
-              <div className="text-sm text-gray-600 text-center">
+              <div className="text-sm text-[#D7AC81] text-center">
                 {formData.concerns.length}/3 selected
               </div>
             </div>
@@ -644,15 +644,15 @@ z"/>
           {step === 3 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">Choose Your Style</h2>
-                <p className="text-gray-600">What look are you going for?</p>
+                <h2 className="text-3xl font-bold text-[#D7AC81] mb-2">Choose Your Style</h2>
+                <p className="text-[#D7AC81]">What look are you going for?</p>
               </div>
 
               {Object.entries(styleCategories).map(([key, category]) => (
                 <div key={key} className="space-y-3">
                   <div>
-                    <h3 className="font-bold text-lg text-gray-800">{category.label}</h3>
-                    <p className="text-sm text-gray-600">{category.subtitle}</p>
+                    <h3 className="font-bold text-lg text-[#D7AC81]">{category.label}</h3>
+                    <p className="text-sm text-[#D7AC81]">{category.subtitle}</p>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {category.styles.map(style => (
@@ -666,12 +666,12 @@ z"/>
                         }))}
                         className={`p-4 rounded-xl border-2 text-left transition-all ${
                           formData.desiredStyle === style.name
-                            ? 'border-[#FCE1C7] bg-purple-50'
-                            : 'border-[#FCE1C7] hover:border-[#FCE1C7]'
+                            ? 'border-[#FED9B4] bg-purple-50'
+                            : 'border-[#FED9B4] hover:border-[#FED9B4]'
                         }`}
                       >
-                        <div className="font-semibold text-gray-800">{style.name}</div>
-                        <div className="text-xs text-gray-600 mt-1">
+                        <div className="font-semibold text-[#D7AC81]">{style.name}</div>
+                        <div className="text-xs text-[#D7AC81] mt-1">
                           {style.duration} • {style.maintenance} maintenance
                         </div>
                       </button>
@@ -686,8 +686,8 @@ z"/>
           {step === 4 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">Set the Vibe</h2>
-                <p className="text-gray-600">What's the occasion or aesthetic?</p>
+                <h2 className="text-3xl font-bold text-[#D7AC81] mb-2">Set the Vibe</h2>
+                <p className="text-[#D7AC81]">What's the occasion or aesthetic?</p>
               </div>
 
               <div className="space-y-3">
@@ -698,15 +698,15 @@ z"/>
                     onClick={() => setFormData(prev => ({ ...prev, vibe: vibe.id }))}
                     className={`w-full p-5 rounded-xl border-2 text-left transition-all ${
                       formData.vibe === vibe.id
-                        ? 'border-[#FCE1C7] bg-purple-50'
-                        : 'border-[#FCE1C7] hover:border-[#FCE1C7]'
+                        ? 'border-[#FED9B4] bg-purple-50'
+                        : 'border-[#FED9B4] hover:border-[#FED9B4]'
                     }`}
                   >
                     <div className="flex items-center gap-4">
                       <div className="text-3xl">{vibe.emoji}</div>
                       <div>
-                        <div className="font-semibold text-gray-800">{vibe.name}</div>
-                        <div className="text-sm text-gray-600 mt-1">{vibe.description}</div>
+                        <div className="font-semibold text-[#D7AC81]">{vibe.name}</div>
+                        <div className="text-sm text-[#D7AC81] mt-1">{vibe.description}</div>
                       </div>
                     </div>
                   </button>
