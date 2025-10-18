@@ -120,37 +120,43 @@ export default function RefinedHairProfileForm() {
       code: '4c',
       name: 'Type 4C',
       description: 'Tightly coiled, Z-pattern, 75%+ shrinkage',
-      visual: '🌀🌀🌀'
+      visual: '⚬⚬⚬',
+      isCoil: true
     },
     {
       code: '4b',
       name: 'Type 4B',
       description: 'Sharp Z-pattern coils, 70-75% shrinkage',
-      visual: '🌀🌀'
+      visual: '⚬⚬',
+      isCoil: true
     },
     {
       code: '4a',
       name: 'Type 4A',
       description: 'Defined S-curls, springy, 50-70% shrinkage',
-      visual: '🌀'
+      visual: '⚬',
+      isCoil: true
     },
     {
       code: '3c',
       name: 'Type 3C',
       description: 'Tight corkscrew curls, 30-50% shrinkage',
-      visual: '〰️〰️'
+      visual: '∼∼',
+      isCoil: false
     },
     {
       code: '3b',
       name: 'Type 3B',
       description: 'Loose corkscrew curls, bouncy ringlets',
-      visual: '〰️'
+      visual: '∼',
+      isCoil: false
     },
     {
       code: '3a',
       name: 'Type 3A',
       description: 'Loose spiral curls, defined wave pattern',
-      visual: '〰'
+      visual: '~',
+      isCoil: false
     }
   ];
 
@@ -451,7 +457,8 @@ z"/>
             </div>
             <Link 
               href="/how-it-works"
-              className="px-6 py-2 text-purple-600 hover:text-purple-700 font-semibold border-2 border-purple-600 hover:border-purple-700 rounded-lg transition-colors"
+              className="font-semibold hover:opacity-80 transition-opacity underline decoration-2 underline-offset-4"
+              style={{ color: '#c22a9f' }}
             >
               How It Works
             </Link>
@@ -547,7 +554,7 @@ z"/>
                           : 'border-[#FED9B4] hover:border-[#FED9B4]'
                       }`}
                     >
-                      <div className="text-2xl mb-1">{type.visual}</div>
+                      <div className="text-2xl mb-1 text-purple-600">{type.visual}</div>
                       <div className="font-semibold text-[#C87726]">{type.name}</div>
                       <div className="text-xs text-[#C87726] mt-1">{type.description}</div>
                     </button>
