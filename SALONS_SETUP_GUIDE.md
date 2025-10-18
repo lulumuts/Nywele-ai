@@ -5,6 +5,7 @@
 A complete salon directory integrated with your Braiding Nairobi app, showing how Nywele.ai can plug into existing salon ecosystems.
 
 **Features:**
+
 - 8 sample salons across Nairobi with real specialties and services
 - Smart recommendations based on user's hair type
 - Area-based filtering
@@ -23,6 +24,7 @@ A complete salon directory integrated with your Braiding Nairobi app, showing ho
 3. Click **RUN**
 
 This will:
+
 - ✅ Create the `salons` table with proper schema
 - ✅ Insert 8 sample salons in Nairobi
 - ✅ Add `product_name` and `salon_name` columns to `analytics_events`
@@ -32,6 +34,7 @@ This will:
 ### Step 2: Verify the Data
 
 In Supabase:
+
 1. Go to **Table Editor** → `salons`
 2. You should see 8 salons with data
 3. Check that `analytics_events` table has `salon_name` column
@@ -44,6 +47,7 @@ In Supabase:
 ```
 
 **Test Flow:**
+
 1. Fill out the form (make sure to note your hair type!)
 2. View results page
 3. Click "Find a Salon Near You" button
@@ -54,6 +58,7 @@ In Supabase:
 ### Step 4: Check Analytics
 
 Visit `http://localhost:3000/analytics` to see:
+
 - **Most Popular Salons** section with tracked data
 - **Suggested appointments** CTA
 
@@ -71,6 +76,7 @@ Visit `http://localhost:3000/analytics` to see:
 8. **Coils & Curls Collective** (Parklands) - Curly hair specialist
 
 Each salon has:
+
 - Specialties (hair types they work with)
 - Services offered
 - Location and contact info
@@ -82,11 +88,13 @@ Each salon has:
 ## 🎨 UI Features
 
 ### Results Page
+
 - Prominent salon CTA after products section
 - "Find Salons" link in header navigation
 - Shows user's hair type in the message
 
 ### Salons Page
+
 - Grid layout with beautiful salon cards
 - Area-based filtering (9 areas)
 - Smart recommendations (highlights salons matching user's hair type)
@@ -95,6 +103,7 @@ Each salon has:
 - Integration note: "Powered by Braiding Nairobi"
 
 ### Analytics Dashboard
+
 - "Most Popular Salons" section
 - "Appointment Scheduling" CTA
 - Salon view counts
@@ -104,11 +113,12 @@ Each salon has:
 ## 🔗 Integration Story for Judges
 
 **Key Points:**
+
 1. **Real-World Integration**: Shows how Nywele.ai plugs into existing Braiding Nairobi salon network
-2. **Two-Way Value**: 
+2. **Two-Way Value**:
    - Users get personalized recommendations + nearby salons
    - Salons get qualified referrals
-3. **Revenue Model**: 
+3. **Revenue Model**:
    - Salon referral fees
    - Booking commissions
    - Premium salon listings
@@ -116,6 +126,7 @@ Each salon has:
 5. **Analytics Value**: Track which salons are most popular, optimize recommendations
 
 **Demo Script Addition:**
+
 > "After getting their personalized routine, users can immediately find salons specializing in their hair type. We've integrated with our Braiding Nairobi salon network - these are real salons we work with. Notice how the system highlights salons that match the user's specific hair type. This creates a complete journey from recommendation to booking."
 
 ---
@@ -123,6 +134,7 @@ Each salon has:
 ## 📊 Analytics Tracking
 
 When users interact with salons, we track:
+
 - Salon name
 - Location/area
 - Services offered
@@ -130,6 +142,7 @@ When users interact with salons, we track:
 - Event type: "Call Now" or "View Details"
 
 This data appears in:
+
 - `/analytics` page - "Most Popular Salons" section
 - Can be used to optimize salon recommendations
 - Shows judges that you're thinking about the full product loop
@@ -139,6 +152,7 @@ This data appears in:
 ## 🚀 What's Next (Optional Enhancements)
 
 If you have extra time:
+
 1. **Booking Integration**: Link to actual booking flow from Braiding Nairobi app
 2. **Reviews**: Add user reviews from Braiding Nairobi database
 3. **Availability**: Show real-time salon availability
@@ -174,16 +188,19 @@ But for the hackathon, what you have is **complete and impressive** ✨
 ## 🐛 Troubleshooting
 
 **"No salons showing"**
+
 - Check that you ran the SQL script
 - Verify in Supabase Table Editor
 - Check browser console for errors
 
 **"Tracking not working"**
+
 - Check that `salon_name` column exists in `analytics_events`
 - Verify Supabase credentials in `.env.local`
 - Check browser console for Supabase errors
 
 **"Recommended badge not showing"**
+
 - Make sure you filled out the form with a specific hair type
 - Check that hair type is stored in sessionStorage
 - Try "Type 4C" which matches most sample salons
@@ -193,14 +210,15 @@ But for the hackathon, what you have is **complete and impressive** ✨
 ## 📁 Files Added/Modified
 
 **New Files:**
+
 - `CREATE_SALONS_TABLE.sql` - Database schema and seed data
 - `app/salons/page.tsx` - Salons browse page
 - `SALONS_SETUP_GUIDE.md` - This guide
 
 **Modified Files:**
+
 - `app/results/page.tsx` - Added salon CTA and header link
 - `lib/analytics.ts` - Already had `trackSalonView()` function
 - `app/analytics/page.tsx` - Already had salon analytics section
 
 All changes are committed and pushed to GitHub! 🎉
-

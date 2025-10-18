@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { trackProductClick } from '@/lib/analytics';
+import { trackProductClick, trackSalonView } from '@/lib/analytics';
+import { supabase } from '@/lib/supabase';
 
 interface Step {
   stepNumber: number;
@@ -28,6 +29,20 @@ interface Product {
   price?: number;
 }
 
+interface Salon {
+  id: string;
+  name: string;
+  location: string;
+  area: string;
+  phone: string;
+  specialties: string[];
+  services: string[];
+  description: string;
+  image_url: string;
+  price_range: string;
+  rating: number;
+}
+
 interface RecommendationData {
   routine: Routine;
   products: Product[];
@@ -39,6 +54,8 @@ export default function Results() {
   const [data, setData] = useState<RecommendationData | null>(null);
   const [styleImage, setStyleImage] = useState<string | null>(null);
   const [loadingImage, setLoadingImage] = useState(false);
+  const [salons, setSalons] = useState<Salon[]>([]);
+  const [loadingSalons, setLoadingSalons] = useState(true);
 
   useEffect(() => {
     const stored = sessionStorage.getItem('recommendation');
@@ -48,10 +65,52 @@ export default function Results() {
       
       // Generate style inspiration image
       generateStyleImage(recData);
+      
+      // Fetch relevant salons
+      fetchRelevantSalons();
     } else {
       router.push('/');
     }
   }, [router]);
+
+  const fetchRelevantSalons = async () => {
+    try {
+      const desiredStyle = sessionStorage.getItem('desiredStyle');
+      const hairType = sessionStorage.getItem('hairType');
+      
+      if (!supabase) {
+        console.log('Supabase not configured');
+        setLoadingSalons(false);
+        return;
+      }
+
+      // Fetch all salons
+      const { data: allSalons, error } = await supabase
+        .from('salons')
+        .select('*')
+        .order('rating', { ascending: false });
+
+      if (error) throw error;
+
+      // Filter salons by services matching desired style or specialties matching hair type
+      const relevantSalons = (allSalons || []).filter((salon: Salon) => {
+        const hasMatchingService = desiredStyle && salon.services.some((service: string) => 
+          service.toLowerCase().includes(desiredStyle.toLowerCase()) ||
+          desiredStyle.toLowerCase().includes(service.toLowerCase())
+        );
+        const hasMatchingSpecialty = hairType && salon.specialties.includes(hairType);
+        
+        return hasMatchingService || hasMatchingSpecialty;
+      });
+
+      // If no matches, show top 3 salons
+      setSalons(relevantSalons.length > 0 ? relevantSalons.slice(0, 3) : (allSalons || []).slice(0, 3));
+    } catch (error) {
+      console.error('Error fetching salons:', error);
+    } finally {
+      setLoadingSalons(false);
+    }
+  };
 
   const generateStyleImage = async (recData: RecommendationData) => {
     setLoadingImage(true);
@@ -112,12 +171,6 @@ export default function Results() {
             <p className="text-gray-600 mt-1">Your Personalized Hair Care Plan</p>
           </div>
           <div className="flex gap-3">
-            <Link 
-              href="/salons"
-              className="px-6 py-2 text-purple-600 hover:text-purple-700 font-semibold border-2 border-purple-600 hover:border-purple-700 rounded-lg transition-colors"
-            >
-              Find Salons
-            </Link>
             <Link 
               href="/how-it-works"
               className="px-6 py-2 text-purple-600 hover:text-purple-700 font-semibold border-2 border-purple-600 hover:border-purple-700 rounded-lg transition-colors"
@@ -293,25 +346,104 @@ export default function Results() {
           </div>
         </div>
 
-        {/* Salon Recommendation */}
-        <div className="mt-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-8 text-white shadow-2xl">
-          <div className="text-center">
-            <div className="text-5xl mb-4">💈</div>
-            <h2 className="text-3xl font-bold mb-3">Ready to Book Your Style?</h2>
-            <p className="text-lg opacity-95 mb-6">
-              Find trusted salons in Nairobi specializing in {sessionStorage.getItem('hairType') || 'your hair type'}
-            </p>
-            <button
-              onClick={() => router.push('/salons')}
-              className="px-8 py-4 bg-white text-purple-600 rounded-xl font-bold text-lg hover:shadow-2xl transition-all inline-flex items-center gap-2"
-            >
-              Find a Salon Near You
-              <span>→</span>
-            </button>
-            <p className="text-sm opacity-75 mt-4">
-              ✨ Powered by Braiding Nairobi salon network
+        {/* Salons Who Can Do It */}
+        <div className="mt-12 bg-white rounded-3xl shadow-2xl p-8">
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Salons Who Can Do This Style</h2>
+            <p className="text-gray-600">
+              Trusted specialists in Nairobi for {sessionStorage.getItem('desiredStyle') || 'your desired style'}
+              {' '}• Powered by Braiding Nairobi
             </p>
           </div>
+
+          {loadingSalons ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Finding salons near you...</p>
+            </div>
+          ) : salons.length > 0 ? (
+            <div className="grid md:grid-cols-3 gap-6">
+              {salons.map((salon) => (
+                <div 
+                  key={salon.id}
+                  className="border-2 border-gray-100 rounded-2xl overflow-hidden hover:border-purple-300 hover:shadow-lg transition-all"
+                >
+                  {/* Salon Image */}
+                  <div className="relative h-48 overflow-hidden">
+                    <img 
+                      src={salon.image_url} 
+                      alt={salon.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute bottom-3 left-3 flex items-center gap-2">
+                      <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold text-gray-900">
+                        ⭐ {salon.rating.toFixed(1)}
+                      </span>
+                      <span className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold text-gray-900">
+                        {salon.price_range}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Salon Info */}
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">{salon.name}</h3>
+                    <div className="flex items-center text-gray-600 text-sm mb-3">
+                      <span className="mr-1">📍</span>
+                      <span>{salon.area}</span>
+                    </div>
+
+                    <p className="text-gray-700 text-sm mb-4 line-clamp-2">
+                      {salon.description}
+                    </p>
+
+                    {/* Services */}
+                    <div className="mb-4">
+                      <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Services</p>
+                      <div className="flex flex-wrap gap-2">
+                        {salon.services.slice(0, 3).map((service, idx) => (
+                          <span key={idx} className="px-2 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-medium">
+                            {service}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* CTA Button */}
+                    <a
+                      href={`tel:${salon.phone}`}
+                      onClick={() => {
+                        trackSalonView({
+                          salonName: salon.name,
+                          location: salon.area,
+                          services: salon.services,
+                          hairType: sessionStorage.getItem('hairType') || undefined,
+                        });
+                      }}
+                      className="block w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold text-center hover:shadow-lg transition-all"
+                    >
+                      📞 Call to Book
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-xl">
+              <div className="text-5xl mb-4">💈</div>
+              <p className="text-gray-600">
+                Salon recommendations will appear here after you complete the form
+              </p>
+            </div>
+          )}
+
+          {salons.length > 0 && (
+            <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-purple-100">
+              <p className="text-center text-purple-900 font-semibold">
+                ✨ These salons specialize in {sessionStorage.getItem('desiredStyle') || 'your style'} and {sessionStorage.getItem('hairType') || 'your hair type'}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* CTA */}
