@@ -1,3 +1,4 @@
+# Nywele.ai - AI-Powered Hair Care for African Hair
 # Nywele.ai
 
 AI-powered hair care recommendations for African hair types, featuring multi-AI architecture with GPT-4o and Gemini Nano Banana.
