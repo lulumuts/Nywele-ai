@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 // Custom coil SVG component
 const CoilSVG = () => (
-  <svg version="1.1" viewBox="0 0 848 1008" className="w-24 h-28 mx-auto mb-6">
+  <svg version="1.1" viewBox="0 0 848 1008" className="w-24 h-28 mx-auto mb-2">
     <defs>
       <linearGradient id="coilGradient" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#9333ea" />
