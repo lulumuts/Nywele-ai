@@ -352,8 +352,8 @@ export default function RefinedHairProfileForm() {
 
   return (
     <div className="min-h-screen">
-      {/* Header - Only show when not on landing */}
-      {!showLanding && (
+      {/* Header - Only show when not on landing and not loading */}
+      {!showLanding && !loading && (
         <header className="backdrop-blur-md border-b border-white/10">
           <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
             <div className="flex items-center gap-3">
@@ -459,7 +459,7 @@ z"/>
         </header>
       )}
 
-      <div className={showLanding ? "flex items-center justify-center min-h-screen px-4" : "max-w-3xl mx-auto py-12 px-4"}>
+      <div className={showLanding || loading ? "flex items-center justify-center min-h-screen px-4" : "max-w-3xl mx-auto py-12 px-4"}>
         {showLanding ? (
           /* Landing Screen */
           <div className="p-12 text-center animate-fade-in max-w-2xl w-full">
@@ -495,6 +495,15 @@ z"/>
                 How It Works
               </Link>
             </div>
+          </div>
+        ) : loading ? (
+          /* Generating Screen */
+          <div className="text-center animate-fade-in">
+            <CoilSVG />
+            
+            <h2 className="text-4xl font-normal mt-8" style={{ color: '#c22a9f' }}>
+              Coming up with your routine
+            </h2>
           </div>
         ) : (
           <>
