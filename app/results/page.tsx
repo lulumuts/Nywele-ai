@@ -276,7 +276,7 @@ z"/>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Stylist Tip */}
         <div className="mb-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-8 text-white shadow-2xl">
           <div className="flex items-start gap-4">
@@ -288,8 +288,77 @@ z"/>
           </div>
         </div>
 
-        {/* Routine */}
-        <div className="mb-8 bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[80vh] overflow-y-auto">
+        {/* Two Column Layout: Image (Left) + Routine (Right) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Style Inspiration Section - AI-Generated (LEFT COLUMN) */}
+          {loadingImage && (
+            <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">Style Inspiration</h2>
+              <div className="animate-pulse">
+                <div className="h-96 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl"></div>
+                <p className="text-center mt-4 text-gray-500">✨ Generating your style inspiration...</p>
+              </div>
+            </div>
+          )}
+
+          {styleImage && !loadingImage && (
+            <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-3xl font-bold text-gray-800">Style Inspiration</h2>
+                <div className="px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full">
+                  <span className="text-sm font-semibold text-purple-700">✨ AI-Powered by Gemini</span>
+                </div>
+              </div>
+              <div className="relative">
+                <img 
+                  src={styleImage} 
+                  alt="Hairstyle inspiration" 
+                  className="w-full h-96 object-cover rounded-2xl shadow-lg"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 rounded-b-2xl">
+                  <p className="text-white text-lg font-semibold">
+                    Perfect for {sessionStorage.getItem('hairType')} hair
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 p-4 bg-purple-50 rounded-xl">
+                <p className="text-gray-700 text-center">
+                  <span className="font-semibold">Style:</span> {sessionStorage.getItem('currentStyle') || 'Natural'}
+                </p>
+              </div>
+              
+              {/* AI Prompt Details - Shows advanced prompt engineering to judges */}
+              <details className="mt-6">
+                <summary className="cursor-pointer text-purple-600 font-semibold hover:text-purple-700 flex items-center justify-center gap-2">
+                  🤖 View AI Prompt Engineering Details
+                </summary>
+                <div className="mt-4 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200">
+                  <h4 className="font-bold text-gray-800 mb-3">Advanced Prompt Engineering:</h4>
+                  <p className="text-sm text-gray-700 leading-relaxed mb-4">
+                    This image was generated using a highly-detailed, bias-countering prompt specifically designed for authentic African hair representation. Our system uses explicit ethnicity markers and detailed texture descriptions to counter AI biases and ensure culturally accurate results.
+                  </p>
+                  <div className="bg-white p-4 rounded-lg border border-purple-200">
+                    <p className="text-xs font-mono text-gray-600">
+                      {sessionStorage.getItem('aiPrompt') || 'Detailed prompt used for AI generation'}
+                    </p>
+                  </div>
+                  <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                    <div className="bg-white p-3 rounded-lg">
+                      <div className="font-semibold text-purple-700">Hair Type</div>
+                      <div className="text-gray-600">{sessionStorage.getItem('hairType')}</div>
+                    </div>
+                    <div className="bg-white p-3 rounded-lg">
+                      <div className="font-semibold text-purple-700">Vibe</div>
+                      <div className="text-gray-600">{sessionStorage.getItem('vibe')}</div>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          )}
+
+          {/* Routine Section (RIGHT COLUMN) */}
+          <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-3xl font-bold text-gray-800">Your Hair Care Routine</h2>
             <div className="text-right">
@@ -320,78 +389,9 @@ z"/>
               </div>
             ))}
           </div>
+          </div>
         </div>
-
-        {/* Style Inspiration Section - AI-Generated */}
-        {loadingImage && (
-          <div className="mb-8 bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">Style Inspiration</h2>
-            <div className="animate-pulse">
-              <div className="h-96 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl"></div>
-              <p className="text-center mt-4 text-gray-500">✨ Generating your style inspiration...</p>
-            </div>
-          </div>
-        )}
-
-        {styleImage && !loadingImage && (
-          <div className="mb-8 bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-bold text-gray-800">Style Inspiration</h2>
-              <div className="px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full">
-                <span className="text-sm font-semibold text-purple-700">✨ AI-Powered by Gemini</span>
-              </div>
-            </div>
-            <div className="relative">
-              <img 
-                src={styleImage} 
-                alt="Hairstyle inspiration" 
-                className="w-full h-96 object-cover rounded-2xl shadow-lg"
-              />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 rounded-b-2xl">
-                <p className="text-white text-lg font-semibold">
-                  Perfect for {sessionStorage.getItem('hairType')} hair
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 p-4 bg-purple-50 rounded-xl">
-              <p className="text-gray-700 text-center">
-                <span className="font-semibold">Style:</span> {sessionStorage.getItem('currentStyle') || 'Natural'}
-              </p>
-            </div>
-            
-            {/* AI Prompt Details - Shows advanced prompt engineering to judges */}
-            <details className="mt-6">
-              <summary className="cursor-pointer text-purple-600 font-semibold hover:text-purple-700 flex items-center justify-center gap-2">
-                🤖 View AI Prompt Engineering Details
-              </summary>
-              <div className="mt-4 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200">
-                <h4 className="font-bold text-gray-800 mb-3">Advanced Prompt Engineering:</h4>
-                <p className="text-sm text-gray-700 leading-relaxed mb-4">
-                  This image was generated using a highly-detailed, bias-countering prompt specifically designed for authentic African hair representation. Our system uses explicit ethnicity markers and detailed texture descriptions to counter AI biases and ensure culturally accurate results.
-                </p>
-                <div className="bg-white p-4 rounded-lg border border-purple-200">
-                  <p className="text-xs font-mono text-gray-600">
-                    {sessionStorage.getItem('aiPrompt') || 'Detailed prompt used for AI generation'}
-                  </p>
-                </div>
-                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                  <div className="bg-white p-3 rounded-lg">
-                    <span className="font-semibold text-purple-700">Hair Type:</span> {sessionStorage.getItem('hairType')}
-                  </div>
-                  <div className="bg-white p-3 rounded-lg">
-                    <span className="font-semibold text-purple-700">Length:</span> {sessionStorage.getItem('length')}
-                  </div>
-                  <div className="bg-white p-3 rounded-lg">
-                    <span className="font-semibold text-purple-700">Representation:</span> {sessionStorage.getItem('ethnicity')}
-                  </div>
-                  <div className="bg-white p-3 rounded-lg">
-                    <span className="font-semibold text-purple-700">Style:</span> {sessionStorage.getItem('vibe')}
-                  </div>
-                </div>
-              </div>
-            </details>
-          </div>
-        )}
+        {/* End Two Column Layout */}
 
         {/* Products */}
         <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[80vh] overflow-y-auto">
