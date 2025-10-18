@@ -36,9 +36,9 @@ const NATURAL_STYLES = [
 // Map ethnicity to detailed subject description with hairstyle focus
 function mapEthnicityToPrompt(ethnicity: string): string {
   const map: Record<string, string> = {
-    'Black Woman': 'back view of a Black woman with dark, glowing skin showcasing',
-    'Black Man': 'back view of a Black man with dark skin showcasing',
-    'Person of African Descent': 'back view of a person of African descent showcasing'
+    'Black Woman': 'back view of a Black African woman with rich dark brown skin tone and melanin-rich complexion showcasing',
+    'Black Man': 'back view of a Black African man with rich dark brown skin tone and melanin-rich complexion showcasing',
+    'Person of African Descent': 'back view of a person of African descent with dark brown skin tone showcasing'
   };
   return map[ethnicity] || map['Black Woman'];
 }
@@ -133,11 +133,11 @@ export function generateImagePrompt(inputs: PromptInputs): string {
   
   if (isProtective) {
     // For protective styles: focus on the style itself, not natural texture
-    prompt = `${subject} ${style}. The hairstyle is ${length} with clear definition and authentic styling. Shot from back/3-4 view angle focusing on the hairstyle detail. ${setting}. The hairstyle must be clearly visible and authentic to African hair styling. High detail, photorealistic, professional hair photography with minimal face visibility.`;
+    prompt = `${subject} ${style}. The hairstyle is ${length} with clear definition and authentic styling. Shot from back/3-4 view angle focusing on the hairstyle detail. ${setting}. IMPORTANT: The person must be Black African/African American with dark brown skin tone, NOT white or light-skinned. The hairstyle must be clearly visible and authentic to African hair styling. High detail, photorealistic, professional hair photography with minimal face visibility. Dark skin tone is essential.`;
   } else {
     // For natural styles: include hair texture
     const texture = mapTextureToPrompt(inputs.hairType);
-    prompt = `${subject} ${style}. The hair is ${length} with ${texture} showing natural texture and definition. Shot from back/3-4 view angle focusing on the hair detail. ${setting}. The hair texture must be clearly visible and authentic to African hair types. High detail, photorealistic, professional hair photography with minimal face visibility.`;
+    prompt = `${subject} ${style}. The hair is ${length} with ${texture} showing natural texture and definition. Shot from back/3-4 view angle focusing on the hair detail. ${setting}. IMPORTANT: The person must be Black African/African American with dark brown skin tone, NOT white or light-skinned. The hair texture must be clearly visible and authentic to African hair types. High detail, photorealistic, professional hair photography with minimal face visibility. Dark skin tone is essential.`;
   }
 
   return prompt;

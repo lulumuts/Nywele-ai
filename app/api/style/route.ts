@@ -37,12 +37,23 @@ export async function POST(request: NextRequest) {
       try {
         console.log('🚀 Calling Gemini 2.5 Flash Image (Nano Banana) API...');
         
-        // Use Gemini's native image generation model
+        // Use Gemini's native image generation model with explicit configuration
         const model = genAI.getGenerativeModel({ 
           model: 'gemini-2.5-flash-image',
           generationConfig: {
-            responseModalities: ['IMAGE']
-          } as any // Type assertion for Gemini image generation config
+            responseModalities: ['IMAGE'],
+            temperature: 0.4, // Lower temperature for more faithful prompt following
+          } as any, // Type assertion for Gemini image generation config
+          safetySettings: [
+            {
+              category: 'HARM_CATEGORY_HATE_SPEECH',
+              threshold: 'BLOCK_NONE'
+            },
+            {
+              category: 'HARM_CATEGORY_DANGEROUS_CONTENT', 
+              threshold: 'BLOCK_NONE'
+            }
+          ] as any
         });
         
         const result = await model.generateContent([detailedPrompt]);
