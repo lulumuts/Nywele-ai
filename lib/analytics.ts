@@ -1,5 +1,20 @@
 import { supabase } from './supabase';
 
+// Type for analytics events from Supabase
+interface AnalyticsEvent {
+  id: string;
+  event_type: string;
+  hair_type?: string;
+  porosity?: string;
+  concerns?: string[];
+  style?: string;
+  success?: boolean;
+  product_name?: string;
+  salon_name?: string;
+  metadata?: any;
+  created_at: string;
+}
+
 // Helper function to safely track recommendation events
 export async function trackRecommendation(data: {
   hairType: string;
@@ -169,11 +184,11 @@ export async function getAnalyticsStats() {
       return null;
     }
 
-    const recommendations = events?.filter(e => e.event_type === 'recommendation') || [];
-    const styleGenerations = events?.filter(e => e.event_type === 'style_generation') || [];
-    const productClicks = events?.filter(e => e.event_type === 'product_click') || [];
-    const salonViews = events?.filter(e => e.event_type === 'salon_view') || [];
-    const successfulAI = styleGenerations.filter(e => e.success === true);
+    const recommendations = events?.filter((e: AnalyticsEvent) => e.event_type === 'recommendation') || [];
+    const styleGenerations = events?.filter((e: AnalyticsEvent) => e.event_type === 'style_generation') || [];
+    const productClicks = events?.filter((e: AnalyticsEvent) => e.event_type === 'product_click') || [];
+    const salonViews = events?.filter((e: AnalyticsEvent) => e.event_type === 'salon_view') || [];
+    const successfulAI = styleGenerations.filter((e: AnalyticsEvent) => e.success === true);
 
     return {
       totalRecommendations: recommendations.length,
