@@ -370,9 +370,9 @@ z"/>
 
           <div className="space-y-6">
             {data.routine.steps.map((step, index) => (
-              <div key={index} className="flex gap-6 p-6 border-2 border-[#E9A96A] rounded-2xl">
+              <div key={index} className="flex gap-6 p-6 border-2 border-[#E9A96A] rounded-2xl bg-transparent">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-[#E9A96A] rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  <div className="w-12 h-12 border-2 border-[#E9A96A] rounded-full flex items-center justify-center text-[#E9A96A] font-bold text-xl bg-transparent">
                     {step.stepNumber}
                   </div>
                 </div>
