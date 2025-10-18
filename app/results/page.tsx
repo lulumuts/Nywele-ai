@@ -293,7 +293,7 @@ z"/>
           {/* Style Inspiration Section - AI-Generated (LEFT COLUMN) */}
           {loadingImage && (
             <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">Style Inspiration</h2>
+              <h2 className="text-3xl font-bold text-[#E9A96A] mb-6">Style Inspiration</h2>
               <div className="animate-pulse">
                 <div className="h-96 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl"></div>
                 <p className="text-center mt-4 text-gray-500">✨ Generating your style inspiration...</p>
@@ -304,7 +304,7 @@ z"/>
           {styleImage && !loadingImage && (
             <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-3xl font-bold text-gray-800">Style Inspiration</h2>
+                <h2 className="text-3xl font-bold text-[#E9A96A]">Style Inspiration</h2>
                 <div className="px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full">
                   <span className="text-sm font-semibold text-purple-700">✨ AI-Powered by Gemini</span>
                 </div>
@@ -313,7 +313,7 @@ z"/>
                 <img 
                   src={styleImage} 
                   alt="Hairstyle inspiration" 
-                  className="w-full h-[500px] object-cover rounded-2xl shadow-lg"
+                  className="w-full h-[700px] object-cover rounded-2xl shadow-lg"
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 rounded-b-2xl">
                   <p className="text-white text-lg font-semibold">
@@ -333,7 +333,7 @@ z"/>
                   🤖 View AI Prompt Engineering Details
                 </summary>
                 <div className="mt-4 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200">
-                  <h4 className="font-bold text-gray-800 mb-3">Advanced Prompt Engineering:</h4>
+                  <h4 className="font-bold text-[#E9A96A] mb-3">Advanced Prompt Engineering:</h4>
                   <p className="text-sm text-gray-700 leading-relaxed mb-4">
                     This image was generated using a highly-detailed, bias-countering prompt specifically designed for authentic African hair representation. Our system uses explicit ethnicity markers and detailed texture descriptions to counter AI biases and ensure culturally accurate results.
                   </p>
@@ -360,7 +360,7 @@ z"/>
           {/* Routine Section (RIGHT COLUMN) */}
           <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold text-gray-800">Your Hair Care Routine</h2>
+            <h2 className="text-3xl font-bold text-[#E9A96A]">Your Hair Care Routine</h2>
             <div className="text-right">
               <div className="text-sm text-gray-500">Total Time</div>
               <div className="text-2xl font-bold text-purple-600">{data.routine.totalTime}</div>
@@ -370,15 +370,15 @@ z"/>
 
           <div className="space-y-6">
             {data.routine.steps.map((step, index) => (
-              <div key={index} className="flex gap-6 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
+              <div key={index} className="flex gap-6 p-6 border-2 border-[#E9A96A] rounded-2xl">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  <div className="w-12 h-12 bg-[#E9A96A] rounded-full flex items-center justify-center text-white font-bold text-xl">
                     {step.stepNumber}
                   </div>
                 </div>
                 <div className="flex-grow">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">{step.action}</h3>
-                  <p className="text-gray-700 mb-2">{step.instructions}</p>
+                  <h3 className="text-xl font-bold text-[#E9A96A] mb-2">{step.action}</h3>
+                  <p className="text-[#E9A96A] mb-2">{step.instructions}</p>
                   <div className="flex items-center gap-4 text-sm">
                     <span className="text-purple-600 font-semibold">⏱️ {step.duration}</span>
                     {step.productName && (
@@ -395,7 +395,7 @@ z"/>
 
         {/* Products */}
         <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[80vh] overflow-y-auto">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">Recommended Products</h2>
+          <h2 className="text-3xl font-bold text-[#E9A96A] mb-6">Recommended Products</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {data.products.map((product, index) => (
               <div key={index} className="border-2 border-gray-100 rounded-2xl p-6 hover:border-purple-300 hover:shadow-lg transition-all">
@@ -407,11 +407,11 @@ z"/>
                   />
                 )}
                 <div className="text-sm text-purple-600 font-semibold mb-1">{product.brand}</div>
-                <h3 className="text-lg font-bold text-gray-800 mb-2">{product.name}</h3>
-                <p className="text-gray-600 text-sm mb-4">{product.reason}</p>
+                <h3 className="text-lg font-bold text-[#E9A96A] mb-2">{product.name}</h3>
+                <p className="text-[#E9A96A] text-sm mb-4">{product.reason}</p>
                 <div className="flex items-center justify-between">
                   {product.price && (
-                    <span className="text-2xl font-bold text-gray-800">${product.price}</span>
+                    <span className="text-2xl font-bold text-[#E9A96A]">${product.price}</span>
                   )}
                   <a
                     href={product.affiliateLink || '#'}
@@ -437,7 +437,7 @@ z"/>
 
         {/* Salons Who Can Do It */}
         <div className="mt-12 bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[80vh] overflow-y-auto">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6">Salons Who Can Do This Style</h2>
+          <h2 className="text-3xl font-bold text-[#E9A96A] mb-6">Salons Who Can Do This Style</h2>
 
           {loadingSalons ? (
             <div className="text-center py-12">
@@ -453,8 +453,8 @@ z"/>
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="text-xl font-bold text-gray-800">{salon.name}</h3>
-                      <div className="flex items-center text-gray-600 text-sm mt-1">
+                      <h3 className="text-xl font-bold text-[#E9A96A]">{salon.name}</h3>
+                      <div className="flex items-center text-[#E9A96A] text-sm mt-1">
                         <span className="mr-1">📍</span>
                         <span>{salon.area}</span>
                       </div>
@@ -463,13 +463,13 @@ z"/>
                       <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-bold">
                         ⭐ {salon.rating.toFixed(1)}
                       </span>
-                      <span className="text-gray-600 font-semibold text-sm">
+                      <span className="text-[#E9A96A] font-semibold text-sm">
                         {salon.price_range}
                       </span>
                     </div>
                   </div>
 
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                  <p className="text-[#E9A96A] text-sm mb-4 line-clamp-2">
                     {salon.description}
                   </p>
 
