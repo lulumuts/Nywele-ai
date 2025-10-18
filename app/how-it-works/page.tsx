@@ -96,7 +96,7 @@ export default function HowItWorks() {
           <h1 className="text-5xl font-bold text-[#C87726] mb-4">
             How Nywele.ai Works
           </h1>
-          <p className="text-xl text-[#E9A96A] max-w-2xl mx-auto">
+          <p className="text-xl text-[#C87726] max-w-2xl mx-auto">
             A sophisticated multi-AI system built specifically for African hair care, 
             combining GPT-4o and Gemini Nano Banana.
           </p>
@@ -146,8 +146,8 @@ export default function HowItWorks() {
                   <p className="text-sm text-[#E9A96A]">{item.description}</p>
                 </div>
                 {idx < 3 && (
-                  <div className="hidden md:block absolute top-1/2 -right-3 z-10">
-                    <ArrowRight className="w-6 h-6 text-purple-300" />
+                  <div className="hidden md:block absolute top-1/2 right-0 transform translate-x-1/2 z-10">
+                    <ArrowRight className="w-6 h-6 text-purple-600" />
                   </div>
                 )}
               </div>
@@ -157,7 +157,7 @@ export default function HowItWorks() {
 
         {/* Why This Matters Section */}
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-12 text-white mb-20">
-          <h2 className="text-3xl font-bold mb-8 text-center">Why Traditional AI Fails Black Hair</h2>
+          <h2 className="text-3xl font-bold mb-8 text-center">Why Traditional AI Fails African Hair</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {challenges.map((item, idx) => (
               <div key={idx} className="bg-white/10 backdrop-blur rounded-xl p-6">
@@ -225,15 +225,15 @@ export default function HowItWorks() {
           <h2 className="text-3xl font-bold mb-12 text-[#C87726]">Built for Real Impact</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 border-[#E9A96A] shadow-lg p-8">
-              <div className="text-4xl font-bold text-purple-600 mb-2">2 AI Models</div>
+              <div className="text-4xl font-bold text-[#C87726] mb-2">2 AI Models</div>
               <p className="text-[#E9A96A]">Working together for accuracy</p>
             </div>
             <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 border-[#E9A96A] shadow-lg p-8">
-              <div className="text-4xl font-bold text-purple-600 mb-2">Type 1a-4c</div>
+              <div className="text-4xl font-bold text-[#C87726] mb-2">Type 1a-4c</div>
               <p className="text-[#E9A96A]">All hair textures supported</p>
             </div>
             <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 border-[#E9A96A] shadow-lg p-8">
-              <div className="text-4xl font-bold text-purple-600 mb-2">150+ Lines</div>
+              <div className="text-4xl font-bold text-[#C87726] mb-2">150+ Lines</div>
               <p className="text-[#E9A96A]">Of prompt engineering logic</p>
             </div>
           </div>

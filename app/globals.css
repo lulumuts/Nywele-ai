@@ -202,17 +202,36 @@ body {
 }
 
 @keyframes fade-in {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(20px);
   }
-  to {
+  100% {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 .animate-fade-in {
-  animation: fade-in 0.6s ease-out;
+  animation: fade-in 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* SVG Stroke Animation for Loader */
+.animated-path {
+  fill: none;
+  stroke: url(#loaderGradient);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  animation: drawUndraw 4s ease-in-out infinite;
+}
+
+@keyframes drawUndraw {
+  0%, 100% {
+    stroke-dashoffset: 300;
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
 }
 
