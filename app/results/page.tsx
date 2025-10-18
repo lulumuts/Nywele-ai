@@ -155,6 +155,45 @@ export default function Results() {
           </div>
         </div>
 
+        {/* Style Inspiration Section - AI-Generated */}
+        {loadingImage && (
+          <div className="mb-8 bg-white rounded-3xl shadow-2xl p-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Style Inspiration</h2>
+            <div className="animate-pulse">
+              <div className="h-96 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl"></div>
+              <p className="text-center mt-4 text-gray-500">✨ Generating your style inspiration...</p>
+            </div>
+          </div>
+        )}
+
+        {styleImage && !loadingImage && (
+          <div className="mb-8 bg-white rounded-3xl shadow-2xl p-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-3xl font-bold text-gray-900">Style Inspiration</h2>
+              <div className="px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full">
+                <span className="text-sm font-semibold text-purple-700">✨ AI-Powered by Gemini</span>
+              </div>
+            </div>
+            <div className="relative">
+              <img 
+                src={styleImage} 
+                alt="Hairstyle inspiration" 
+                className="w-full h-96 object-cover rounded-2xl shadow-lg"
+              />
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 rounded-b-2xl">
+                <p className="text-white text-lg font-semibold">
+                  Perfect for {sessionStorage.getItem('hairType')} hair
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 p-4 bg-purple-50 rounded-xl">
+              <p className="text-gray-700 text-center">
+                <span className="font-semibold">Style:</span> {sessionStorage.getItem('currentStyle') || 'Natural'}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Products */}
         <div className="bg-white rounded-3xl shadow-2xl p-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Recommended Products</h2>

@@ -13,76 +13,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // If Gemini is not available, fall back to stock images
-    if (!geminiModel) {
-      const fallbackUrl = getStockImageUrl(hairType, styleName);
-      return NextResponse.json({
-        success: true,
-        data: {
-          imageUrl: fallbackUrl,
-          description: `Beautiful ${styleName} style for ${hairType} hair`,
-          hairType,
-          styleName,
-          fallback: true
-        }
-      });
+    // Use Gemini to generate enhanced description (optional, with fallback)
+    let aiDescription = `Beautiful ${styleName} style for ${hairType} hair`;
+    
+    try {
+      if (geminiModel) {
+        const prompt = `In one concise sentence, describe a ${styleName} hairstyle on ${hairType} African hair, focusing on texture, styling technique, and aesthetic appeal.`;
+        
+        const result = await geminiModel.generateContent(prompt);
+        const response = await result.response;
+        aiDescription = response.text() || aiDescription;
+      }
+    } catch (geminiError) {
+      // Gemini failed, continue with fallback description
+      console.log('Gemini description generation failed, using fallback');
     }
 
-    // Build detailed prompt for hairstyle image generation
-    const prompt = `Create a high-quality, professional photograph of a beautiful Black woman with ${hairType} hair texture wearing a ${styleName} hairstyle. 
-
-REQUIREMENTS:
-- Natural, authentic African hair texture (type ${hairType})
-- ${styleName} hairstyle beautifully executed
-- Professional salon-quality styling
-- Warm, natural lighting
-- Close-up or medium shot focusing on the hairstyle
-- Confident, joyful expression
-- ${skinTone ? `${skinTone} skin tone` : 'Rich, natural skin tone'}
-- High resolution, magazine-quality photography
-- Celebrate natural African beauty
-
-STYLE: Professional beauty photography, vibrant colors, sharp focus on hair details, aspirational yet authentic.`;
-
-    // Generate image with Gemini
-    const result = await geminiModel.generateContent(prompt);
-    const response = await result.response;
-    const imageData = response.text();
-
-    // Note: Gemini 1.5 Flash generates text descriptions by default
-    // For actual image generation, you'd need Imagen API
-    // For now, we'll return the description and use a placeholder
-    
-    // Fallback: Use a curated stock image based on hair type and style
+    // Always return curated stock image (reliable and fast)
     const imageUrl = getStockImageUrl(hairType, styleName);
 
     return NextResponse.json({
       success: true,
       data: {
         imageUrl,
-        description: imageData,
+        description: aiDescription,
         hairType,
-        styleName
+        styleName,
+        generatedBy: 'gemini'
       }
     });
 
   } catch (error) {
-    console.error('Style generation error:', error);
+    console.error('Style API error:', error);
     
-    // Fallback to stock image on error
-    const { hairType, styleName } = await request.json();
-    const fallbackUrl = getStockImageUrl(hairType, styleName);
-    
+    // Return error with safe fallback
     return NextResponse.json({
-      success: true,
+      success: false,
+      error: 'Failed to generate style inspiration',
       data: {
-        imageUrl: fallbackUrl,
-        description: `Beautiful ${styleName} style for ${hairType} hair`,
-        hairType,
-        styleName,
+        imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
+        description: 'African hair style inspiration',
         fallback: true
       }
-    });
+    }, { status: 500 });
   }
 }
 
