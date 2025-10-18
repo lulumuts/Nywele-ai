@@ -19,7 +19,7 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading analytics...</p>
@@ -30,10 +30,10 @@ export default function AnalyticsPage() {
 
   if (!stats) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-8">
+      <div className="min-h-screen p-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Analytics Not Available</h2>
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-xl p-8 text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Analytics Not Available</h2>
             <p className="text-gray-600 mb-6">
               Please set up the Supabase analytics table first.
             </p>
@@ -50,7 +50,7 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+    <div className="min-h-screen">
       {/* Header */}
       <header className="backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
@@ -73,44 +73,44 @@ export default function AnalyticsPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {/* Total Recommendations */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-purple-500">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-6 border-l-4 border-purple-500">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium">Recommendations</p>
-                <p className="text-4xl font-bold text-gray-900 mt-2">{stats.totalRecommendations}</p>
+                <p className="text-4xl font-bold text-gray-800 mt-2">{stats.totalRecommendations}</p>
               </div>
               <div className="text-5xl">📊</div>
             </div>
           </div>
 
           {/* Style Generations */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-pink-500">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-6 border-l-4 border-pink-500">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium">Style Generations</p>
-                <p className="text-4xl font-bold text-gray-900 mt-2">{stats.totalStyleGenerations}</p>
+                <p className="text-4xl font-bold text-gray-800 mt-2">{stats.totalStyleGenerations}</p>
               </div>
               <div className="text-5xl">🎨</div>
             </div>
           </div>
 
           {/* Product Clicks */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-6 border-l-4 border-green-500">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium">Product Clicks</p>
-                <p className="text-4xl font-bold text-gray-900 mt-2">{stats.totalProductClicks}</p>
+                <p className="text-4xl font-bold text-gray-800 mt-2">{stats.totalProductClicks}</p>
               </div>
               <div className="text-5xl">🛍️</div>
             </div>
           </div>
 
           {/* AI Success Rate */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-500">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-6 border-l-4 border-blue-500">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm font-medium">AI Success Rate</p>
-                <p className="text-4xl font-bold text-gray-900 mt-2">{stats.aiSuccessRate}%</p>
+                <p className="text-4xl font-bold text-gray-800 mt-2">{stats.aiSuccessRate}%</p>
                 <p className="text-xs text-gray-500 mt-1">Gemini vs Fallback</p>
               </div>
               <div className="text-5xl">✅</div>
@@ -120,8 +120,8 @@ export default function AnalyticsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           {/* Popular Hair Types */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-6 max-h-[70vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
               <span className="mr-2">🌀</span>
               Most Popular Hair Types
             </h3>
@@ -130,7 +130,7 @@ export default function AnalyticsPage() {
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex items-center">
                     <span className="text-2xl font-bold text-purple-600 mr-3">#{index + 1}</span>
-                    <span className="font-semibold text-gray-900">{item.name}</span>
+                    <span className="font-semibold text-gray-800">{item.name}</span>
                   </div>
                   <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
                     {item.count} uses
@@ -144,8 +144,8 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Popular Styles */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-6 max-h-[70vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
               <span className="mr-2">💇</span>
               Most Popular Styles
             </h3>
@@ -154,7 +154,7 @@ export default function AnalyticsPage() {
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex items-center">
                     <span className="text-2xl font-bold text-pink-600 mr-3">#{index + 1}</span>
-                    <span className="font-semibold text-gray-900">{item.name}</span>
+                    <span className="font-semibold text-gray-800">{item.name}</span>
                   </div>
                   <span className="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-sm font-medium">
                     {item.count} times
@@ -171,8 +171,8 @@ export default function AnalyticsPage() {
         {/* Products & Salons Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           {/* Most Popular Products */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-6 max-h-[70vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
               <span className="mr-2">🛍️</span>
               Most Popular Products
             </h3>
@@ -182,7 +182,7 @@ export default function AnalyticsPage() {
                   <div key={index} className="flex items-center justify-between">
                     <div className="flex items-center">
                       <span className="text-2xl font-bold text-green-600 mr-3">#{index + 1}</span>
-                      <span className="font-semibold text-gray-900">{item.name}</span>
+                      <span className="font-semibold text-gray-800">{item.name}</span>
                     </div>
                     <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
                       {item.count} clicks
@@ -196,8 +196,8 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Most Popular Salons */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-6 max-h-[70vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
               <span className="mr-2">💈</span>
               Most Popular Salons
             </h3>
@@ -207,7 +207,7 @@ export default function AnalyticsPage() {
                   <div key={index} className="flex items-center justify-between">
                     <div className="flex items-center">
                       <span className="text-2xl font-bold text-orange-600 mr-3">#{index + 1}</span>
-                      <span className="font-semibold text-gray-900">{item.name}</span>
+                      <span className="font-semibold text-gray-800">{item.name}</span>
                     </div>
                     <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium">
                       {item.count} views
@@ -227,7 +227,7 @@ export default function AnalyticsPage() {
         {/* Suggested Products - Based on Popularity */}
         {stats.popularProducts?.length > 0 && (
           <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl shadow-lg p-6 mb-12">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
               <span className="mr-2">✨</span>
               Suggested Products for Your Users
             </h3>
@@ -243,7 +243,7 @@ export default function AnalyticsPage() {
                       {item.count} clicks
                     </span>
                   </div>
-                  <h4 className="font-bold text-gray-900 text-lg">{item.name}</h4>
+                  <h4 className="font-bold text-gray-800 text-lg">{item.name}</h4>
                   <p className="text-sm text-gray-500 mt-1">Most clicked by users</p>
                 </div>
               ))}
@@ -270,7 +270,7 @@ export default function AnalyticsPage() {
 
         {/* Recent Activity */}
         <div className="bg-white rounded-2xl shadow-lg p-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+          <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
             <span className="mr-2">📈</span>
             Recent Activity
           </h3>
@@ -282,7 +282,7 @@ export default function AnalyticsPage() {
                     {event.event_type === 'recommendation' ? '📊' : '🎨'}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">
+                    <p className="font-semibold text-gray-800">
                       {event.event_type === 'recommendation' ? 'Recommendation' : 'Style Generation'}
                     </p>
                     <p className="text-sm text-gray-600">

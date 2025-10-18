@@ -74,7 +74,7 @@ export default function HowItWorks() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
+    <div className="min-h-screen">
       {/* Navigation */}
       <div className="max-w-6xl mx-auto px-4 pt-8">
         <Link 
@@ -93,7 +93,7 @@ export default function HowItWorks() {
             <Sparkles className="w-4 h-4" />
             Multi-AI Architecture
           </div>
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+          <h1 className="text-5xl font-bold text-gray-800 mb-4">
             How Nywele.ai Works
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -109,13 +109,13 @@ export default function HowItWorks() {
             {techStack.map((tech) => {
               const Icon = tech.icon;
               return (
-                <div key={tech.name} className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition-shadow">
+                <div key={tech.name} className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg p-8 hover:shadow-xl transition-shadow">
                   <div className="flex items-start gap-4 mb-4">
                     <div className={`${tech.color} p-3 rounded-xl`}>
                       <Icon className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900">{tech.name}</h3>
+                      <h3 className="text-xl font-bold text-gray-800">{tech.name}</h3>
                       <p className="text-sm text-gray-500 font-medium">{tech.role}</p>
                     </div>
                   </div>
@@ -137,12 +137,12 @@ export default function HowItWorks() {
           <div className="grid md:grid-cols-4 gap-6">
             {workflow.map((item, idx) => (
               <div key={item.step} className="relative">
-                <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow h-full">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow h-full">
                   <div className="text-4xl mb-4 text-center">{item.icon}</div>
                   <div className="absolute -top-3 -left-3 w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                     {item.step}
                   </div>
-                  <h3 className="font-bold text-lg mb-2 text-gray-900">{item.title}</h3>
+                  <h3 className="font-bold text-lg mb-2 text-gray-800">{item.title}</h3>
                   <p className="text-sm text-gray-600">{item.description}</p>
                 </div>
                 {idx < 3 && (
@@ -172,7 +172,7 @@ export default function HowItWorks() {
         </div>
 
         {/* Prompt Engineering Highlight */}
-        <div className="bg-white rounded-2xl shadow-xl p-12 mb-20">
+        <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-xl p-12 mb-20 max-h-[80vh] overflow-y-auto">
           <h2 className="text-3xl font-bold mb-6 text-center">Prompt Engineering</h2>
           <p className="text-gray-600 text-center mb-8 max-w-3xl mx-auto">
             Our 150+ line prompt generator creates culturally-accurate, bias-countering prompts 
@@ -224,15 +224,15 @@ export default function HowItWorks() {
         <div className="text-center mb-20">
           <h2 className="text-3xl font-bold mb-12">Built for Real Impact</h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-xl shadow-lg p-8">
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl shadow-lg p-8">
               <div className="text-4xl font-bold text-purple-600 mb-2">2 AI Models</div>
               <p className="text-gray-600">Working together for accuracy</p>
             </div>
-            <div className="bg-white rounded-xl shadow-lg p-8">
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl shadow-lg p-8">
               <div className="text-4xl font-bold text-purple-600 mb-2">Type 1a-4c</div>
               <p className="text-gray-600">All hair textures supported</p>
             </div>
-            <div className="bg-white rounded-xl shadow-lg p-8">
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl shadow-lg p-8">
               <div className="text-4xl font-bold text-purple-600 mb-2">150+ Lines</div>
               <p className="text-gray-600">Of prompt engineering logic</p>
             </div>

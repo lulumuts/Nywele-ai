@@ -150,7 +150,7 @@ export default function Results() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading your personalized routine...</p>
@@ -160,7 +160,7 @@ export default function Results() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+    <div className="min-h-screen">
       {/* Header */}
       <header className="backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
@@ -200,9 +200,9 @@ export default function Results() {
         </div>
 
         {/* Routine */}
-        <div className="mb-8 bg-white rounded-3xl shadow-2xl p-8">
+        <div className="mb-8 bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[80vh] overflow-y-auto">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold text-gray-900">Your Hair Care Routine</h2>
+            <h2 className="text-3xl font-bold text-gray-800">Your Hair Care Routine</h2>
             <div className="text-right">
               <div className="text-sm text-gray-500">Total Time</div>
               <div className="text-2xl font-bold text-purple-600">{data.routine.totalTime}</div>
@@ -219,7 +219,7 @@ export default function Results() {
                   </div>
                 </div>
                 <div className="flex-grow">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{step.action}</h3>
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">{step.action}</h3>
                   <p className="text-gray-700 mb-2">{step.instructions}</p>
                   <div className="flex items-center gap-4 text-sm">
                     <span className="text-purple-600 font-semibold">⏱️ {step.duration}</span>
@@ -235,8 +235,8 @@ export default function Results() {
 
         {/* Style Inspiration Section - AI-Generated */}
         {loadingImage && (
-          <div className="mb-8 bg-white rounded-3xl shadow-2xl p-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Style Inspiration</h2>
+          <div className="mb-8 bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8">
+            <h2 className="text-3xl font-bold text-gray-800 mb-6">Style Inspiration</h2>
             <div className="animate-pulse">
               <div className="h-96 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl"></div>
               <p className="text-center mt-4 text-gray-500">✨ Generating your style inspiration...</p>
@@ -245,9 +245,9 @@ export default function Results() {
         )}
 
         {styleImage && !loadingImage && (
-          <div className="mb-8 bg-white rounded-3xl shadow-2xl p-8">
+          <div className="mb-8 bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-bold text-gray-900">Style Inspiration</h2>
+              <h2 className="text-3xl font-bold text-gray-800">Style Inspiration</h2>
               <div className="px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full">
                 <span className="text-sm font-semibold text-purple-700">✨ AI-Powered by Gemini</span>
               </div>
@@ -276,7 +276,7 @@ export default function Results() {
                 🤖 View AI Prompt Engineering Details
               </summary>
               <div className="mt-4 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200">
-                <h4 className="font-bold text-gray-900 mb-3">Advanced Prompt Engineering:</h4>
+                <h4 className="font-bold text-gray-800 mb-3">Advanced Prompt Engineering:</h4>
                 <p className="text-sm text-gray-700 leading-relaxed mb-4">
                   This image was generated using a highly-detailed, bias-countering prompt specifically designed for authentic African hair representation. Our system uses explicit ethnicity markers and detailed texture descriptions to counter AI biases and ensure culturally accurate results.
                 </p>
@@ -305,8 +305,8 @@ export default function Results() {
         )}
 
         {/* Products */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Recommended Products</h2>
+        <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[80vh] overflow-y-auto">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">Recommended Products</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {data.products.map((product, index) => (
               <div key={index} className="border-2 border-gray-100 rounded-2xl p-6 hover:border-purple-300 hover:shadow-lg transition-all">
@@ -318,11 +318,11 @@ export default function Results() {
                   />
                 )}
                 <div className="text-sm text-purple-600 font-semibold mb-1">{product.brand}</div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{product.name}</h3>
+                <h3 className="text-lg font-bold text-gray-800 mb-2">{product.name}</h3>
                 <p className="text-gray-600 text-sm mb-4">{product.reason}</p>
                 <div className="flex items-center justify-between">
                   {product.price && (
-                    <span className="text-2xl font-bold text-gray-900">${product.price}</span>
+                    <span className="text-2xl font-bold text-gray-800">${product.price}</span>
                   )}
                   <a
                     href={product.affiliateLink || '#'}
@@ -347,8 +347,8 @@ export default function Results() {
         </div>
 
         {/* Salons Who Can Do It */}
-        <div className="mt-12 bg-white rounded-3xl shadow-2xl p-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Salons Who Can Do This Style</h2>
+        <div className="mt-12 bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[80vh] overflow-y-auto">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">Salons Who Can Do This Style</h2>
 
           {loadingSalons ? (
             <div className="text-center py-12">
@@ -364,7 +364,7 @@ export default function Results() {
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="text-xl font-bold text-gray-900">{salon.name}</h3>
+                      <h3 className="text-xl font-bold text-gray-800">{salon.name}</h3>
                       <div className="flex items-center text-gray-600 text-sm mt-1">
                         <span className="mr-1">📍</span>
                         <span>{salon.area}</span>

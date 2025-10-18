@@ -261,7 +261,7 @@ export default function RefinedHairProfileForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+    <div className="min-h-screen">
       {/* Header */}
       <header className="backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
@@ -295,12 +295,12 @@ export default function RefinedHairProfileForm() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8">
+        <form onSubmit={handleSubmit} className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-h-[75vh] overflow-y-auto">
           {/* Step 1: Hair Profile */}
           {step === 1 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Your Hair Profile</h2>
+                <h2 className="text-3xl font-bold text-gray-800 mb-2">Your Hair Profile</h2>
                 <p className="text-gray-600">Let's understand your beautiful texture</p>
               </div>
 
@@ -322,7 +322,7 @@ export default function RefinedHairProfileForm() {
                       }`}
                     >
                       <div className="text-2xl mb-1">{type.visual}</div>
-                      <div className="font-semibold text-gray-900">{type.name}</div>
+                      <div className="font-semibold text-gray-800">{type.name}</div>
                       <div className="text-xs text-gray-600 mt-1">{type.description}</div>
                     </button>
                   ))}
@@ -350,7 +350,7 @@ export default function RefinedHairProfileForm() {
                           : 'border-gray-200 hover:border-purple-300'
                       }`}
                     >
-                      <div className="font-semibold text-gray-900">{option.name}</div>
+                      <div className="font-semibold text-gray-800">{option.name}</div>
                       <div className="text-sm text-gray-600 mt-1">{option.description}</div>
                       <div className="text-xs text-purple-600 mt-2">{option.tip}</div>
                     </button>
@@ -377,7 +377,7 @@ export default function RefinedHairProfileForm() {
                     >
                       <div className="flex justify-between items-center">
                         <div>
-                          <div className="font-semibold text-gray-900">{option.label}</div>
+                          <div className="font-semibold text-gray-800">{option.label}</div>
                           <div className="text-xs text-gray-500">{option.stretched} stretched • {option.shrunken}</div>
                         </div>
                       </div>
@@ -392,7 +392,7 @@ export default function RefinedHairProfileForm() {
           {step === 2 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">What Are Your Goals?</h2>
+                <h2 className="text-3xl font-bold text-gray-800 mb-2">What Are Your Goals?</h2>
                 <p className="text-gray-600">Select up to 3 main concerns</p>
               </div>
 
@@ -412,7 +412,7 @@ export default function RefinedHairProfileForm() {
                     }`}
                   >
                     <div className="text-2xl mb-2">{concern.icon}</div>
-                    <div className="font-semibold text-sm text-gray-900">{concern.label}</div>
+                    <div className="font-semibold text-sm text-gray-800">{concern.label}</div>
                   </button>
                 ))}
               </div>
@@ -427,14 +427,14 @@ export default function RefinedHairProfileForm() {
           {step === 3 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Choose Your Style</h2>
+                <h2 className="text-3xl font-bold text-gray-800 mb-2">Choose Your Style</h2>
                 <p className="text-gray-600">What look are you going for?</p>
               </div>
 
               {Object.entries(styleCategories).map(([key, category]) => (
                 <div key={key} className="space-y-3">
                   <div>
-                    <h3 className="font-bold text-lg text-gray-900">{category.label}</h3>
+                    <h3 className="font-bold text-lg text-gray-800">{category.label}</h3>
                     <p className="text-sm text-gray-600">{category.subtitle}</p>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -453,7 +453,7 @@ export default function RefinedHairProfileForm() {
                             : 'border-gray-200 hover:border-purple-300'
                         }`}
                       >
-                        <div className="font-semibold text-gray-900">{style.name}</div>
+                        <div className="font-semibold text-gray-800">{style.name}</div>
                         <div className="text-xs text-gray-600 mt-1">
                           {style.duration} • {style.maintenance} maintenance
                         </div>
@@ -469,7 +469,7 @@ export default function RefinedHairProfileForm() {
           {step === 4 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Set the Vibe</h2>
+                <h2 className="text-3xl font-bold text-gray-800 mb-2">Set the Vibe</h2>
                 <p className="text-gray-600">What's the occasion or aesthetic?</p>
               </div>
 
@@ -488,7 +488,7 @@ export default function RefinedHairProfileForm() {
                     <div className="flex items-center gap-4">
                       <div className="text-3xl">{vibe.emoji}</div>
                       <div>
-                        <div className="font-semibold text-gray-900">{vibe.name}</div>
+                        <div className="font-semibold text-gray-800">{vibe.name}</div>
                         <div className="text-sm text-gray-600 mt-1">{vibe.description}</div>
                       </div>
                     </div>
