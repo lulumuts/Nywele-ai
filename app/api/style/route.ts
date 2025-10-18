@@ -33,9 +33,9 @@ export async function POST(request: NextRequest) {
     console.log('🎨 Generated Gemini Prompt:', detailedPrompt);
 
     // Try to use Gemini Native Image Generation (Nano Banana)
-    // TEMPORARILY DISABLED due to documented AI bias - see AI_BIAS_DOCUMENTATION.md
-    // Gemini consistently generates white women despite explicit "Black African" prompts
-    if (false && genAI) {
+    // Note: AI bias documented in AI_BIAS_DOCUMENTATION.md
+    // Keeping enabled to demonstrate bias-countering techniques
+    if (genAI) {
       try {
         console.log('🚀 Calling Gemini 2.5 Flash Image (Nano Banana) API...');
         
