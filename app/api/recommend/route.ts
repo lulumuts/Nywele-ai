@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { openai } from '@/lib/openai';
 import { supabase } from '@/lib/supabase';
+import { trackRecommendation } from '@/lib/convex';
 
 interface Product {
   id: string;
@@ -143,6 +144,15 @@ IMPORTANT:
     if (saveError) {
       console.error('Failed to save recommendation:', saveError);
     }
+
+    // Track analytics with Convex (if configured)
+    trackRecommendation({
+      hairType,
+      goals,
+      currentStyle,
+      ethnicity: body.ethnicity || 'Not specified',
+      length: body.length || 'Not specified',
+    }).catch(err => console.error('Analytics tracking failed:', err));
 
     return NextResponse.json({
       success: true,

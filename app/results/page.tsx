@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface Step {
   stepNumber: number;
@@ -109,12 +110,20 @@ export default function Results() {
             </h1>
             <p className="text-gray-600 mt-1">Your Personalized Hair Care Plan</p>
           </div>
-          <button
-            onClick={() => router.push('/')}
-            className="px-6 py-2 bg-white border-2 border-purple-200 text-purple-600 rounded-xl font-semibold hover:bg-purple-50 transition-all"
-          >
-            Start Over
-          </button>
+          <div className="flex gap-3">
+            <Link 
+              href="/how-it-works"
+              className="px-6 py-2 text-purple-600 hover:text-purple-700 font-semibold border-2 border-purple-600 hover:border-purple-700 rounded-lg transition-colors"
+            >
+              How It Works
+            </Link>
+            <button
+              onClick={() => router.push('/')}
+              className="px-6 py-2 bg-white border-2 border-purple-200 text-purple-600 rounded-xl font-semibold hover:bg-purple-50 transition-all"
+            >
+              Start Over
+            </button>
+          </div>
         </div>
       </header>
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Home() {
   const router = useRouter();
@@ -92,11 +93,19 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-purple-100">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Nywele.ai
-          </h1>
-          <p className="text-gray-600 mt-1">AI-Powered African Hair Care</p>
+        <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Nywele.ai
+            </h1>
+            <p className="text-gray-600 mt-1">AI-Powered African Hair Care</p>
+          </div>
+          <Link 
+            href="/how-it-works"
+            className="px-6 py-2 text-purple-600 hover:text-purple-700 font-semibold border-2 border-purple-600 hover:border-purple-700 rounded-lg transition-colors"
+          >
+            How It Works
+          </Link>
         </div>
       </header>
 

@@ -128,6 +128,7 @@ professional hair photography with minimal face visibility."
 
 - Next.js API Routes
 - Supabase (configured for future features)
+- Convex (real-time analytics - schema ready, requires `npx convex dev` to activate)
 
 **Deployment:**
 

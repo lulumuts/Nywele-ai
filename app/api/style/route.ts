@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { generateImagePrompt } from '@/lib/promptGenerator';
+import { trackStyleGeneration } from '@/lib/convex';
 
 // Initialize Google GenAI client for Gemini Native Image Generation (Nano Banana)
 const genAI = process.env.GEMINI_API_KEY 
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
           model: 'gemini-2.5-flash-image',
           generationConfig: {
             responseModalities: ['IMAGE']
-          }
+          } as any // Type assertion for Gemini image generation config
         });
         
         const result = await model.generateContent([detailedPrompt]);
@@ -65,6 +66,16 @@ export async function POST(request: NextRequest) {
               const base64Data = part.inlineData.data;
               const dataUrl = `data:${mimeType};base64,${base64Data}`;
               
+              // Track successful generation
+              trackStyleGeneration({
+                hairType,
+                style: styleName,
+                ethnicity,
+                length,
+                vibe,
+                success: true,
+              }).catch(err => console.error('Analytics tracking failed:', err));
+
               return NextResponse.json({
                 success: true,
                 data: {
@@ -96,6 +107,16 @@ export async function POST(request: NextRequest) {
 
     // Fallback to curated stock images
     const imageUrl = getStockImageUrl(hairType, styleName);
+
+    // Track fallback usage
+    trackStyleGeneration({
+      hairType,
+      style: styleName,
+      ethnicity,
+      length,
+      vibe,
+      success: false, // Using fallback, not AI-generated
+    }).catch(err => console.error('Analytics tracking failed:', err));
 
     return NextResponse.json({
       success: true,
