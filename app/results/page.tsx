@@ -113,6 +113,12 @@ export default function Results() {
           </div>
           <div className="flex gap-3">
             <Link 
+              href="/salons"
+              className="px-6 py-2 text-purple-600 hover:text-purple-700 font-semibold border-2 border-purple-600 hover:border-purple-700 rounded-lg transition-colors"
+            >
+              Find Salons
+            </Link>
+            <Link 
               href="/how-it-works"
               className="px-6 py-2 text-purple-600 hover:text-purple-700 font-semibold border-2 border-purple-600 hover:border-purple-700 rounded-lg transition-colors"
             >
@@ -284,6 +290,27 @@ export default function Results() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Salon Recommendation */}
+        <div className="mt-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-8 text-white shadow-2xl">
+          <div className="text-center">
+            <div className="text-5xl mb-4">💈</div>
+            <h2 className="text-3xl font-bold mb-3">Ready to Book Your Style?</h2>
+            <p className="text-lg opacity-95 mb-6">
+              Find trusted salons in Nairobi specializing in {sessionStorage.getItem('hairType') || 'your hair type'}
+            </p>
+            <button
+              onClick={() => router.push('/salons')}
+              className="px-8 py-4 bg-white text-purple-600 rounded-xl font-bold text-lg hover:shadow-2xl transition-all inline-flex items-center gap-2"
+            >
+              Find a Salon Near You
+              <span>→</span>
+            </button>
+            <p className="text-sm opacity-75 mt-4">
+              ✨ Powered by Braiding Nairobi salon network
+            </p>
           </div>
         </div>
 
