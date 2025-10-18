@@ -3,7 +3,7 @@
 
 AI-powered hair care recommendations for African hair types, featuring multi-AI architecture with GPT-4o and Gemini Nano Banana.
 
-**Live Demo:** [https://nywele-ai-97xa.vercel.app/](https://nywele-ai-97xa.vercel.app/)
+**Live Demo:** [https://nywele-ai.netlify.app](https://nywele-ai.netlify.app)
 
 ---
 
@@ -133,7 +133,7 @@ professional hair photography with minimal face visibility."
 
 **Deployment:**
 
-- Vercel (auto-deploy from GitHub)
+- Netlify (production deployment from GitHub)
 
 ---
 
@@ -281,5 +281,5 @@ All prompts explicitly specify ethnicity, texture, and viewing angles to counter
 This project addresses the lack of culturally-specific AI tools for African hair care. By combining advanced prompt engineering with multi-AI orchestration, it delivers personalized recommendations that respect and celebrate natural African hair textures.
 
 **Tech Stack:** Next.js + GPT-4o + Gemini Nano Banana
-**Deployment:** Vercel
+**Deployment:** Netlify
 **License:** MIT
