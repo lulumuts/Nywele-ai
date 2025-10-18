@@ -370,21 +370,23 @@ z"/>
 
           <div className="space-y-6">
             {data.routine.steps.map((step, index) => (
-              <div key={index} className="flex gap-6 p-6 border-2 border-[#E9A96A] rounded-2xl bg-transparent">
+              <div key={index} className="relative flex gap-6 p-6 border-2 border-[#E9A96A] rounded-2xl bg-transparent">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 border-2 border-[#E9A96A] rounded-full flex items-center justify-center text-[#E9A96A] font-bold text-xl bg-transparent">
                     {step.stepNumber}
                   </div>
                 </div>
                 <div className="flex-grow">
-                  <h3 className="text-xl font-bold text-[#E9A96A] mb-2">{step.action}</h3>
+                  <h3 className="text-xl font-bold text-[#E9A96A] mb-2 pr-20">{step.action}</h3>
                   <p className="text-[#E9A96A] mb-2">{step.instructions}</p>
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="text-purple-600 font-semibold">⏱️ {step.duration}</span>
-                    {step.productName && (
+                  {step.productName && (
+                    <div className="text-sm">
                       <span className="text-gray-600">🧴 {step.productName}</span>
-                    )}
-                  </div>
+                    </div>
+                  )}
+                </div>
+                <div className="absolute top-6 right-6">
+                  <span className="text-purple-600 font-semibold text-sm">⏱️ {step.duration}</span>
                 </div>
               </div>
             ))}
