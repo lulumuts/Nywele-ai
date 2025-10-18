@@ -288,28 +288,30 @@ export default function RefinedHairProfileForm() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header className="backdrop-blur-md border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Nywele.ai
-            </h1>
-            <p className="text-gray-600 mt-1">AI-Powered African Hair Care</p>
+      {/* Header - Only show when not on landing */}
+      {!showLanding && (
+        <header className="backdrop-blur-md border-b border-white/10">
+          <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Nywele.ai
+              </h1>
+              <p className="text-gray-600 mt-1">AI-Powered African Hair Care</p>
+            </div>
+            <Link 
+              href="/how-it-works"
+              className="px-6 py-2 text-purple-600 hover:text-purple-700 font-semibold border-2 border-purple-600 hover:border-purple-700 rounded-lg transition-colors"
+            >
+              How It Works
+            </Link>
           </div>
-          <Link 
-            href="/how-it-works"
-            className="px-6 py-2 text-purple-600 hover:text-purple-700 font-semibold border-2 border-purple-600 hover:border-purple-700 rounded-lg transition-colors"
-          >
-            How It Works
-          </Link>
-        </div>
-      </header>
+        </header>
+      )}
 
-      <div className="max-w-3xl mx-auto py-12 px-4">
+      <div className={showLanding ? "flex items-center justify-center min-h-screen px-4" : "max-w-3xl mx-auto py-12 px-4"}>
         {showLanding ? (
           /* Landing Screen */
-          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-xl p-12 text-center animate-fade-in">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-xl p-12 text-center animate-fade-in max-w-2xl w-full">
             <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-8">
               Nywele.ai
             </h1>
@@ -325,12 +327,21 @@ export default function RefinedHairProfileForm() {
               products, and styles for your unique hair texture.
             </p>
             
-            <button
-              onClick={() => setShowLanding(false)}
-              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all transform hover:scale-105"
-            >
-              Get Started
-            </button>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => setShowLanding(false)}
+                className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all transform hover:scale-105"
+              >
+                Get Started
+              </button>
+              
+              <Link
+                href="/how-it-works"
+                className="px-8 py-4 bg-white/80 backdrop-blur-sm text-purple-600 border-2 border-purple-600 rounded-xl font-bold text-lg hover:shadow-xl transition-all transform hover:scale-105 inline-flex items-center"
+              >
+                How It Works
+              </Link>
+            </div>
           </div>
         ) : (
           <>
