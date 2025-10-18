@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { generateImagePrompt } from '@/lib/promptGenerator';
-// import { trackStyleGeneration } from '@/lib/convex'; // Uncomment after running `npx convex dev`
+import { trackStyleGeneration } from '@/lib/analytics';
 
 // Initialize Google GenAI client for Gemini Native Image Generation (Nano Banana)
 const genAI = process.env.GEMINI_API_KEY 
@@ -66,16 +66,15 @@ export async function POST(request: NextRequest) {
               const base64Data = part.inlineData.data;
               const dataUrl = `data:${mimeType};base64,${base64Data}`;
               
-              // Track successful generation
-              // Commented out until Convex is initialized with `npx convex dev`
-              // trackStyleGeneration({
-              //   hairType,
-              //   style: styleName,
-              //   ethnicity,
-              //   length,
-              //   vibe,
-              //   success: true,
-              // }).catch(err => console.error('Analytics tracking failed:', err));
+              // Track successful AI generation
+              trackStyleGeneration({
+                hairType,
+                style: styleName,
+                ethnicity,
+                length,
+                vibe,
+                success: true,
+              }).catch(err => console.error('Analytics tracking failed:', err));
 
               return NextResponse.json({
                 success: true,
@@ -110,15 +109,14 @@ export async function POST(request: NextRequest) {
     const imageUrl = getStockImageUrl(hairType, styleName);
 
     // Track fallback usage
-    // Commented out until Convex is initialized with `npx convex dev`
-    // trackStyleGeneration({
-    //   hairType,
-    //   style: styleName,
-    //   ethnicity,
-    //   length,
-    //   vibe,
-    //   success: false, // Using fallback, not AI-generated
-    // }).catch(err => console.error('Analytics tracking failed:', err));
+    trackStyleGeneration({
+      hairType,
+      style: styleName,
+      ethnicity,
+      length,
+      vibe,
+      success: false, // Using fallback, not AI-generated
+    }).catch(err => console.error('Analytics tracking failed:', err));
 
     return NextResponse.json({
       success: true,
