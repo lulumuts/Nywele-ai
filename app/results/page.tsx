@@ -309,11 +309,11 @@ z"/>
                   <span className="text-sm font-semibold text-purple-700">✨ AI-Powered by Gemini</span>
                 </div>
               </div>
-              <div className="relative h-full">
+              <div className="relative">
                 <img 
                   src={styleImage} 
                   alt="Hairstyle inspiration" 
-                  className="w-full h-full min-h-[600px] object-cover rounded-2xl shadow-lg"
+                  className="w-full h-[500px] object-cover rounded-2xl shadow-lg"
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6 rounded-b-2xl">
                   <p className="text-white text-lg font-semibold">
