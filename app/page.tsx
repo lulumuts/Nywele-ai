@@ -120,21 +120,21 @@ export default function RefinedHairProfileForm() {
       code: '4c',
       name: 'Type 4C',
       description: 'Tightly coiled, Z-pattern, 75%+ shrinkage',
-      visual: '⚬⚬⚬',
+      visual: '🌀🌀🌀',
       isCoil: true
     },
     {
       code: '4b',
       name: 'Type 4B',
       description: 'Sharp Z-pattern coils, 70-75% shrinkage',
-      visual: '⚬⚬',
+      visual: '🌀🌀',
       isCoil: true
     },
     {
       code: '4a',
       name: 'Type 4A',
       description: 'Defined S-curls, springy, 50-70% shrinkage',
-      visual: '⚬',
+      visual: '🌀',
       isCoil: true
     },
     {
