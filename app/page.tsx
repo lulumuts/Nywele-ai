@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronRight, Info } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // Custom coil SVG component
 const CoilSVG = () => (
@@ -206,36 +207,36 @@ export default function RefinedHairProfileForm() {
       label: 'Protective Styles',
       subtitle: 'Low maintenance, hide natural texture',
       styles: [
-        { name: 'Box Braids', duration: '6-8 weeks', maintenance: 'Low' },
-        { name: 'Passion Twists', duration: '4-6 weeks', maintenance: 'Low' },
-        { name: 'Senegalese Twists', duration: '6-8 weeks', maintenance: 'Low' },
-        { name: 'Faux Locs', duration: '8-12 weeks', maintenance: 'Very Low' },
-        { name: 'Cornrows', duration: '2-4 weeks', maintenance: 'Low' },
-        { name: 'Knotless Braids', duration: '4-6 weeks', maintenance: 'Low' },
-        { name: 'Goddess Locs', duration: '6-8 weeks', maintenance: 'Low' }
+        { name: 'Box Braids', duration: '6-8 weeks', maintenance: 'Low', image: '/images/styles/box-braids.jpg' },
+        { name: 'Passion Twists', duration: '4-6 weeks', maintenance: 'Low', image: '/images/styles/passion-twists.jpg' },
+        { name: 'Senegalese Twists', duration: '6-8 weeks', maintenance: 'Low', image: '/images/styles/senegalese-twists.jpg' },
+        { name: 'Faux Locs', duration: '8-12 weeks', maintenance: 'Very Low', image: '/images/styles/faux-locs.jpg' },
+        { name: 'Cornrows', duration: '2-4 weeks', maintenance: 'Low', image: '/images/styles/cornrows.jpg' },
+        { name: 'Knotless Braids', duration: '4-6 weeks', maintenance: 'Low', image: '/images/styles/knotless-braids.jpg' },
+        { name: 'Goddess Locs', duration: '6-8 weeks', maintenance: 'Low', image: '/images/styles/goddess-locs.jpg' }
       ]
     },
     natural: {
       label: 'Natural Styles',
       subtitle: 'Show your texture, embrace shrinkage',
       styles: [
-        { name: 'Wash and Go', duration: '3-5 days', maintenance: 'Medium' },
-        { name: 'Twist Out', duration: '3-7 days', maintenance: 'Low' },
-        { name: 'Bantu Knot Out', duration: '3-5 days', maintenance: 'Medium' },
-        { name: 'Braid Out', duration: '5-7 days', maintenance: 'Low' },
-        { name: 'High Puff', duration: '1-2 days', maintenance: 'Low' },
-        { name: 'Afro/TWA', duration: 'Daily', maintenance: 'High' },
-        { name: 'Finger Coils', duration: '1 week', maintenance: 'Medium' }
+        { name: 'Wash and Go', duration: '3-5 days', maintenance: 'Medium', image: '/images/styles/wash-and-go.jpg' },
+        { name: 'Twist Out', duration: '3-7 days', maintenance: 'Low', image: '/images/styles/twist-out.jpg' },
+        { name: 'Bantu Knot Out', duration: '3-5 days', maintenance: 'Medium', image: '/images/styles/bantu-knot-out.jpg' },
+        { name: 'Braid Out', duration: '5-7 days', maintenance: 'Low', image: '/images/styles/braid-out.jpg' },
+        { name: 'High Puff', duration: '1-2 days', maintenance: 'Low', image: '/images/styles/high-puff.jpg' },
+        { name: 'Afro/TWA', duration: 'Daily', maintenance: 'High', image: '/images/styles/afro-twa.jpg' },
+        { name: 'Finger Coils', duration: '1 week', maintenance: 'Medium', image: '/images/styles/finger-coils.jpg' }
       ]
     },
     lowManipulation: {
       label: 'Low Manipulation',
       subtitle: 'Minimal styling, gentle on hair',
       styles: [
-        { name: 'Two-Strand Twists', duration: '1-2 weeks', maintenance: 'Low' },
-        { name: 'Bantu Knots', duration: '1 week', maintenance: 'Low' },
-        { name: 'Mini Twists', duration: '2-4 weeks', maintenance: 'Very Low' },
-        { name: 'Flat Twists', duration: '1-2 weeks', maintenance: 'Low' }
+        { name: 'Two-Strand Twists', duration: '1-2 weeks', maintenance: 'Low', image: '/images/styles/two-strand-twists.jpg' },
+        { name: 'Bantu Knots', duration: '1 week', maintenance: 'Low', image: '/images/styles/bantu-knots.jpg' },
+        { name: 'Mini Twists', duration: '2-4 weeks', maintenance: 'Very Low', image: '/images/styles/mini-twists.jpg' },
+        { name: 'Flat Twists', duration: '1-2 weeks', maintenance: 'Low', image: '/images/styles/flat-twists.jpg' }
       ]
     }
   };
@@ -548,15 +549,15 @@ z"/>
                       key={type.code}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, hairType: type.code }))}
-                      className={`p-4 rounded-full border-2 text-left transition-all ${
+                      className={`p-4 rounded-lg border-2 text-left transition-all ${
                         formData.hairType === type.code
-                          ? 'border-[#FED9B4] bg-purple-50'
+                          ? 'border-purple-600 bg-purple-600'
                           : 'border-[#FED9B4] hover:border-[#FED9B4]'
                       }`}
                     >
-                      <div className="text-2xl mb-1 text-purple-600">{type.visual}</div>
-                      <div className="font-semibold text-[#C87726]">{type.name}</div>
-                      <div className="text-xs text-[#C87726] mt-1">{type.description}</div>
+                      <div className={`text-2xl mb-1 ${formData.hairType === type.code ? 'text-[#FFEEDE]' : 'text-purple-600'}`}>{type.visual}</div>
+                      <div className={`font-semibold ${formData.hairType === type.code ? 'text-[#FFEEDE]' : 'text-[#C87726]'}`}>{type.name}</div>
+                      <div className={`text-xs mt-1 ${formData.hairType === type.code ? 'text-[#FFEEDE]' : 'text-[#C87726]'}`}>{type.description}</div>
                     </button>
                   ))}
                 </div>
@@ -577,15 +578,15 @@ z"/>
                       key={option.level}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, porosity: option.level }))}
-                      className={`w-full p-4 rounded-full border-2 text-left transition-all ${
+                      className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
                         formData.porosity === option.level
-                          ? 'border-[#FED9B4] bg-purple-50'
+                          ? 'border-purple-600 bg-purple-600'
                           : 'border-[#FED9B4] hover:border-[#FED9B4]'
                       }`}
                     >
-                      <div className="font-semibold text-[#C87726]">{option.name}</div>
-                      <div className="text-sm text-[#C87726] mt-1">{option.description}</div>
-                      <div className="text-xs text-[#C87726] mt-2">{option.tip}</div>
+                      <div className={`font-semibold ${formData.porosity === option.level ? 'text-[#FFEEDE]' : 'text-[#C87726]'}`}>{option.name}</div>
+                      <div className={`text-sm mt-1 ${formData.porosity === option.level ? 'text-[#FFEEDE]' : 'text-[#C87726]'}`}>{option.description}</div>
+                      <div className={`text-xs mt-2 ${formData.porosity === option.level ? 'text-[#FFEEDE]' : 'text-[#C87726]'}`}>{option.tip}</div>
                     </button>
                   ))}
                 </div>
@@ -602,16 +603,16 @@ z"/>
                       key={option.value}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, length: option.value }))}
-                      className={`w-full p-3 rounded-full border-2 text-left transition-all ${
+                      className={`w-full p-3 rounded-lg border-2 text-left transition-all ${
                         formData.length === option.value
-                          ? 'border-[#FED9B4] bg-purple-50'
+                          ? 'border-purple-600 bg-purple-600'
                           : 'border-[#FED9B4] hover:border-[#FED9B4]'
                       }`}
                     >
                       <div className="flex justify-between items-center">
                         <div>
-                          <div className="font-semibold text-[#C87726]">{option.label}</div>
-                          <div className="text-xs text-[#C87726]">{option.stretched} stretched • {option.shrunken}</div>
+                          <div className={`font-semibold ${formData.length === option.value ? 'text-[#FFEEDE]' : 'text-[#C87726]'}`}>{option.label}</div>
+                          <div className={`text-xs ${formData.length === option.value ? 'text-[#FFEEDE]' : 'text-[#C87726]'}`}>{option.stretched} stretched • {option.shrunken}</div>
                         </div>
                       </div>
                     </button>
@@ -636,16 +637,16 @@ z"/>
                     type="button"
                     onClick={() => handleConcernToggle(concern.id)}
                     disabled={!formData.concerns.includes(concern.id) && formData.concerns.length >= 3}
-                    className={`p-4 rounded-full border-2 text-left transition-all ${
+                    className={`p-4 rounded-lg border-2 text-left transition-all ${
                       formData.concerns.includes(concern.id)
-                        ? 'border-[#FED9B4] bg-purple-50'
+                        ? 'border-purple-600 bg-purple-600'
                         : formData.concerns.length >= 3
                         ? 'border-[#FED9B4] opacity-50 cursor-not-allowed'
                         : 'border-[#FED9B4] hover:border-[#FED9B4]'
                     }`}
                   >
                     <div className="text-2xl mb-2">{concern.icon}</div>
-                    <div className="font-semibold text-sm text-[#C87726]">{concern.label}</div>
+                    <div className={`font-semibold text-sm ${formData.concerns.includes(concern.id) ? 'text-[#FFEEDE]' : 'text-[#C87726]'}`}>{concern.label}</div>
                   </button>
                 ))}
               </div>
@@ -670,7 +671,7 @@ z"/>
                     <h3 className="font-bold text-lg text-[#C87726]">{category.label}</h3>
                     <p className="text-sm text-[#C87726]">{category.subtitle}</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto">
                     {category.styles.map(style => (
                       <button
                         key={style.name}
@@ -680,15 +681,29 @@ z"/>
                           desiredStyle: style.name,
                           duration: style.duration 
                         }))}
-                        className={`p-4 rounded-full border-2 text-left transition-all ${
+                        className={`aspect-square rounded-full border-2 text-center transition-all overflow-hidden flex flex-col ${
                           formData.desiredStyle === style.name
-                            ? 'border-[#FED9B4] bg-purple-50'
+                            ? 'border-purple-600 bg-purple-600'
                             : 'border-[#FED9B4] hover:border-[#FED9B4]'
                         }`}
                       >
-                        <div className="font-semibold text-[#C87726]">{style.name}</div>
-                        <div className="text-xs text-[#C87726] mt-1">
-                          {style.duration} • {style.maintenance} maintenance
+                        <div className="relative w-full flex-1 bg-gray-200">
+                          <Image
+                            src={style.image}
+                            alt={style.name}
+                            fill
+                            className="object-cover"
+                            onError={(e) => {
+                              // Fallback to gradient if image not found
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                        <div className="p-3">
+                          <div className={`font-semibold text-xs ${formData.desiredStyle === style.name ? 'text-[#FFEEDE]' : 'text-[#C87726]'}`}>{style.name}</div>
+                          <div className={`text-[10px] mt-1 ${formData.desiredStyle === style.name ? 'text-[#FFEEDE]' : 'text-[#C87726]'}`}>
+                            {style.duration}
+                          </div>
                         </div>
                       </button>
                     ))}
@@ -712,17 +727,17 @@ z"/>
                     key={vibe.id}
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, vibe: vibe.id }))}
-                    className={`w-full p-5 rounded-full border-2 text-left transition-all ${
+                    className={`w-full p-5 rounded-lg border-2 text-left transition-all ${
                       formData.vibe === vibe.id
-                        ? 'border-[#FED9B4] bg-purple-50'
+                        ? 'border-purple-600 bg-purple-600'
                         : 'border-[#FED9B4] hover:border-[#FED9B4]'
                     }`}
                   >
                     <div className="flex items-center gap-4">
                       <div className="text-3xl">{vibe.emoji}</div>
                       <div>
-                        <div className="font-semibold text-[#C87726]">{vibe.name}</div>
-                        <div className="text-sm text-[#C87726] mt-1">{vibe.description}</div>
+                        <div className={`font-semibold ${formData.vibe === vibe.id ? 'text-[#FFEEDE]' : 'text-[#C87726]'}`}>{vibe.name}</div>
+                        <div className={`text-sm mt-1 ${formData.vibe === vibe.id ? 'text-[#FFEEDE]' : 'text-[#C87726]'}`}>{vibe.description}</div>
                       </div>
                     </div>
                   </button>
@@ -738,7 +753,7 @@ z"/>
                 type="button"
                 onClick={() => setStep(step - 1)}
                 disabled={loading}
-                className="px-6 py-3 text-purple-600 hover:bg-purple-50 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 text-purple-600 hover:bg-purple-50 font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Back
               </button>
@@ -754,7 +769,7 @@ z"/>
                     (step === 2 && formData.concerns.length === 0) ||
                     (step === 3 && !formData.desiredStyle)
                   }
-                  className="flex items-center gap-2 px-8 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  className="flex items-center gap-2 px-8 py-3 bg-purple-600 text-white rounded-full font-semibold hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
                   Next
                   <ChevronRight className="w-5 h-5" />
@@ -763,7 +778,7 @@ z"/>
                 <button
                   type="submit"
                   disabled={!formData.vibe || loading}
-                  className="px-8 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  className="px-8 py-3 bg-purple-600 text-white font-semibold hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
                   {loading ? (
                     <span className="flex items-center">
