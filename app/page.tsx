@@ -5,8 +5,34 @@ import { useRouter } from 'next/navigation';
 import { ChevronRight, Info } from 'lucide-react';
 import Link from 'next/link';
 
+// Simple coil SVG component
+const CoilSVG = () => (
+  <svg viewBox="0 0 200 200" className="w-32 h-32 mx-auto mb-8">
+    <defs>
+      <linearGradient id="coilGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#9333ea" />
+        <stop offset="100%" stopColor="#ec4899" />
+      </linearGradient>
+    </defs>
+    {/* Outer coil ring */}
+    <circle cx="100" cy="100" r="70" fill="none" stroke="url(#coilGradient)" strokeWidth="6" opacity="0.3" />
+    <circle cx="100" cy="100" r="55" fill="none" stroke="url(#coilGradient)" strokeWidth="6" opacity="0.5" />
+    <circle cx="100" cy="100" r="40" fill="none" stroke="url(#coilGradient)" strokeWidth="6" opacity="0.7" />
+    {/* Center spiral */}
+    <path 
+      d="M 100 60 Q 120 80, 100 100 Q 80 120, 100 140" 
+      fill="none" 
+      stroke="url(#coilGradient)" 
+      strokeWidth="8" 
+      strokeLinecap="round"
+    />
+    <circle cx="100" cy="100" r="15" fill="url(#coilGradient)" opacity="0.8" />
+  </svg>
+);
+
 export default function RefinedHairProfileForm() {
   const router = useRouter();
+  const [showLanding, setShowLanding] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     hairType: '',
@@ -281,8 +307,35 @@ export default function RefinedHairProfileForm() {
       </header>
 
       <div className="max-w-3xl mx-auto py-12 px-4">
-        {/* Progress Bar */}
-        <div className="mb-8">
+        {showLanding ? (
+          /* Landing Screen */
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-xl p-12 text-center animate-fade-in">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-8">
+              Nywele.ai
+            </h1>
+            
+            <CoilSVG />
+            
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+              Get Your Hair Care Tips
+            </h2>
+            
+            <p className="text-lg text-gray-600 mb-8 max-w-xl mx-auto">
+              Personalized recommendations powered by AI. Discover the perfect routine, 
+              products, and styles for your unique hair texture.
+            </p>
+            
+            <button
+              onClick={() => setShowLanding(false)}
+              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all transform hover:scale-105"
+            >
+              Get Started
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Progress Bar */}
+            <div className="mb-8">
           <div className="flex justify-between mb-2">
             <span className="text-sm font-medium text-gray-700">Step {step} of 4</span>
             <span className="text-sm text-gray-500">{Math.round((step / 4) * 100)}% Complete</span>
@@ -295,7 +348,7 @@ export default function RefinedHairProfileForm() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-h-[75vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-h-[65vh] overflow-y-auto">
           {/* Step 1: Hair Profile */}
           {step === 1 && (
             <div className="space-y-6">
@@ -548,6 +601,8 @@ export default function RefinedHairProfileForm() {
             </div>
           </div>
         </form>
+          </>
+        )}
       </div>
     </div>
   );
