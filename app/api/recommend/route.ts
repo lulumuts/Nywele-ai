@@ -4,6 +4,14 @@ import { supabase } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if services are available
+    if (!openai || !supabase) {
+      return NextResponse.json(
+        { error: 'Service configuration error' },
+        { status: 500 }
+      );
+    }
+
     const body = await request.json();
     const { hairType, goals, currentStyle, durationPreference } = body;
 

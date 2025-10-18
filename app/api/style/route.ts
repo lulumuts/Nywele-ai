@@ -13,6 +13,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // If Gemini is not available, fall back to stock images
+    if (!geminiModel) {
+      const fallbackUrl = getStockImageUrl(hairType, styleName);
+      return NextResponse.json({
+        success: true,
+        data: {
+          imageUrl: fallbackUrl,
+          description: `Beautiful ${styleName} style for ${hairType} hair`,
+          hairType,
+          styleName,
+          fallback: true
+        }
+      });
+    }
+
     // Build detailed prompt for hairstyle image generation
     const prompt = `Create a high-quality, professional photograph of a beautiful Black woman with ${hairType} hair texture wearing a ${styleName} hairstyle. 
 
