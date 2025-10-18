@@ -3,6 +3,7 @@
 ## Why Convex?
 
 Convex provides real-time analytics for tracking:
+
 - User recommendation requests
 - Style generation success rates
 - Popular hair types and styles
@@ -17,6 +18,7 @@ npx convex dev
 ```
 
 This will:
+
 - Prompt you to log in to Convex
 - Create a new project or link to existing one
 - Generate `convex/_generated` directory
@@ -65,9 +67,9 @@ See `/Users/lulumutuli/Documents/nywele-ai/lib/convex.ts` for client configurati
 ## Hackathon Note
 
 If you don't have time to fully set up Convex, the schema and functions are ready to demonstrate:
+
 - Multi-service integration
 - Real-time analytics capability
 - Production-ready architecture
 
 The app works without Convex - it's an enhancement for the sponsor prize.
-
