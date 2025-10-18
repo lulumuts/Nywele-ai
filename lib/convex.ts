@@ -15,6 +15,9 @@ export async function trackRecommendation(data: {
   currentStyle?: string;
   ethnicity: string;
   length: string;
+  porosity?: string;
+  concerns?: string[];
+  desiredStyle?: string;
 }) {
   if (!convex) {
     console.log('[Convex] Not configured - skipping tracking');

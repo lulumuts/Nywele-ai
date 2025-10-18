@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { hairType, goals, currentStyle, durationPreference } = body;
+    const { hairType, goals, currentStyle, durationPreference, porosity, concerns, desiredStyle } = body;
 
     // Validate input
     if (!hairType || !goals || goals.length === 0) {
@@ -50,20 +50,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Build porosity-specific guidance
+    const porosityGuidance: Record<string, string> = {
+      'low': 'Low porosity hair needs lightweight products and heat for absorption. Avoid heavy oils that sit on the surface. Use clarifying treatments regularly to prevent buildup.',
+      'normal': 'Normal porosity hair has balanced moisture retention. Most products work well. Focus on maintaining the natural moisture balance.',
+      'high': 'High porosity hair absorbs quickly but loses moisture fast. Use heavy sealants, protein treatments, and the LOC/LCO method. Layer products to lock in moisture.',
+      'unsure': 'Recommend balanced, versatile products suitable for various porosity levels.'
+    };
+
+    const concernsText = concerns?.length > 0 
+      ? `- Main Concerns: ${concerns.join(', ')}` 
+      : '';
+    
+    const styleText = desiredStyle 
+      ? `- Desired Style: ${desiredStyle}` 
+      : '';
+
     // Build GPT-4 prompt
     const prompt = `You are an expert trichologist specializing in African hair care with 15 years of experience.
 
 PROFILE:
 - Hair Type: ${hairType}
+- Porosity: ${porosity || 'Not specified'}
 - Current Style: ${currentStyle || 'None'}
+${styleText}
 - Goals: ${goals.join(', ')}
+${concernsText}
 - Available Time: ${durationPreference || '30 minutes'}
+
+POROSITY-SPECIFIC GUIDANCE:
+${porosityGuidance[porosity as string] || porosityGuidance['unsure']}
 
 AVAILABLE PRODUCTS:
 ${products?.map((p: Product) => `- ${p.brand} ${p.name}: ${p.description}`).join('\n')}
 
 TASK:
-Create a personalized hair care routine. Return your response in this EXACT JSON format:
+Create a personalized hair care routine specifically optimized for ${porosity || 'balanced'} porosity hair. Return your response in this EXACT JSON format:
 
 {
   "routine": {
@@ -83,18 +105,20 @@ Create a personalized hair care routine. Return your response in this EXACT JSON
     {
       "name": "Product name",
       "brand": "Brand name",
-      "reason": "Why this product works for their hair type and goals"
+      "reason": "Why this product works for their hair type, porosity, and goals"
     }
   ],
-  "stylistTip": "One expert tip for their specific hair type and goals"
+  "stylistTip": "One expert tip for their specific hair type, porosity, and goals"
 }
 
 IMPORTANT:
 - Give 3-5 steps maximum
 - Only recommend products from the available list
 - Focus on their specific goals: ${goals.join(', ')}
+- Tailor recommendations to ${porosity || 'balanced'} porosity characteristics
 - Keep instructions clear and actionable
-- Consider hair type ${hairType} characteristics (porosity, curl pattern)`;
+- Consider hair type ${hairType} characteristics (porosity, curl pattern)
+- Address their main concerns: ${concerns?.join(', ') || 'general hair health'}`;
 
     // Call OpenAI
     const completion = await openai.chat.completions.create({
@@ -152,6 +176,9 @@ IMPORTANT:
       currentStyle,
       ethnicity: body.ethnicity || 'Not specified',
       length: body.length || 'Not specified',
+      porosity: porosity || 'Not specified',
+      concerns: concerns || [],
+      desiredStyle: desiredStyle || 'Not specified',
     }).catch(err => console.error('Analytics tracking failed:', err));
 
     return NextResponse.json({
