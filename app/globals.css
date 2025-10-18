@@ -56,8 +56,8 @@ body {
     rgba(254, 230, 150, 0.15) 85%,
     rgba(255, 255, 255, 0) 100%
   );
-  filter: blur(80px);
-  animation: float 15s ease-in-out infinite;
+  filter: blur(120px);
+  animation: float 45s ease-in-out infinite;
 }
 
 /* Secondary blob for depth */
@@ -79,8 +79,8 @@ body {
     rgba(253, 186, 116, 0.25) 65%,
     rgba(255, 255, 255, 0) 100%
   );
-  filter: blur(60px);
-  animation: float2 18s ease-in-out infinite;
+  filter: blur(100px);
+  animation: float2 55s ease-in-out infinite;
 }
 
 /* Tertiary blob */
@@ -102,8 +102,8 @@ body {
     rgba(254, 230, 180, 0.15) 80%,
     rgba(255, 255, 255, 0) 100%
   );
-  filter: blur(70px);
-  animation: float3 22s ease-in-out infinite;
+  filter: blur(110px);
+  animation: float3 65s ease-in-out infinite;
 }
 
 /* Grain texture overlay */
@@ -111,10 +111,10 @@ body {
   position: absolute;
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3.5' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.3;
+  opacity: 0.2;
   mix-blend-mode: overlay;
   pointer-events: none;
-  animation: grain 8s steps(10) infinite;
+  animation: grain 20s steps(10) infinite;
 }
 
 /* Subtle pulse effect */
@@ -126,7 +126,7 @@ body {
     rgba(255, 255, 255, 0.1) 0%,
     rgba(255, 255, 255, 0) 70%
   );
-  animation: pulse 4s ease-in-out infinite;
+  animation: pulse 10s ease-in-out infinite;
 }
 
 /* Animations */
