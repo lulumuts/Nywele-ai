@@ -382,7 +382,7 @@ export default function RefinedHairProfileForm() {
               Nywele.ai
             </h1>
             
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">
+            <h2 className="text-4xl font-medium text-gray-800 mb-4">
               Get Your Hair Care Tips
             </h2>
             
