@@ -29,7 +29,7 @@ body {
 /* Animated Gradient Background */
 .gradient-container {
   position: fixed;
-  inset: 0;
+  inset: -20%;
   overflow: hidden;
   z-index: 0;
   pointer-events: none;
@@ -48,15 +48,15 @@ body {
   border-radius: 50%;
   background: radial-gradient(
     circle at center,
-    rgba(236, 72, 153, 0.6) 0%,
-    rgba(244, 114, 182, 0.5) 25%,
-    rgba(251, 146, 163, 0.4) 45%,
-    rgba(252, 165, 165, 0.3) 60%,
-    rgba(254, 215, 170, 0.2) 75%,
-    rgba(254, 230, 150, 0.1) 85%,
+    rgba(236, 72, 153, 0.5) 0%,
+    rgba(244, 114, 182, 0.4) 20%,
+    rgba(251, 146, 163, 0.3) 35%,
+    rgba(252, 165, 165, 0.2) 50%,
+    rgba(254, 215, 170, 0.1) 65%,
+    rgba(254, 230, 150, 0.05) 80%,
     rgba(255, 255, 255, 0) 100%
   );
-  filter: blur(140px);
+  filter: blur(160px);
   animation: float 45s ease-in-out infinite;
 }
 
@@ -73,13 +73,14 @@ body {
   border-radius: 50%;
   background: radial-gradient(
     circle at center,
-    rgba(219, 39, 119, 0.5) 0%,
-    rgba(236, 72, 153, 0.4) 25%,
-    rgba(251, 146, 163, 0.3) 45%,
-    rgba(253, 186, 116, 0.2) 65%,
+    rgba(219, 39, 119, 0.4) 0%,
+    rgba(236, 72, 153, 0.3) 20%,
+    rgba(251, 146, 163, 0.2) 40%,
+    rgba(253, 186, 116, 0.1) 60%,
+    rgba(255, 255, 255, 0.05) 80%,
     rgba(255, 255, 255, 0) 100%
   );
-  filter: blur(130px);
+  filter: blur(150px);
   animation: float2 55s ease-in-out infinite;
 }
 
@@ -96,13 +97,14 @@ body {
   border-radius: 50%;
   background: radial-gradient(
     circle at center,
-    rgba(252, 165, 165, 0.45) 0%,
-    rgba(253, 195, 145, 0.3) 35%,
-    rgba(254, 215, 170, 0.2) 60%,
-    rgba(254, 230, 180, 0.1) 80%,
+    rgba(252, 165, 165, 0.4) 0%,
+    rgba(253, 195, 145, 0.25) 25%,
+    rgba(254, 215, 170, 0.15) 50%,
+    rgba(254, 230, 180, 0.08) 70%,
+    rgba(255, 255, 255, 0.03) 85%,
     rgba(255, 255, 255, 0) 100%
   );
-  filter: blur(130px);
+  filter: blur(150px);
   animation: float3 65s ease-in-out infinite;
 }
 
