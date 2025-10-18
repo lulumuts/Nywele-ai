@@ -5,6 +5,7 @@ const apiKey = process.env.GEMINI_API_KEY;
 
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null as any;
 
-export const geminiModel = genAI ? genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }) : null as any;
+// Use gemini-pro for text generation (gemini-1.5-flash doesn't exist in v1beta)
+export const geminiModel = genAI ? genAI.getGenerativeModel({ model: 'gemini-pro' }) : null as any;
 
 export default geminiModel;

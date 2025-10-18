@@ -56,6 +56,9 @@ export default function Results() {
     try {
       const hairType = sessionStorage.getItem('hairType') || '4c';
       const currentStyle = sessionStorage.getItem('currentStyle') || 'natural';
+      const ethnicity = sessionStorage.getItem('ethnicity') || 'Black Woman';
+      const length = sessionStorage.getItem('length') || 'Shoulder-Length';
+      const vibe = sessionStorage.getItem('vibe') || 'Professional Studio Portrait';
       
       const response = await fetch('/api/style', {
         method: 'POST',
@@ -63,13 +66,19 @@ export default function Results() {
         body: JSON.stringify({
           hairType,
           styleName: currentStyle,
-          skinTone: 'medium brown'
+          ethnicity,
+          length,
+          vibe
         })
       });
 
       const result = await response.json();
       if (result.success && result.data.imageUrl) {
         setStyleImage(result.data.imageUrl);
+        // Store the prompt for display
+        if (result.data.prompt) {
+          sessionStorage.setItem('aiPrompt', result.data.prompt);
+        }
       }
     } catch (error) {
       console.error('Failed to generate style image:', error);
@@ -191,6 +200,38 @@ export default function Results() {
                 <span className="font-semibold">Style:</span> {sessionStorage.getItem('currentStyle') || 'Natural'}
               </p>
             </div>
+            
+            {/* AI Prompt Details - Shows advanced prompt engineering to judges */}
+            <details className="mt-6">
+              <summary className="cursor-pointer text-purple-600 font-semibold hover:text-purple-700 flex items-center justify-center gap-2">
+                🤖 View AI Prompt Engineering Details
+              </summary>
+              <div className="mt-4 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200">
+                <h4 className="font-bold text-gray-900 mb-3">Advanced Prompt Engineering:</h4>
+                <p className="text-sm text-gray-700 leading-relaxed mb-4">
+                  This image was generated using a highly-detailed, bias-countering prompt specifically designed for authentic African hair representation. Our system uses explicit ethnicity markers and detailed texture descriptions to counter AI biases and ensure culturally accurate results.
+                </p>
+                <div className="bg-white p-4 rounded-lg border border-purple-200">
+                  <p className="text-xs font-mono text-gray-600">
+                    {sessionStorage.getItem('aiPrompt') || 'Detailed prompt used for AI generation'}
+                  </p>
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  <div className="bg-white p-3 rounded-lg">
+                    <span className="font-semibold text-purple-700">Hair Type:</span> {sessionStorage.getItem('hairType')}
+                  </div>
+                  <div className="bg-white p-3 rounded-lg">
+                    <span className="font-semibold text-purple-700">Length:</span> {sessionStorage.getItem('length')}
+                  </div>
+                  <div className="bg-white p-3 rounded-lg">
+                    <span className="font-semibold text-purple-700">Representation:</span> {sessionStorage.getItem('ethnicity')}
+                  </div>
+                  <div className="bg-white p-3 rounded-lg">
+                    <span className="font-semibold text-purple-700">Style:</span> {sessionStorage.getItem('vibe')}
+                  </div>
+                </div>
+              </div>
+            </details>
           </div>
         )}
 

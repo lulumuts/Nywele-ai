@@ -10,12 +10,35 @@ export default function Home() {
     hairType: '',
     goals: [] as string[],
     currentStyle: '',
-    durationPreference: '30 minutes'
+    durationPreference: '30 minutes',
+    ethnicity: 'Black Woman', // NEW - for AI image generation
+    length: 'Shoulder-Length', // NEW - for AI prompt
+    vibe: 'Professional Studio Portrait' // NEW - for AI prompt
   });
 
   const hairTypes = ['1a', '1b', '1c', '2a', '2b', '2c', '3a', '3b', '3c', '4a', '4b', '4c'];
   const goalOptions = ['Growth', 'Moisture', 'Strength', 'Shine', 'Definition', 'Repair'];
   const durations = ['15 minutes', '30 minutes', '45 minutes', '1 hour', '1+ hours'];
+  const styleOptions = [
+    'Box Braids',
+    'Cornrows',
+    'Twists',
+    'Twist Out',
+    'Bantu Knots',
+    'Afro/Natural',
+    'Locs/Dreadlocs',
+    'Senegalese Twists',
+    'Crochet Braids',
+    'Braided Updo',
+    'Faux Locs',
+    'Wash and Go',
+    'Flat Twists',
+    'Protective Style',
+    'Other'
+  ];
+  const ethnicityOptions = ['Black Woman', 'Black Man', 'Person of African Descent'];
+  const lengthOptions = ['Close-Cropped', 'Ear-Length', 'Chin-Length', 'Shoulder-Length', 'Mid-Back', 'Waist-Length'];
+  const vibeOptions = ['Professional Studio Portrait', 'Outdoor Golden Hour', 'Urban Street Style', 'Natural Indoor Lighting', 'Magazine Editorial'];
 
   const handleGoalToggle = (goal: string) => {
     setFormData(prev => ({
@@ -50,6 +73,9 @@ export default function Home() {
         sessionStorage.setItem('recommendation', JSON.stringify(result.data));
         sessionStorage.setItem('hairType', formData.hairType);
         sessionStorage.setItem('currentStyle', formData.currentStyle || 'natural');
+        sessionStorage.setItem('ethnicity', formData.ethnicity); // NEW
+        sessionStorage.setItem('length', formData.length); // NEW
+        sessionStorage.setItem('vibe', formData.vibe); // NEW
         router.push('/results');
       } else {
         alert('Failed to generate recommendation. Please try again.');
@@ -136,15 +162,88 @@ export default function Home() {
           {/* Current Style */}
           <div className="mb-8">
             <label className="block text-lg font-semibold text-gray-900 mb-4">
-              Current hairstyle (optional)
+              Current or desired hairstyle
             </label>
-            <input
-              type="text"
+            <select
               value={formData.currentStyle}
               onChange={(e) => setFormData(prev => ({ ...prev, currentStyle: e.target.value }))}
-              placeholder="e.g., Box braids, Twist out, Natural afro..."
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none text-gray-900"
-            />
+              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none text-gray-900 bg-white"
+            >
+              <option value="">Select a style...</option>
+              {styleOptions.map(style => (
+                <option key={style} value={style}>{style}</option>
+              ))}
+            </select>
+            {formData.currentStyle === 'Other' && (
+              <input
+                type="text"
+                placeholder="Please specify your style..."
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none text-gray-900 mt-3"
+                onChange={(e) => setFormData(prev => ({ ...prev, currentStyle: e.target.value }))}
+              />
+            )}
+          </div>
+
+          {/* Ethnicity/Representation - NEW */}
+          <div className="mb-8">
+            <label className="block text-lg font-semibold text-gray-900 mb-4">
+              Representation (for AI image generation)
+            </label>
+            <div className="grid grid-cols-1 gap-3">
+              {ethnicityOptions.map(option => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, ethnicity: option }))}
+                  className={`py-3 px-6 rounded-xl font-medium transition-all ${
+                    formData.ethnicity === option
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Desired Length - NEW */}
+          <div className="mb-8">
+            <label className="block text-lg font-semibold text-gray-900 mb-4">
+              Desired hair length
+            </label>
+            <select
+              value={formData.length}
+              onChange={(e) => setFormData(prev => ({ ...prev, length: e.target.value }))}
+              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none text-gray-900 bg-white"
+            >
+              {lengthOptions.map(length => (
+                <option key={length} value={length}>{length}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Setting/Vibe - NEW */}
+          <div className="mb-8">
+            <label className="block text-lg font-semibold text-gray-900 mb-4">
+              Image style preference
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {vibeOptions.map(vibe => (
+                <button
+                  key={vibe}
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, vibe: vibe }))}
+                  className={`py-3 px-6 rounded-xl font-medium transition-all text-sm ${
+                    formData.vibe === vibe
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {vibe}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Duration */}
