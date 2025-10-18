@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronRight, Info } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 // Custom loader with stroke animation
 const LoaderSVG = () => (
@@ -712,29 +711,21 @@ z"/>
                           desiredStyle: style.name,
                           duration: style.duration 
                         }))}
-                        className={`aspect-square rounded-full border-2 text-center transition-all overflow-hidden flex flex-col ${
+                        className={`aspect-square rounded-full border-2 text-center transition-all overflow-hidden relative ${
                           formData.desiredStyle === style.name
                             ? 'border-purple-600 bg-purple-600'
                             : 'border-[#FED9B4] hover:border-[#FED9B4]'
                         }`}
                       >
-                        <div className="relative w-full flex-1 bg-gray-200">
-                          <Image
-                            src={style.image}
-                            alt={style.name}
-                            fill
-                            className="object-cover"
-                            priority
-                            unoptimized
-                            onError={(e) => {
-                              // Fallback to gradient if image not found
-                              e.currentTarget.style.display = 'none';
-                            }}
-                          />
-                        </div>
-                        <div className="p-3">
-                          <div className={`font-semibold text-xs ${formData.desiredStyle === style.name ? 'text-[#FFEEDE]' : 'text-[#C87726]'}`}>{style.name}</div>
-                          <div className={`text-[10px] mt-1 ${formData.desiredStyle === style.name ? 'text-[#FFEEDE]' : 'text-[#C87726]'}`}>
+                        <img
+                          src={style.image}
+                          alt={style.name}
+                          className="w-full h-full object-cover"
+                          loading="eager"
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4 pt-8">
+                          <div className={`font-semibold text-xs ${formData.desiredStyle === style.name ? 'text-[#FFEEDE]' : 'text-white'}`}>{style.name}</div>
+                          <div className={`text-[10px] mt-1 ${formData.desiredStyle === style.name ? 'text-[#FFEEDE]' : 'text-white/90'}`}>
                             {style.duration}
                           </div>
                         </div>
