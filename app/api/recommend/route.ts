@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { openai } from '@/lib/openai';
 import { supabase } from '@/lib/supabase';
 
+interface Product {
+  id: string;
+  name: string;
+  brand: string;
+  description: string;
+  compatible_hair_types: string[];
+  affiliate_link?: string;
+  image_url?: string;
+  price?: number;
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Check if services are available
@@ -48,7 +59,7 @@ PROFILE:
 - Available Time: ${durationPreference || '30 minutes'}
 
 AVAILABLE PRODUCTS:
-${products?.map(p => `- ${p.brand} ${p.name}: ${p.description}`).join('\n')}
+${products?.map((p: Product) => `- ${p.brand} ${p.name}: ${p.description}`).join('\n')}
 
 TASK:
 Create a personalized hair care routine. Return your response in this EXACT JSON format:
@@ -105,7 +116,7 @@ IMPORTANT:
 
     // Match recommended products with database products (for affiliate links)
     const enrichedProducts = recommendation.recommendedProducts?.map((recProd: any) => {
-      const dbProduct = products?.find(p => 
+      const dbProduct = products?.find((p: Product) => 
         p.name.toLowerCase().includes(recProd.name.toLowerCase()) ||
         recProd.name.toLowerCase().includes(p.name.toLowerCase())
       );
