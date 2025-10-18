@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { openai } from '@/lib/openai';
 import { supabase } from '@/lib/supabase';
-import { trackRecommendation } from '@/lib/convex';
+// import { trackRecommendation } from '@/lib/convex'; // Uncomment after running `npx convex dev`
 
 interface Product {
   id: string;
@@ -170,16 +170,17 @@ IMPORTANT:
     }
 
     // Track analytics with Convex (if configured)
-    trackRecommendation({
-      hairType,
-      goals,
-      currentStyle,
-      ethnicity: body.ethnicity || 'Not specified',
-      length: body.length || 'Not specified',
-      porosity: porosity || 'Not specified',
-      concerns: concerns || [],
-      desiredStyle: desiredStyle || 'Not specified',
-    }).catch(err => console.error('Analytics tracking failed:', err));
+    // Commented out until Convex is initialized with `npx convex dev`
+    // trackRecommendation({
+    //   hairType,
+    //   goals,
+    //   currentStyle,
+    //   ethnicity: body.ethnicity || 'Not specified',
+    //   length: body.length || 'Not specified',
+    //   porosity: porosity || 'Not specified',
+    //   concerns: concerns || [],
+    //   desiredStyle: desiredStyle || 'Not specified',
+    // }).catch(err => console.error('Analytics tracking failed:', err));
 
     return NextResponse.json({
       success: true,
