@@ -724,6 +724,8 @@ z"/>
                             alt={style.name}
                             fill
                             className="object-cover"
+                            priority
+                            unoptimized
                             onError={(e) => {
                               // Fallback to gradient if image not found
                               e.currentTarget.style.display = 'none';
