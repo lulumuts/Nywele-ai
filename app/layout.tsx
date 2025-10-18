@@ -16,7 +16,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {/* Animated gradient background */}
+        <div className="gradient-container">
+          <div className="gradient-blob"></div>
+          <div className="gradient-blob-2"></div>
+          <div className="gradient-blob-3"></div>
+          <div className="pulse-overlay"></div>
+          <div className="grain-overlay"></div>
+        </div>
+        
+        {/* Main content - positioned above gradient */}
+        <div className="relative z-10">
+          {children}
+        </div>
+      </body>
     </html>
   );
 }
