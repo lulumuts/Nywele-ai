@@ -82,6 +82,76 @@ export async function trackStyleGeneration(data: {
   }
 }
 
+// Track product clicks
+export async function trackProductClick(data: {
+  productName: string;
+  brand?: string;
+  hairType?: string;
+  price?: number;
+}) {
+  if (!supabase) {
+    console.log('[Analytics] Supabase not configured - skipping tracking');
+    return;
+  }
+
+  try {
+    const { error } = await supabase
+      .from('analytics_events')
+      .insert({
+        event_type: 'product_click',
+        product_name: data.productName,
+        hair_type: data.hairType,
+        metadata: {
+          brand: data.brand,
+          price: data.price,
+        }
+      });
+
+    if (error) {
+      console.error('[Analytics] Failed to track product click:', error);
+    } else {
+      console.log('[Analytics] ✅ Tracked product click:', data.productName);
+    }
+  } catch (error) {
+    console.error('[Analytics] Failed to track product click:', error);
+  }
+}
+
+// Track salon views (for future use)
+export async function trackSalonView(data: {
+  salonName: string;
+  location?: string;
+  services?: string[];
+  hairType?: string;
+}) {
+  if (!supabase) {
+    console.log('[Analytics] Supabase not configured - skipping tracking');
+    return;
+  }
+
+  try {
+    const { error } = await supabase
+      .from('analytics_events')
+      .insert({
+        event_type: 'salon_view',
+        salon_name: data.salonName,
+        hair_type: data.hairType,
+        metadata: {
+          location: data.location,
+          services: data.services,
+        }
+      });
+
+    if (error) {
+      console.error('[Analytics] Failed to track salon view:', error);
+    } else {
+      console.log('[Analytics] ✅ Tracked salon view:', data.salonName);
+    }
+  } catch (error) {
+    console.error('[Analytics] Failed to track salon view:', error);
+  }
+}
+
 // Get analytics stats
 export async function getAnalyticsStats() {
   if (!supabase) {
@@ -101,17 +171,23 @@ export async function getAnalyticsStats() {
 
     const recommendations = events?.filter(e => e.event_type === 'recommendation') || [];
     const styleGenerations = events?.filter(e => e.event_type === 'style_generation') || [];
+    const productClicks = events?.filter(e => e.event_type === 'product_click') || [];
+    const salonViews = events?.filter(e => e.event_type === 'salon_view') || [];
     const successfulAI = styleGenerations.filter(e => e.success === true);
 
     return {
       totalRecommendations: recommendations.length,
       totalStyleGenerations: styleGenerations.length,
+      totalProductClicks: productClicks.length,
+      totalSalonViews: salonViews.length,
       aiSuccessRate: styleGenerations.length > 0 
         ? Math.round((successfulAI.length / styleGenerations.length) * 100)
         : 0,
       recentActivity: events?.slice(0, 10) || [],
       popularHairTypes: getPopularItems(recommendations, 'hair_type'),
       popularStyles: getPopularItems(styleGenerations, 'style'),
+      popularProducts: getPopularItems(productClicks, 'product_name'),
+      popularSalons: getPopularItems(salonViews, 'salon_name'),
     };
   } catch (error) {
     console.error('[Analytics] Failed to fetch stats:', error);

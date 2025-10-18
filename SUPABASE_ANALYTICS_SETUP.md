@@ -14,6 +14,8 @@ CREATE TABLE analytics_events (
   porosity TEXT,
   concerns TEXT[],
   style TEXT,
+  product_name TEXT,
+  salon_name TEXT,
   success BOOLEAN,
   metadata JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -22,6 +24,8 @@ CREATE TABLE analytics_events (
 -- Create indexes for faster queries
 CREATE INDEX idx_event_type ON analytics_events(event_type);
 CREATE INDEX idx_hair_type ON analytics_events(hair_type);
+CREATE INDEX idx_product_name ON analytics_events(product_name);
+CREATE INDEX idx_salon_name ON analytics_events(salon_name);
 CREATE INDEX idx_created_at ON analytics_events(created_at DESC);
 
 -- Enable Row Level Security (optional for hackathon, but good practice)
@@ -45,6 +49,7 @@ npm run dev
 ```
 
 Fill out the form and submit. Check your terminal for:
+
 ```
 [Analytics] ✅ Tracked recommendation
 [Analytics] ✅ Tracked style generation (fallback)
@@ -59,11 +64,13 @@ You should see your tracked events!
 ## Step 4: View Analytics Dashboard
 
 Once you have some data, visit:
+
 ```
 http://localhost:3000/analytics
 ```
 
 You'll see:
+
 - Total recommendations
 - Style generation attempts
 - AI success rate
@@ -74,6 +81,7 @@ You'll see:
 ## What Gets Tracked
 
 ### Recommendation Events
+
 - Hair type
 - Porosity
 - Concerns
@@ -81,14 +89,28 @@ You'll see:
 - Goals, ethnicity, length (in metadata)
 
 ### Style Generation Events
+
 - Hair type
 - Style
 - Success (AI vs fallback)
 - Ethnicity, length, vibe (in metadata)
+
+### Product Click Events
+
+- Product name
+- Brand (in metadata)
+- Hair type
+- Context (recommendation or suggestion)
+
+### Salon View Events
+
+- Salon name
+- Location (in metadata)
+- Services (in metadata)
+- Hair type preferences
 
 ## Production Deploy
 
 Your Supabase credentials are already in `.env.local` and will work in production on Vercel!
 
 No additional setup needed ✨
-

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { trackProductClick } from '@/lib/analytics';
 
 interface Step {
   stepNumber: number;
@@ -268,6 +269,14 @@ export default function Results() {
                     href={product.affiliateLink || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => {
+                      trackProductClick({
+                        productName: product.name,
+                        brand: product.brand,
+                        hairType: sessionStorage.getItem('hairType') || undefined,
+                        price: product.price,
+                      });
+                    }}
                     className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
                   >
                     Shop Now
