@@ -375,7 +375,7 @@ export default function RefinedHairProfileForm() {
       <div className={showLanding ? "flex items-center justify-center min-h-screen px-4" : "max-w-3xl mx-auto py-12 px-4"}>
         {showLanding ? (
           /* Landing Screen */
-          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-xl p-12 text-center animate-fade-in max-w-2xl w-full">
+          <div className="p-12 text-center animate-fade-in max-w-2xl w-full">
             <CoilSVG />
             
             <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-8">
@@ -391,17 +391,17 @@ export default function RefinedHairProfileForm() {
               products, and styles for your unique hair texture.
             </p>
             
-            <div className="flex gap-4 justify-center">
+            <div className="flex gap-8 justify-center">
               <button
                 onClick={() => setShowLanding(false)}
-                className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all transform hover:scale-105"
+                className="text-purple-600 font-semibold text-lg hover:text-purple-700 transition-colors underline decoration-2 underline-offset-4"
               >
                 Get Started
               </button>
               
               <Link
                 href="/how-it-works"
-                className="px-8 py-4 bg-white/80 backdrop-blur-sm text-purple-600 border-2 border-purple-600 rounded-xl font-bold text-lg hover:shadow-xl transition-all transform hover:scale-105 inline-flex items-center"
+                className="text-purple-600 font-semibold text-lg hover:text-purple-700 transition-colors underline decoration-2 underline-offset-4"
               >
                 How It Works
               </Link>
