@@ -510,8 +510,8 @@ z"/>
             {/* Progress Bar */}
             <div className="mb-8">
           <div className="flex justify-between mb-2">
-            <span className="text-sm font-medium text-[#D7AC81]">Step {step} of 4</span>
-            <span className="text-sm text-[#D7AC81]">{Math.round((step / 4) * 100)}% Complete</span>
+            <span className="text-sm font-medium text-[#C87726]">Step {step} of 4</span>
+            <span className="text-sm text-[#C87726]">{Math.round((step / 4) * 100)}% Complete</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
@@ -526,13 +526,13 @@ z"/>
           {step === 1 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold text-[#D7AC81] mb-2">Your Hair Profile</h2>
-                <p className="text-[#D7AC81]">Let's understand your beautiful texture</p>
+                <h2 className="text-3xl font-bold text-[#C87726] mb-2">Your Hair Profile</h2>
+                <p className="text-[#C87726]">Let's understand your beautiful texture</p>
               </div>
 
               {/* Hair Type */}
               <div>
-                <label className="block text-sm font-semibold text-[#D7AC81] mb-3">
+                <label className="block text-sm font-semibold text-[#C87726] mb-3">
                   Hair Type
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -548,8 +548,8 @@ z"/>
                       }`}
                     >
                       <div className="text-2xl mb-1">{type.visual}</div>
-                      <div className="font-semibold text-[#D7AC81]">{type.name}</div>
-                      <div className="text-xs text-[#D7AC81] mt-1">{type.description}</div>
+                      <div className="font-semibold text-[#C87726]">{type.name}</div>
+                      <div className="text-xs text-[#C87726] mt-1">{type.description}</div>
                     </button>
                   ))}
                 </div>
@@ -557,10 +557,10 @@ z"/>
 
               {/* Porosity */}
               <div>
-                <label className="block text-sm font-semibold text-[#D7AC81] mb-1">
+                <label className="block text-sm font-semibold text-[#C87726] mb-1">
                   Hair Porosity
                 </label>
-                <div className="flex items-center gap-2 mb-3 text-xs text-[#D7AC81]">
+                <div className="flex items-center gap-2 mb-3 text-xs text-[#C87726]">
                   <Info className="w-4 h-4" />
                   <span>How well your hair absorbs and retains moisture</span>
                 </div>
@@ -576,9 +576,9 @@ z"/>
                           : 'border-[#FED9B4] hover:border-[#FED9B4]'
                       }`}
                     >
-                      <div className="font-semibold text-[#D7AC81]">{option.name}</div>
-                      <div className="text-sm text-[#D7AC81] mt-1">{option.description}</div>
-                      <div className="text-xs text-[#D7AC81] mt-2">{option.tip}</div>
+                      <div className="font-semibold text-[#C87726]">{option.name}</div>
+                      <div className="text-sm text-[#C87726] mt-1">{option.description}</div>
+                      <div className="text-xs text-[#C87726] mt-2">{option.tip}</div>
                     </button>
                   ))}
                 </div>
@@ -586,7 +586,7 @@ z"/>
 
               {/* Length */}
               <div>
-                <label className="block text-sm font-semibold text-[#D7AC81] mb-3">
+                <label className="block text-sm font-semibold text-[#C87726] mb-3">
                   Current Length (Stretched)
                 </label>
                 <div className="space-y-2">
@@ -603,8 +603,8 @@ z"/>
                     >
                       <div className="flex justify-between items-center">
                         <div>
-                          <div className="font-semibold text-[#D7AC81]">{option.label}</div>
-                          <div className="text-xs text-[#D7AC81]">{option.stretched} stretched • {option.shrunken}</div>
+                          <div className="font-semibold text-[#C87726]">{option.label}</div>
+                          <div className="text-xs text-[#C87726]">{option.stretched} stretched • {option.shrunken}</div>
                         </div>
                       </div>
                     </button>
@@ -618,8 +618,8 @@ z"/>
           {step === 2 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold text-[#D7AC81] mb-2">What Are Your Goals?</h2>
-                <p className="text-[#D7AC81]">Select up to 3 main concerns</p>
+                <h2 className="text-3xl font-bold text-[#C87726] mb-2">What Are Your Goals?</h2>
+                <p className="text-[#C87726]">Select up to 3 main concerns</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -638,12 +638,12 @@ z"/>
                     }`}
                   >
                     <div className="text-2xl mb-2">{concern.icon}</div>
-                    <div className="font-semibold text-sm text-[#D7AC81]">{concern.label}</div>
+                    <div className="font-semibold text-sm text-[#C87726]">{concern.label}</div>
                   </button>
                 ))}
               </div>
 
-              <div className="text-sm text-[#D7AC81] text-center">
+              <div className="text-sm text-[#C87726] text-center">
                 {formData.concerns.length}/3 selected
               </div>
             </div>
@@ -653,15 +653,15 @@ z"/>
           {step === 3 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold text-[#D7AC81] mb-2">Choose Your Style</h2>
-                <p className="text-[#D7AC81]">What look are you going for?</p>
+                <h2 className="text-3xl font-bold text-[#C87726] mb-2">Choose Your Style</h2>
+                <p className="text-[#C87726]">What look are you going for?</p>
               </div>
 
               {Object.entries(styleCategories).map(([key, category]) => (
                 <div key={key} className="space-y-3">
                   <div>
-                    <h3 className="font-bold text-lg text-[#D7AC81]">{category.label}</h3>
-                    <p className="text-sm text-[#D7AC81]">{category.subtitle}</p>
+                    <h3 className="font-bold text-lg text-[#C87726]">{category.label}</h3>
+                    <p className="text-sm text-[#C87726]">{category.subtitle}</p>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {category.styles.map(style => (
@@ -679,8 +679,8 @@ z"/>
                             : 'border-[#FED9B4] hover:border-[#FED9B4]'
                         }`}
                       >
-                        <div className="font-semibold text-[#D7AC81]">{style.name}</div>
-                        <div className="text-xs text-[#D7AC81] mt-1">
+                        <div className="font-semibold text-[#C87726]">{style.name}</div>
+                        <div className="text-xs text-[#C87726] mt-1">
                           {style.duration} • {style.maintenance} maintenance
                         </div>
                       </button>
@@ -695,8 +695,8 @@ z"/>
           {step === 4 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold text-[#D7AC81] mb-2">Set the Vibe</h2>
-                <p className="text-[#D7AC81]">What's the occasion or aesthetic?</p>
+                <h2 className="text-3xl font-bold text-[#C87726] mb-2">Set the Vibe</h2>
+                <p className="text-[#C87726]">What's the occasion or aesthetic?</p>
               </div>
 
               <div className="space-y-3">
@@ -714,8 +714,8 @@ z"/>
                     <div className="flex items-center gap-4">
                       <div className="text-3xl">{vibe.emoji}</div>
                       <div>
-                        <div className="font-semibold text-[#D7AC81]">{vibe.name}</div>
-                        <div className="text-sm text-[#D7AC81] mt-1">{vibe.description}</div>
+                        <div className="font-semibold text-[#C87726]">{vibe.name}</div>
+                        <div className="text-sm text-[#C87726] mt-1">{vibe.description}</div>
                       </div>
                     </div>
                   </button>
