@@ -35,15 +35,48 @@ interface RecommendationData {
 export default function Results() {
   const router = useRouter();
   const [data, setData] = useState<RecommendationData | null>(null);
+  const [styleImage, setStyleImage] = useState<string | null>(null);
+  const [loadingImage, setLoadingImage] = useState(false);
 
   useEffect(() => {
     const stored = sessionStorage.getItem('recommendation');
     if (stored) {
-      setData(JSON.parse(stored));
+      const recData = JSON.parse(stored);
+      setData(recData);
+      
+      // Generate style inspiration image
+      generateStyleImage(recData);
     } else {
       router.push('/');
     }
   }, [router]);
+
+  const generateStyleImage = async (recData: RecommendationData) => {
+    setLoadingImage(true);
+    try {
+      const hairType = sessionStorage.getItem('hairType') || '4c';
+      const currentStyle = sessionStorage.getItem('currentStyle') || 'natural';
+      
+      const response = await fetch('/api/style', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          hairType,
+          styleName: currentStyle,
+          skinTone: 'medium brown'
+        })
+      });
+
+      const result = await response.json();
+      if (result.success && result.data.imageUrl) {
+        setStyleImage(result.data.imageUrl);
+      }
+    } catch (error) {
+      console.error('Failed to generate style image:', error);
+    } finally {
+      setLoadingImage(false);
+    }
+  };
 
   if (!data) {
     return (

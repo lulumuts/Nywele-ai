@@ -46,8 +46,10 @@ export default function Home() {
       const result = await response.json();
 
       if (result.success) {
-        // Store results in sessionStorage and navigate
+        // Store results and form data in sessionStorage
         sessionStorage.setItem('recommendation', JSON.stringify(result.data));
+        sessionStorage.setItem('hairType', formData.hairType);
+        sessionStorage.setItem('currentStyle', formData.currentStyle || 'natural');
         router.push('/results');
       } else {
         alert('Failed to generate recommendation. Please try again.');
