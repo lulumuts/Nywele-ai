@@ -382,11 +382,11 @@ export default function RefinedHairProfileForm() {
               Nywele.ai
             </h1>
             
-            <h2 className="text-4xl font-medium mb-4" style={{ color: '#E09600' }}>
+            <h2 className="text-4xl font-medium mb-4" style={{ color: '#F53D69' }}>
               Get Your Hair Care Tips
             </h2>
             
-            <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: '#E09600' }}>
+            <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: '#F53D69' }}>
               Personalized recommendations powered by AI. Discover the perfect routine, 
               products, and styles for your unique hair texture.
             </p>
@@ -395,7 +395,7 @@ export default function RefinedHairProfileForm() {
               <button
                 onClick={() => setShowLanding(false)}
                 className="font-semibold text-lg hover:opacity-80 transition-opacity underline decoration-2 underline-offset-4"
-                style={{ color: '#E09600' }}
+                style={{ color: '#F53D69' }}
               >
                 Get Started
               </button>
@@ -403,7 +403,7 @@ export default function RefinedHairProfileForm() {
               <Link
                 href="/how-it-works"
                 className="font-semibold text-lg hover:opacity-80 transition-opacity underline decoration-2 underline-offset-4"
-                style={{ color: '#E09600' }}
+                style={{ color: '#F53D69' }}
               >
                 How It Works
               </Link>
