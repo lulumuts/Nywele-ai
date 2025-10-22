@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
+import Navbar from "./components/Navbar";
 
 const bricolage = Bricolage_Grotesque({ 
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default function RootLayout({
         
         {/* Main content - positioned above gradient */}
         <div className="relative z-10">
+          <Navbar />
           {children}
         </div>
       </body>

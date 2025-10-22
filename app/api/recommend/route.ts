@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { hairType, goals, currentStyle, durationPreference, porosity, concerns, desiredStyle } = body;
+    const { hairType, goals, currentStyle, durationPreference, porosity, concerns, desiredStyle, budget } = body;
 
     // Validate input
     if (!hairType || !goals || goals.length === 0) {
@@ -58,6 +58,16 @@ export async function POST(request: NextRequest) {
       'unsure': 'Recommend balanced, versatile products suitable for various porosity levels.'
     };
 
+    // Build budget-specific guidance
+    const budgetGuidance: Record<string, string> = {
+      'budget': 'Focus on affordable drugstore brands ($5-$15 per product). Recommend multi-use products and DIY alternatives. Suggest ways to stretch products longer. Typical monthly spend: $20-$40.',
+      'mid-range': 'Balance quality and affordability with mid-tier brands ($15-$35 per product). Mix some drugstore staples with specialty products. Typical monthly spend: $40-$80.',
+      'premium': 'Recommend high-end salon brands and specialty products ($35-$60+ per product). Focus on luxury ingredients and professional results. Typical monthly spend: $80-$150+.',
+      'any': 'Provide 3 tiers: Budget-friendly options ($5-$15), mid-range alternatives ($15-$35), and premium choices ($35+). Let user choose based on budget.'
+    };
+    
+    const budgetTier = budget || 'any';
+
     const concernsText = concerns?.length > 0 
       ? `- Main Concerns: ${concerns.join(', ')}` 
       : '';
@@ -77,15 +87,19 @@ ${styleText}
 - Goals: ${goals.join(', ')}
 ${concernsText}
 - Available Time: ${durationPreference || '30 minutes'}
+- Budget: ${budgetTier === 'any' ? 'Show all tiers' : budgetTier}
 
 POROSITY-SPECIFIC GUIDANCE:
 ${porosityGuidance[porosity as string] || porosityGuidance['unsure']}
+
+BUDGET GUIDANCE:
+${budgetGuidance[budgetTier]}
 
 AVAILABLE PRODUCTS:
 ${products?.map((p: Product) => `- ${p.brand} ${p.name}: ${p.description}`).join('\n')}
 
 TASK:
-Create a personalized hair care routine specifically optimized for ${porosity || 'balanced'} porosity hair. Return your response in this EXACT JSON format:
+Create a personalized hair care routine specifically optimized for ${porosity || 'balanced'} porosity hair and ${budgetTier} budget. Return your response in this EXACT JSON format:
 
 {
   "routine": {

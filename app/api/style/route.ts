@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { generateImagePrompt } from '@/lib/promptGenerator';
 import { trackStyleGeneration } from '@/lib/analytics';
+import { findStyleImage, getStyleCostEstimate, getStyleInfo } from '@/lib/imageLibrary';
 
 // Initialize Google GenAI client for Gemini Native Image Generation (Nano Banana)
 const genAI = process.env.GEMINI_API_KEY 
@@ -118,8 +119,21 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Fallback to curated stock images
-    const imageUrl = getStockImageUrl(hairType, styleName);
+    // Use curated image library for authentic representation
+    const lengthCategory = 
+      length === 'Close-Cropped' || length === 'Ear-Length' ? 'short' :
+      length === 'Chin-Length' || length === 'Shoulder-Length' ? 'medium' : 'long';
+    
+    const styleImage = findStyleImage(
+      styleName,
+      hairType,
+      lengthCategory,
+      'back' // Prefer back view
+    );
+
+    const imageUrl = styleImage?.url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80';
+    const costEstimate = getStyleCostEstimate(styleName);
+    const styleInfo = getStyleInfo(styleName);
 
     // Track fallback usage
     trackStyleGeneration({
@@ -128,7 +142,7 @@ export async function POST(request: NextRequest) {
       ethnicity,
       length,
       vibe,
-      success: false, // Using fallback, not AI-generated
+      success: false, // Using curated images, not AI-generated
     }).catch(err => console.error('Analytics tracking failed:', err));
 
     return NextResponse.json({
@@ -142,8 +156,11 @@ export async function POST(request: NextRequest) {
         length,
         vibe,
         prompt: detailedPrompt,
-        generatedBy: 'curated-stock',
-        fallback: true
+        generatedBy: styleImage?.source || 'curated-library',
+        fallback: true,
+        costEstimate,
+        styleInfo,
+        imageAttribution: styleImage?.attribution
       }
     });
 
@@ -161,68 +178,4 @@ export async function POST(request: NextRequest) {
       }
     }, { status: 500 });
   }
-}
-
-// Helper function to get appropriate stock images
-function getStockImageUrl(hairType: string, styleName: string): string {
-  // Expanded map of curated Unsplash/Pexels images for African hairstyles
-  const imageMap: Record<string, string> = {
-    'box braids': 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=800&q=80',
-    'cornrows': 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=800&q=80',
-    'twists': 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=800&q=80',
-    'twist out': 'https://images.unsplash.com/photo-1616683693457-c45984ccb3ae?w=800&q=80',
-    'bantu knots': 'https://images.unsplash.com/photo-1583884098485-8e9a6ee00eb3?w=800&q=80',
-    'afro/natural': 'https://images.unsplash.com/photo-1524502397800-2eeaad7c3fe5?w=800&q=80',
-    'afro': 'https://images.unsplash.com/photo-1524502397800-2eeaad7c3fe5?w=800&q=80',
-    'natural': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
-    'locs/dreadlocs': 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&q=80',
-    'locs': 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&q=80',
-    'dreadlocs': 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&q=80',
-    'senegalese twists': 'https://images.unsplash.com/photo-1598217309180-a9ea0cb11175?w=800&q=80',
-    'crochet braids': 'https://images.unsplash.com/photo-1580465039100-ec840a36bb4c?w=800&q=80',
-    'braided updo': 'https://images.unsplash.com/photo-1609505848912-b7c3b8b4beda?w=800&q=80',
-    'faux locs': 'https://images.unsplash.com/photo-1609505848912-b7c3b8b4beda?w=800&q=80',
-    'wash and go': 'https://images.unsplash.com/photo-1616683693457-c45984ccb3ae?w=800&q=80',
-    'flat twists': 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=800&q=80',
-    'protective style': 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=800&q=80',
-    'braids': 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=800&q=80',
-  };
-
-  // Normalize and try exact match first
-  const styleLower = styleName.toLowerCase().trim();
-  
-  // Direct lookup
-  if (imageMap[styleLower]) {
-    return imageMap[styleLower];
-  }
-
-  // Try partial match (more flexible)
-  for (const [key, url] of Object.entries(imageMap)) {
-    const keyLower = key.toLowerCase();
-    // Check if style contains key or key contains style
-    if (styleLower.includes(keyLower) || keyLower.includes(styleLower)) {
-      console.log(`Matched style "${styleName}" to key "${key}"`);
-      return url;
-    }
-    // Also check for individual words (e.g., "bantu" in "Bantu Knots")
-    const styleWords = styleLower.split(' ');
-    const keyWords = keyLower.split(' ');
-    if (styleWords.some(word => keyWords.includes(word)) || keyWords.some(word => styleWords.includes(word))) {
-      console.log(`Matched style "${styleName}" to key "${key}" via word match`);
-      return url;
-    }
-  }
-
-  // Default based on hair type for Type 4 hair (most common for African hair)
-  if (hairType === '4c' || hairType === '4b' || hairType === '4a') {
-    return 'https://images.unsplash.com/photo-1524502397800-2eeaad7c3fe5?w=800&q=80';
-  }
-  
-  // Default for Type 3 hair
-  if (hairType === '3c' || hairType === '3b' || hairType === '3a') {
-    return 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=800&q=80';
-  }
-  
-  // General fallback
-  return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80';
 }
