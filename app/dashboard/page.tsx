@@ -18,16 +18,27 @@ import {
   Clock,
   Phone,
   Calendar,
-  Lightbulb
+  Lightbulb,
+  Package,
+  ShoppingBag
 } from 'lucide-react';
 
 // Removed feature cards - now in navbar
+
+interface SavedRoutine {
+  id: string;
+  createdAt: string;
+  hairAnalysis: any;
+  routine: any;
+  notes?: string;
+}
 
 interface UserProfile {
   name: string;
   email: string;
   hairType: '4a' | '4b' | '4c';
   hairGoals: string[];
+  savedRoutines?: SavedRoutine[];
 }
 
 interface BookingData {
@@ -57,6 +68,7 @@ export default function Dashboard() {
   const [bookingData, setBookingData] = useState<BookingData | null>(null);
   const [showBookingNotification, setShowBookingNotification] = useState(false);
   const [dailyTips, setDailyTips] = useState<DailyTip[]>([]);
+  const [recommendedProducts, setRecommendedProducts] = useState<any[]>([]);
 
   useEffect(() => {
     // Check if user is registered
@@ -83,8 +95,53 @@ export default function Dashboard() {
       
       // Generate daily tips
       generateDailyTips(parsedProfile, booking ? JSON.parse(booking) : null);
+      
+      // Get product recommendations
+      getProductRecommendations(parsedProfile);
     }
   }, []);
+
+  const getProductRecommendations = (profile: UserProfile) => {
+    // Check if user has saved routines with product recommendations
+    if (profile.savedRoutines && profile.savedRoutines.length > 0) {
+      const latestRoutine = profile.savedRoutines[0];
+      if (latestRoutine.routine?.productRecommendations?.essential) {
+        setRecommendedProducts(latestRoutine.routine.productRecommendations.essential.slice(0, 3));
+        return;
+      }
+    }
+
+    // Default product recommendations based on hair type
+    const hairType = profile.hairType;
+    const defaultProducts = [
+      {
+        brand: 'Shea Moisture',
+        name: 'Jamaican Black Castor Oil Strengthen & Restore Leave-In Conditioner',
+        purpose: `Perfect for ${hairType.toUpperCase()} hair, this leave-in provides deep moisture and strengthens hair`,
+        pricing: { currency: 'KES', amount: 1500, size: '312ml' },
+        benefits: ['Moisturizes deeply', 'Reduces breakage', 'Promotes hair growth'],
+        whereToBuy: ['Carrefour', 'Naivas', 'Online stores']
+      },
+      {
+        brand: 'Cantu',
+        name: 'Shea Butter Natural Hair Curl Activator Cream',
+        purpose: 'Defines curls and reduces frizz while maintaining moisture',
+        pricing: { currency: 'KES', amount: 1200, size: '355ml' },
+        benefits: ['Defines curls', 'Reduces frizz', 'Adds shine'],
+        whereToBuy: ['Zucchini', 'Healthy U', 'Chandarana']
+      },
+      {
+        brand: 'African Pride',
+        name: 'Olive Miracle Deep Conditioning Treatment',
+        purpose: 'Weekly deep conditioning for maximum hydration and softness',
+        pricing: { currency: 'KES', amount: 800, size: '355ml' },
+        benefits: ['Deep conditioning', 'Restores moisture', 'Improves elasticity'],
+        whereToBuy: ['Naivas', 'Carrefour', 'Tuskys']
+      }
+    ];
+
+    setRecommendedProducts(defaultProducts);
+  };
 
   const generateDailyTips = (profile: UserProfile, booking: BookingData | null) => {
     const hairType = profile.hairType.toUpperCase();
@@ -137,7 +194,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12 px-4">
+    <div className="min-h-screen bg-peach py-12 px-4">
       <div className="max-w-7xl mx-auto">
         {/* User Profile Banner */}
         {userName ? (
@@ -332,6 +389,120 @@ export default function Dashboard() {
                     <span className="font-semibold">Current Style:</span> {bookingData.desiredStyle.replace(/-/g, ' ')}
                     {' • '}
                     <span className="font-semibold">Next Appointment:</span> {new Date(bookingData.date).toLocaleDateString()}
+                  </p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Product Recommendations */}
+        {userProfile && recommendedProducts.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="mb-12"
+          >
+            <div className="rounded-2xl p-6 border-2" style={{ backgroundColor: 'rgba(184, 125, 72, 0.3)', borderColor: '#9E6240' }}>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <ShoppingBag size={28} style={{ color: '#9E6240' }} />
+                  <h2 className="text-2xl font-bold" style={{ color: '#9E6240' }}>
+                    Recommended Products for You
+                  </h2>
+                </div>
+                <Link 
+                  href="/hair-care"
+                  className="text-sm font-medium flex items-center gap-1 hover:underline"
+                  style={{ color: '#914600' }}
+                >
+                  Get Full Routine
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-4">
+                {recommendedProducts.map((product, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 + index * 0.1 }}
+                    className="rounded-xl p-5 transition-all hover:shadow-lg"
+                    style={{ backgroundColor: 'white', border: '2px solid #9E6240' }}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Package size={16} style={{ color: '#914600' }} />
+                          <span className="text-xs font-semibold" style={{ color: '#914600' }}>
+                            RECOMMENDED
+                          </span>
+                        </div>
+                        <h3 className="text-lg font-bold mb-1" style={{ color: '#9E6240' }}>
+                          {product.brand}
+                        </h3>
+                        <p className="text-sm mb-2" style={{ color: '#914600' }}>
+                          {product.name}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mb-3">
+                      <p className="text-xs mb-2" style={{ color: '#914600' }}>
+                        <strong>Why we recommend:</strong>
+                      </p>
+                      <p className="text-xs" style={{ color: '#914600' }}>
+                        {product.purpose}
+                      </p>
+                    </div>
+
+                    <div className="mb-3">
+                      <p className="text-xs font-semibold mb-1" style={{ color: '#914600' }}>
+                        Key Benefits:
+                      </p>
+                      <ul className="space-y-1">
+                        {product.benefits.slice(0, 2).map((benefit: string, idx: number) => (
+                          <li key={idx} className="text-xs flex items-start gap-1" style={{ color: '#914600' }}>
+                            <span>•</span>
+                            <span>{benefit}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: 'rgba(158, 98, 64, 0.3)' }}>
+                      <div>
+                        <p className="text-lg font-bold" style={{ color: '#9E6240' }}>
+                          {product.pricing.currency} {product.pricing.amount.toLocaleString()}
+                        </p>
+                        <p className="text-xs" style={{ color: '#914600' }}>
+                          {product.pricing.size}
+                        </p>
+                      </div>
+                      <button 
+                        className="px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all hover:shadow-lg"
+                        style={{ backgroundColor: '#914600' }}
+                        onClick={() => {
+                          // Could link to where to buy or product details
+                          alert(`Available at: ${product.whereToBuy.join(', ')}`);
+                        }}
+                      >
+                        Buy Now
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {userProfile.savedRoutines && userProfile.savedRoutines.length > 0 && (
+                <div className="mt-4 p-3 rounded-lg" style={{ backgroundColor: 'rgba(158, 98, 64, 0.2)' }}>
+                  <p className="text-sm text-center" style={{ color: '#914600' }}>
+                    💡 These products are from your latest saved routine • 
+                    <Link href="/profile" className="font-semibold hover:underline ml-1">
+                      View all your routines
+                    </Link>
                   </p>
                 </div>
               )}

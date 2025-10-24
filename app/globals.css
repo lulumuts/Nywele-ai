@@ -3,21 +3,26 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: #FEF4E6;
   --foreground: #171717;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #FEF4E6;
+    --foreground: #171717;
   }
+}
+
+html {
+  background: #FEF4E6;
 }
 
 body {
   color: var(--foreground);
-  background: #fff2e5;
+  background: #FEF4E6;
   overflow-x: hidden;
+  min-height: 100vh;
 }
 
 @layer utilities {
@@ -33,102 +38,32 @@ body {
   overflow: hidden;
   z-index: 0;
   pointer-events: none;
+  display: none; /* Hide gradient overlays */
 }
 
 /* Main animated gradient blob */
 .gradient-blob {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100vw;
-  height: 100vw;
-  max-width: 1200px;
-  max-height: 1200px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at center,
-    rgba(236, 72, 153, 0.5) 0%,
-    rgba(244, 114, 182, 0.4) 20%,
-    rgba(251, 146, 163, 0.3) 35%,
-    rgba(252, 165, 165, 0.2) 50%,
-    rgba(254, 215, 170, 0.1) 65%,
-    rgba(254, 230, 150, 0.05) 80%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  filter: blur(160px);
-  animation: float 45s ease-in-out infinite;
+  display: none;
 }
 
 /* Secondary blob for depth */
 .gradient-blob-2 {
-  position: absolute;
-  top: 30%;
-  left: 60%;
-  width: 80vw;
-  height: 80vw;
-  max-width: 1000px;
-  max-height: 1000px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at center,
-    rgba(219, 39, 119, 0.4) 0%,
-    rgba(236, 72, 153, 0.3) 20%,
-    rgba(251, 146, 163, 0.2) 40%,
-    rgba(253, 186, 116, 0.1) 60%,
-    rgba(255, 255, 255, 0.05) 80%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  filter: blur(150px);
-  animation: float2 55s ease-in-out infinite;
+  display: none;
 }
 
 /* Tertiary blob */
 .gradient-blob-3 {
-  position: absolute;
-  top: 70%;
-  left: 40%;
-  width: 70vw;
-  height: 70vw;
-  max-width: 900px;
-  max-height: 900px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at center,
-    rgba(252, 165, 165, 0.4) 0%,
-    rgba(253, 195, 145, 0.25) 25%,
-    rgba(254, 215, 170, 0.15) 50%,
-    rgba(254, 230, 180, 0.08) 70%,
-    rgba(255, 255, 255, 0.03) 85%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  filter: blur(150px);
-  animation: float3 65s ease-in-out infinite;
+  display: none;
 }
 
 /* Grain texture overlay */
 .grain-overlay {
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3.5' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.2;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-  animation: grain 20s steps(10) infinite;
+  display: none;
 }
 
 /* Subtle pulse effect */
 .pulse-overlay {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0) 70%
-  );
-  animation: pulse 10s ease-in-out infinite;
+  display: none;
 }
 
 /* Animations */

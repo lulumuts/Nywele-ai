@@ -3,7 +3,15 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { User, Mail, Edit2, Save, ArrowRight, Calendar, Heart, Sparkles } from 'lucide-react';
+import { User, Mail, Edit2, Save, ArrowRight, Calendar, Heart, Sparkles, Trash2, FileText, Plus } from 'lucide-react';
+
+interface SavedRoutine {
+  id: string;
+  createdAt: string;
+  hairAnalysis: any;
+  routine: any;
+  notes?: string;
+}
 
 interface UserProfile {
   name: string;
@@ -11,6 +19,7 @@ interface UserProfile {
   hairType: '4a' | '4b' | '4c';
   hairGoals: string[];
   createdAt: string;
+  savedRoutines?: SavedRoutine[];
   lastBooking?: {
     style: string;
     date: string;
@@ -23,6 +32,7 @@ export default function Profile() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedGoals, setEditedGoals] = useState<string[]>([]);
+  const [expandedRoutine, setExpandedRoutine] = useState<string | null>(null);
 
   const hairGoalOptions = [
     { id: 'growth', label: 'Hair Growth', emoji: '🌱' },
@@ -83,6 +93,47 @@ export default function Profile() {
     setIsEditing(false);
   };
 
+  const deleteRoutine = (routineId: string) => {
+    if (!profile || !confirm('Are you sure you want to delete this routine?')) return;
+
+    const updatedRoutines = profile.savedRoutines?.filter(r => r.id !== routineId) || [];
+    const updatedProfile = {
+      ...profile,
+      savedRoutines: updatedRoutines
+    };
+
+    localStorage.setItem('nywele-user-profile', JSON.stringify(updatedProfile));
+    setProfile(updatedProfile);
+  };
+
+  const updateRoutineNotes = (routineId: string, notes: string) => {
+    if (!profile) return;
+
+    const updatedRoutines = profile.savedRoutines?.map(r => 
+      r.id === routineId ? { ...r, notes } : r
+    ) || [];
+
+    const updatedProfile = {
+      ...profile,
+      savedRoutines: updatedRoutines
+    };
+
+    localStorage.setItem('nywele-user-profile', JSON.stringify(updatedProfile));
+    setProfile(updatedProfile);
+  };
+
+  const viewRoutine = (routine: SavedRoutine) => {
+    // Store the routine to be viewed
+    localStorage.setItem('nywele-viewing-routine', JSON.stringify({
+      hairAnalysis: routine.hairAnalysis,
+      routine: routine.routine,
+      isViewing: true
+    }));
+    
+    // Navigate to hair-care page
+    router.push('/hair-care');
+  };
+
   if (!profile) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -92,7 +143,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+    <div className="min-h-screen bg-peach">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -273,11 +324,172 @@ export default function Profile() {
             </motion.div>
           )}
 
-          {/* Quick Actions */}
+          {/* Saved Routines */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
+            className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <FileText className="text-purple-600" size={24} />
+                Saved Routines
+              </h3>
+              <button
+                onClick={() => router.push('/hair-care')}
+                className="px-4 py-2 bg-purple-100 text-purple-600 rounded-lg font-medium hover:bg-purple-200 transition-all flex items-center gap-2"
+              >
+                <Plus size={16} />
+                New Routine
+              </button>
+            </div>
+
+            {!profile.savedRoutines || profile.savedRoutines.length === 0 ? (
+              <div className="text-center py-8">
+                <FileText className="mx-auto text-gray-300 mb-3" size={48} />
+                <p className="text-gray-500 mb-4">No saved routines yet</p>
+                <button
+                  onClick={() => router.push('/hair-care')}
+                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+                >
+                  Create Your First Routine
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {profile.savedRoutines.map((routine, idx) => (
+                  <div
+                    key={routine.id}
+                    className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-600">
+                          {new Date(routine.createdAt).toLocaleDateString('en', {
+                            month: 'long',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                        <div className="flex gap-2 mt-2">
+                          <span className="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-xs font-semibold">
+                            {routine.hairAnalysis?.hairType?.hairType || routine.hairAnalysis?.hairType || '4c'}
+                          </span>
+                          <span className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-semibold">
+                            Health: {routine.hairAnalysis?.health?.healthScore || routine.hairAnalysis?.health?.score || 65}/100
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => deleteRoutine(routine.id)}
+                        className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-all"
+                        title="Delete routine"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+
+                    {/* Routine Summary */}
+                    <div className="bg-gray-50 rounded-lg p-3 mb-3">
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div>
+                          <p className="text-xs text-gray-600">Daily Steps</p>
+                          <p className="text-lg font-bold text-gray-800">
+                            {routine.routine?.personalizedRoutine?.daily?.length || 0}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-600">Weekly Steps</p>
+                          <p className="text-lg font-bold text-gray-800">
+                            {routine.routine?.personalizedRoutine?.weekly?.length || 0}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-600">Monthly Steps</p>
+                          <p className="text-lg font-bold text-gray-800">
+                            {routine.routine?.personalizedRoutine?.monthly?.length || 0}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Notes */}
+                    <div className="mb-3">
+                      <label className="text-xs text-gray-600 mb-1 block">Notes:</label>
+                      <textarea
+                        value={routine.notes || ''}
+                        onChange={(e) => updateRoutineNotes(routine.id, e.target.value)}
+                        placeholder="Add notes about this routine..."
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        rows={2}
+                      />
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => setExpandedRoutine(expandedRoutine === routine.id ? null : routine.id)}
+                        className="py-2 bg-purple-50 text-purple-600 rounded-lg text-sm font-semibold hover:bg-purple-100 transition-all"
+                      >
+                        {expandedRoutine === routine.id ? 'Hide Details' : 'View Details'}
+                      </button>
+                      <button
+                        onClick={() => viewRoutine(routine)}
+                        className="py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg text-sm font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                      >
+                        View Full Routine
+                        <ArrowRight size={16} />
+                      </button>
+                    </div>
+
+                    {/* Expanded Details */}
+                    {expandedRoutine === routine.id && (
+                      <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
+                        <div>
+                          <h4 className="font-semibold text-gray-800 mb-2">Expected Results:</h4>
+                          <p className="text-sm text-gray-600">
+                            {routine.routine?.expectedResults?.timeline || 'View your routine for details'}
+                          </p>
+                          {routine.routine?.expectedResults?.improvements && (
+                            <ul className="mt-2 space-y-1">
+                              {routine.routine.expectedResults.improvements.slice(0, 3).map((imp: string, i: number) => (
+                                <li key={i} className="text-xs text-gray-600 flex items-start gap-2">
+                                  <span className="text-purple-600">•</span>
+                                  <span>{imp}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold text-gray-800 mb-2">Products Recommended:</h4>
+                          {routine.routine?.productRecommendations?.essential && (
+                            <div className="space-y-1">
+                              {routine.routine.productRecommendations.essential.slice(0, 3).map((product: any, i: number) => (
+                                <p key={i} className="text-xs text-gray-600">
+                                  • {product.brand} - {product.name}
+                                </p>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </motion.div>
+
+          {/* Quick Actions */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
             className="grid grid-cols-2 gap-4"
           >
             <button

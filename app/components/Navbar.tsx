@@ -15,6 +15,14 @@ import {
   X
 } from 'lucide-react';
 
+// Import Caprasimo font
+if (typeof document !== 'undefined') {
+  const link = document.createElement('link');
+  link.href = 'https://fonts.googleapis.com/css2?family=Caprasimo&display=swap';
+  link.rel = 'stylesheet';
+  document.head.appendChild(link);
+}
+
 export default function Navbar() {
   const pathname = usePathname();
   const [userName, setUserName] = useState<string>('Profile');
@@ -33,13 +41,13 @@ export default function Navbar() {
   const navLinks = [
     {
       name: 'Home',
-      href: '/dashboard',
+      href: '/',
       icon: Home,
-      description: 'Dashboard'
+      description: 'Home'
     },
     {
       name: 'Book Style',
-      href: '/',
+      href: '/booking',
       icon: Sparkles,
       description: 'Book your hairstyle',
       highlight: true
@@ -65,26 +73,26 @@ export default function Navbar() {
   ];
 
   const isActive = (href: string) => {
-    if (href === '/dashboard') return pathname === '/dashboard';
-    if (href === '/') return pathname === '/' || pathname.startsWith('/booking');
+    if (href === '/') return pathname === '/';
+    if (href === '/booking') return pathname.startsWith('/booking');
     return pathname.startsWith(href);
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200">
+    <nav className="sticky top-0 z-50 bg-transparent backdrop-blur-sm border-b border-transparent">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/dashboard" className="flex items-center space-x-2 group">
+          <Link href="/" className="flex items-center space-x-2 group">
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.5 }}
-              className="w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center"
+              className="w-8 h-8 flex items-center justify-center"
             >
-              <Sparkles className="w-5 h-5 text-white" />
+              <img src="/coil.svg" alt="Nywele.ai" className="w-8 h-8" />
             </motion.div>
-            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Nywele.ai
+            <span className="text-xl font-bold" style={{ fontFamily: 'Caprasimo, serif', color: '#9E6240' }}>
+              nywele.ai
             </span>
           </Link>
 
@@ -94,6 +102,8 @@ export default function Navbar() {
               const Icon = link.icon;
               const active = isActive(link.href);
               
+              const isHairCare = link.href === '/hair-care';
+              
               return (
                 <Link
                   key={link.href}
@@ -101,19 +111,26 @@ export default function Navbar() {
                   className={`
                     relative px-4 py-2 rounded-lg font-medium text-sm transition-all
                     flex items-center space-x-2
-                    ${active 
-                      ? 'text-purple-600 bg-purple-50' 
-                      : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
+                    ${isHairCare 
+                      ? '' 
+                      : active 
+                        ? 'bg-[#9E6240] bg-opacity-20' 
+                        : 'hover:bg-[#9E6240] hover:bg-opacity-10'
                     }
-                    ${link.highlight ? 'ring-2 ring-purple-200' : ''}
+                    ${link.highlight ? 'ring-2 ring-[#9E6240] ring-opacity-30' : ''}
                   `}
+                  style={isHairCare 
+                    ? { backgroundColor: '#9E6240', color: '#FEF4E6' } 
+                    : { color: '#9E6240' }
+                  }
                 >
                   <Icon className="w-4 h-4" />
                   <span>{link.name}</span>
-                  {active && (
+                  {active && !isHairCare && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute inset-0 bg-purple-100 rounded-lg -z-10"
+                      className="absolute inset-0 rounded-lg -z-10"
+                      style={{ backgroundColor: 'rgba(158, 98, 64, 0.2)' }}
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
@@ -127,15 +144,19 @@ export default function Navbar() {
             {userName ? (
               <Link
                 href="/profile"
-                className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors"
+                style={{ backgroundColor: 'rgba(158, 98, 64, 0.1)', color: '#9E6240' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(158, 98, 64, 0.2)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(158, 98, 64, 0.1)'}
               >
-                <User className="w-4 h-4 text-gray-600" />
-                <span className="text-sm font-medium text-gray-700">{userName}</span>
+                <User className="w-4 h-4" style={{ color: '#9E6240' }} />
+                <span className="text-sm font-medium">{userName}</span>
               </Link>
             ) : (
               <Link
                 href="/profile"
-                className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-medium hover:shadow-lg transition-shadow"
+                className="px-4 py-2 rounded-lg text-white text-sm font-medium hover:shadow-lg transition-shadow"
+                style={{ backgroundColor: '#9E6240' }}
               >
                 Get Started
               </Link>
@@ -145,7 +166,10 @@ export default function Navbar() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
+            className="md:hidden p-2 rounded-lg transition-colors"
+            style={{ color: '#9E6240' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(158, 98, 64, 0.1)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             {mobileMenuOpen ? (
               <X className="w-6 h-6" />
@@ -162,12 +186,17 @@ export default function Navbar() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          className="md:hidden border-t border-gray-200 bg-white"
+          className="md:hidden border-t"
+          style={{ 
+            borderColor: 'rgba(158, 98, 64, 0.2)',
+            backgroundColor: 'rgba(254, 244, 230, 0.95)'
+          }}
         >
           <div className="px-4 py-4 space-y-2">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const active = isActive(link.href);
+              const isHairCare = link.href === '/hair-care';
               
               return (
                 <Link
@@ -176,36 +205,44 @@ export default function Navbar() {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`
                     flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors
-                    ${active 
-                      ? 'bg-purple-50 text-purple-600' 
-                      : 'text-gray-700 hover:bg-gray-50'
+                    ${isHairCare
+                      ? ''
+                      : active 
+                        ? 'bg-[#9E6240] bg-opacity-20' 
+                        : 'hover:bg-[#9E6240] hover:bg-opacity-10'
                     }
                   `}
+                  style={isHairCare 
+                    ? { backgroundColor: '#9E6240', color: '#FEF4E6' } 
+                    : { color: '#9E6240' }
+                  }
                 >
                   <Icon className="w-5 h-5" />
                   <div>
                     <div className="font-medium">{link.name}</div>
-                    <div className="text-xs text-gray-500">{link.description}</div>
+                    <div className="text-xs" style={{ color: isHairCare ? '#FEF4E6' : '#B87D48' }}>{link.description}</div>
                   </div>
                 </Link>
               );
             })}
             
-            <div className="pt-4 border-t border-gray-200">
+            <div className="pt-4 border-t" style={{ borderColor: 'rgba(158, 98, 64, 0.2)' }}>
               {userName ? (
                 <Link
                   href="/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-3 px-4 py-3 rounded-lg bg-gray-100"
+                  className="flex items-center space-x-3 px-4 py-3 rounded-lg"
+                  style={{ backgroundColor: 'rgba(158, 98, 64, 0.1)', color: '#9E6240' }}
                 >
-                  <User className="w-5 h-5 text-gray-600" />
-                  <span className="font-medium text-gray-700">{userName}</span>
+                  <User className="w-5 h-5" style={{ color: '#9E6240' }} />
+                  <span className="font-medium">{userName}</span>
                 </Link>
               ) : (
                 <Link
                   href="/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block text-center px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium"
+                  className="block text-center px-4 py-3 rounded-lg text-white font-medium"
+                  style={{ backgroundColor: '#9E6240' }}
                 >
                   Get Started
                 </Link>
