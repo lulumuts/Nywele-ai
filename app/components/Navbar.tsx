@@ -12,7 +12,8 @@ import {
   Heart,
   Home,
   Menu,
-  X
+  X,
+  DollarSign
 } from 'lucide-react';
 
 // Import Caprasimo font
@@ -63,6 +64,12 @@ export default function Navbar() {
       href: '/hair-care',
       icon: Heart,
       description: 'Get recommendations'
+    },
+    {
+      name: 'Budget Tracker',
+      href: '/cost-tracker',
+      icon: DollarSign,
+      description: 'Track spending'
     },
     {
       name: 'For Stylists',
