@@ -1,192 +1,206 @@
 'use client';
 
-import { Brain, Image, Database, CheckCircle2, Sparkles, ArrowRight, Home } from 'lucide-react';
+import { Brain, Image, Database, CheckCircle2, Sparkles, ArrowRight, Home, Calendar, Heart, Save } from 'lucide-react';
 import Link from 'next/link';
+import Navbar from '../components/Navbar';
 
 export default function HowItWorks() {
-  const techStack = [
+  const features = [
     {
       icon: Brain,
-      name: "GPT-4o",
-      role: "Personalized Recommendations",
-      description: "Analyzes your unique hair profile (type, goals, concerns) to generate customized product recommendations and styling advice tailored for African hair.",
-      color: "bg-emerald-500",
-      integration: "Deep analysis with culturally-aware responses for hair types 1a-4c"
+      name: "AI Hair Care Analysis",
+      description: "Upload a photo of your hair and let Gemini AI analyze your hair health, type, and condition.",
+      color: "bg-[#914600]",
+      details: "Get personalized routines and product recommendations tailored to your specific hair needs."
     },
     {
-      icon: Image,
-      name: "Gemini 2.5 Flash Image",
-      role: "Visual Hairstyle Generation",
-      description: "Generates photorealistic hairstyle visualizations with 150+ lines of bias-countering prompts specifically designed for accurate African hair representation.",
-      color: "bg-blue-500",
-      integration: "Advanced prompt engineering ensures authentic texture, volume, and styling accuracy"
+      icon: Calendar,
+      name: "Style Booking",
+      description: "Upload a photo of your desired hairstyle or choose from popular styles.",
+      color: "bg-[#AF5500]",
+      details: "Get matched with salons that can deliver your look, complete with pricing and availability."
     },
     {
-      icon: Database,
-      name: "Supabase",
-      role: "Secure Data Storage",
-      description: "Handles user authentication and stores recommendation history so you can revisit your personalized hair journey.",
-      color: "bg-orange-500",
-      integration: "PostgreSQL database with row-level security for user privacy"
+      icon: Save,
+      name: "Saved Routines",
+      description: "Save your favorite hair care routines and revisit them anytime from your profile.",
+      color: "bg-[#CE935F]",
+      details: "Track your hair care journey and keep all your personalized recommendations in one place."
     }
   ];
 
-  const workflow = [
+  const hairCareFlow = [
     {
       step: 1,
-      title: "Share Your Hair Profile",
-      description: "Tell us about your hair type (1a-4c), goals, current style, ethnicity, length, and desired vibe.",
-      icon: "👋"
+      title: "Upload Your Hair Photo",
+      description: "Take a photo of your hair and upload it to the platform.",
+      icon: "📸"
     },
     {
       step: 2,
-      title: "GPT-4o Analyzes",
-      description: "Our AI examines your unique characteristics and generates personalized recommendations.",
+      title: "Gemini AI Analysis",
+      description: "Our AI analyzes your hair type, health, porosity, and condition.",
       icon: "🧠"
     },
     {
       step: 3,
-      title: "Gemini Creates Visuals",
-      description: "See your chosen hairstyle with AI-generated images that respect African hair texture.",
-      icon: "🎨"
+      title: "Get Your Routine",
+      description: "Receive a personalized hair care routine with product recommendations from our Supabase catalog.",
+      icon: "✨"
     },
     {
       step: 4,
-      title: "Get Your Results",
-      description: "Receive a detailed routine with products, timing, and visual inspiration.",
-      icon: "✨"
+      title: "Save & Track",
+      description: "Save your routine to your profile and track your hair care journey.",
+      icon: "💾"
     }
   ];
 
-  const challenges = [
+  const bookingFlow = [
     {
-      problem: "Generic AI models misrepresent African hair textures",
-      solution: "Custom bias-countering prompts ensure 4C coils look like 4C, not 3A curls"
+      step: 1,
+      title: "Choose Your Style",
+      description: "Upload a photo of your desired hairstyle or select from popular options.",
+      icon: "💇🏾‍♀️"
     },
     {
-      problem: "One-size-fits-all advice doesn't work",
-      solution: "We differentiate between protective styles (hide texture) and natural styles (show texture)"
+      step: 2,
+      title: "AI Style Detection",
+      description: "Gemini AI identifies the style and requirements.",
+      icon: "🔍"
     },
     {
-      problem: "Images focus on face instead of hairstyle",
-      solution: "Back-view and top-down angles that focus on the hairstyle detail and authenticity"
+      step: 3,
+      title: "Salon Matching",
+      description: "Get matched with salons from our Supabase database that can deliver your look.",
+      icon: "🏪"
+    },
+    {
+      step: 4,
+      title: "Book & Pay",
+      description: "View pricing, select your preferred salon, and book your appointment.",
+      icon: "💳"
+    }
+  ];
+
+  const techStack = [
+    {
+      icon: Brain,
+      name: "Gemini AI",
+      role: "Hair Analysis & Style Detection",
+      description: "Analyzes hair photos to determine health, type, and styling needs. Also identifies desired hairstyles from photos.",
+      color: "bg-[#914600]"
+    },
+    {
+      icon: Database,
+      name: "Supabase",
+      role: "Product & Salon Database",
+      description: "Stores our curated catalog of hair care products and verified salons with their services and pricing.",
+      color: "bg-[#AF5500]"
+    },
+    {
+      icon: Save,
+      name: "User Profiles",
+      role: "Personalized Experience",
+      description: "Save your routines, track your hair care journey, and access your recommendations anytime.",
+      color: "bg-[#CE935F]"
     }
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{ backgroundColor: '#FFFBF5' }}>
       {/* Navigation */}
-      <div className="max-w-6xl mx-auto px-4 pt-8">
-        <Link 
-          href="/"
-          className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
-        >
-          <Home className="w-4 h-4" />
-          Back to Home
-        </Link>
-      </div>
+      <Navbar />
 
       {/* Hero Section */}
       <div className="max-w-6xl mx-auto px-4 py-16">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4" 
+            style={{ backgroundColor: 'rgba(206, 147, 95, 0.2)', color: '#914600' }}>
             <Sparkles className="w-4 h-4" />
-            Multi-AI Architecture
+            AI-Powered African Hair Care
           </div>
-          <h1 className="text-5xl font-bold text-[#C87726] mb-4">
+          <h1 className="text-5xl font-bold mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
             How Nywele.ai Works
           </h1>
-          <p className="text-xl text-[#C87726] max-w-3xl mx-auto mb-6">
-            Addressing AI Bias in African Hair Care through Culturally-Informed, Precision-Engineered Hair Routine Generation
+          <p className="text-xl max-w-3xl mx-auto mb-6" style={{ color: '#914600' }}>
+            Your complete AI-powered platform for African hair care and styling
           </p>
-          <p className="text-lg text-[#C87726] max-w-4xl mx-auto">
-            A sophisticated multi-AI system built specifically for African hair care, combining GPT-4o and Gemini 2.5 Flash Image to tackle the critical issue of AI bias by generating accurate, culturally-informed recommendations tailored for African women's unique hair needs.
-          </p>
-        </div>
-
-        {/* The Problem Section */}
-        <div className="mb-20 bg-white/60 backdrop-blur-sm rounded-3xl border-2 border-[#E9A96A] shadow-lg p-10">
-          <h2 className="text-3xl font-bold text-[#C87726] mb-6">The Problem</h2>
-          <p className="text-lg text-[#C87726] mb-4">
-            Current AI models frequently demonstrate bias when addressing African hair, offering generic advice that ignores the unique characteristics of Type 4 hair (coily/kinky textures), protective styling needs, moisture retention challenges, and culturally significant hair practices.
-          </p>
-          <p className="text-lg text-[#C87726]">
-            This gap leaves millions of women without access to AI-powered tools that truly understand their hair care needs—particularly for textures like 4A, 4B, and 4C that require specialized knowledge about shrinkage, breakage prevention, and moisture retention.
+          <p className="text-lg max-w-4xl mx-auto" style={{ color: '#AF5500' }}>
+            From personalized hair care routines to booking your next hairstyle, Nywele.ai uses advanced AI to help you manage and celebrate your African hair.
           </p>
         </div>
 
-        {/* Our Solution Section */}
-        <div className="mb-20 bg-white/60 backdrop-blur-sm rounded-3xl border-2 border-[#E9A96A] shadow-lg p-10">
-          <h2 className="text-3xl font-bold text-[#C87726] mb-6">Our Solution</h2>
-          <p className="text-lg text-[#C87726] mb-6">
-            We've created an optimized prompting framework that addresses these biases through:
-          </p>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-purple-50 rounded-xl p-6">
-              <h3 className="font-bold text-[#C87726] mb-3">✓ Proper Hair Classification</h3>
-              <p className="text-[#C87726]">Incorporates accurate terminology for African hair textures (4A, 4B, 4C classifications) and accounts for porosity, density, and strand thickness variations</p>
+        {/* Features Overview */}
+        <div className="mb-20">
+          <h2 className="text-3xl font-bold text-center mb-12" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+            What We Offer
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {features.map((feature) => {
+              const Icon = feature.icon;
+              return (
+                <div key={feature.name} className="bg-white/60 backdrop-blur-sm rounded-2xl border-2 shadow-lg p-8 hover:shadow-xl transition-shadow"
+                  style={{ borderColor: '#CE935F' }}>
+                  <div className={`${feature.color} p-4 rounded-xl w-fit mb-4`}>
+                    <Icon className="w-8 h-8 text-white" />
+        </div>
+                  <h3 className="text-xl font-bold mb-3" style={{ color: '#643100' }}>{feature.name}</h3>
+                  <p className="mb-3" style={{ color: '#914600' }}>{feature.description}</p>
+                  <p className="text-sm" style={{ color: '#AF5500' }}>{feature.details}</p>
             </div>
-            <div className="bg-purple-50 rounded-xl p-6">
-              <h3 className="font-bold text-[#C87726] mb-3">✓ Protective Styling Recognition</h3>
-              <p className="text-[#C87726]">Recognizes protective styling methods including braids, twists, locs, bantu knots, and their unique maintenance requirements</p>
-            </div>
-            <div className="bg-purple-50 rounded-xl p-6">
-              <h3 className="font-bold text-[#C87726] mb-3">✓ Specific Concern Targeting</h3>
-              <p className="text-[#C87726]">Addresses shrinkage, breakage prevention, moisture retention, scalp health, and growth challenges specific to African hair</p>
-            </div>
-            <div className="bg-purple-50 rounded-xl p-6">
-              <h3 className="font-bold text-[#C87726] mb-3">✓ Cultural Authenticity</h3>
-              <p className="text-[#C87726]">Integrates cultural practices and product recommendations relevant to the African diaspora and community hair care traditions</p>
-            </div>
+              );
+            })}
           </div>
         </div>
 
         {/* Tech Stack Cards */}
         <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-[#C87726]">Our Technology Stack</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <h2 className="text-3xl font-bold text-center mb-12" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+            Our Technology
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
             {techStack.map((tech) => {
               const Icon = tech.icon;
               return (
-                <div key={tech.name} className="bg-white/60 backdrop-blur-sm rounded-2xl border-2 border-[#E9A96A] shadow-lg p-8 hover:shadow-xl transition-shadow">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className={`${tech.color} p-3 rounded-xl`}>
+                <div key={tech.name} className="bg-white/60 backdrop-blur-sm rounded-2xl border-2 shadow-lg p-8 hover:shadow-xl transition-shadow"
+                  style={{ borderColor: '#CE935F' }}>
+                  <div className={`${tech.color} p-3 rounded-xl w-fit mb-4`}>
                       <Icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-[#C87726]">{tech.name}</h3>
-                      <p className="text-sm text-purple-600 font-medium">{tech.role}</p>
-                    </div>
                   </div>
-                  <p className="text-[#E9A96A] mb-4">{tech.description}</p>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-sm text-gray-600">
-                      <span className="font-semibold">Integration:</span> {tech.integration}
-                    </p>
-                  </div>
+                  <h3 className="text-xl font-bold mb-2" style={{ color: '#643100' }}>{tech.name}</h3>
+                  <p className="text-sm font-medium mb-3" style={{ color: '#914600' }}>{tech.role}</p>
+                  <p className="text-sm" style={{ color: '#AF5500' }}>{tech.description}</p>
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* Workflow Section */}
+        {/* Hair Care Workflow Section */}
         <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-[#C87726]">The Journey</h2>
+          <h2 className="text-3xl font-bold text-center mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+            Hair Care Analysis Flow
+          </h2>
+          <p className="text-center mb-12" style={{ color: '#914600' }}>
+            Get personalized hair care routines powered by Gemini AI
+          </p>
           <div className="grid md:grid-cols-4 gap-6">
-            {workflow.map((item, idx) => (
+            {hairCareFlow.map((item, idx) => (
               <div key={item.step} className="relative">
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 border-[#E9A96A] shadow-md p-6 hover:shadow-lg transition-shadow h-full">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 shadow-md p-6 hover:shadow-lg transition-shadow h-full"
+                  style={{ borderColor: '#CE935F' }}>
                   <div className="text-4xl mb-4 text-center">{item.icon}</div>
-                  <div className="absolute -top-3 -left-3 w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                  <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm text-white"
+                    style={{ backgroundColor: '#914600' }}>
                     {item.step}
                   </div>
-                  <h3 className="font-bold text-lg mb-2 text-[#C87726]">{item.title}</h3>
-                  <p className="text-sm text-[#E9A96A]">{item.description}</p>
+                  <h3 className="font-bold text-lg mb-2" style={{ color: '#643100' }}>{item.title}</h3>
+                  <p className="text-sm" style={{ color: '#AF5500' }}>{item.description}</p>
                 </div>
                 {idx < 3 && (
                   <div className="hidden md:block absolute top-1/2 right-0 transform translate-x-1/2 z-10">
-                    <ArrowRight className="w-6 h-6 text-purple-600" />
+                    <ArrowRight className="w-6 h-6" style={{ color: '#914600' }} />
                   </div>
                 )}
               </div>
@@ -194,102 +208,110 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        {/* Why This Matters Section */}
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-12 text-white mb-20">
-          <h2 className="text-3xl font-bold mb-8 text-center">Why Traditional AI Fails African Hair</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {challenges.map((item, idx) => (
-              <div key={idx} className="bg-white/10 backdrop-blur rounded-xl p-6">
-                <div className="mb-3">
-                  <p className="font-semibold mb-2">❌ {item.problem}</p>
-                  <div className="h-px bg-white/20 my-3"></div>
-                  <p className="text-sm text-purple-100">✅ {item.solution}</p>
+        {/* Booking Workflow Section */}
+        <div className="mb-20">
+          <h2 className="text-3xl font-bold text-center mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+            Style Booking Flow
+          </h2>
+          <p className="text-center mb-12" style={{ color: '#914600' }}>
+            Find the perfect salon to bring your hairstyle vision to life
+          </p>
+          <div className="grid md:grid-cols-4 gap-6">
+            {bookingFlow.map((item, idx) => (
+              <div key={item.step} className="relative">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 shadow-md p-6 hover:shadow-lg transition-shadow h-full"
+                  style={{ borderColor: '#CE935F' }}>
+                  <div className="text-4xl mb-4 text-center">{item.icon}</div>
+                  <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm text-white"
+                    style={{ backgroundColor: '#AF5500' }}>
+                    {item.step}
+                  </div>
+                  <h3 className="font-bold text-lg mb-2" style={{ color: '#643100' }}>{item.title}</h3>
+                  <p className="text-sm" style={{ color: '#AF5500' }}>{item.description}</p>
                 </div>
+                {idx < 3 && (
+                  <div className="hidden md:block absolute top-1/2 right-0 transform translate-x-1/2 z-10">
+                    <ArrowRight className="w-6 h-6" style={{ color: '#AF5500' }} />
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Prompt Engineering Highlight */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-2xl border-2 border-[#E9A96A] shadow-xl p-12 mb-20 max-h-[80vh] overflow-y-auto">
-          <h2 className="text-3xl font-bold mb-6 text-center text-[#C87726]">Prompt Engineering</h2>
-          <p className="text-[#E9A96A] text-center mb-8 max-w-3xl mx-auto">
-            Our 150+ line prompt generator creates culturally-accurate, bias-countering prompts 
-            that differentiate between protective styles (box braids, locs) and natural styles (afros, twist-outs).
-          </p>
-          <div className="bg-gray-50 rounded-lg p-6 font-mono text-sm text-gray-800 overflow-x-auto">
-            <div className="mb-4">
-              <span className="text-purple-600 font-bold">Example Input:</span> Bantu Knots, 4C hair, Shoulder-length, Natural Indoor Lighting
-            </div>
-            <div className="mb-2">
-              <span className="text-purple-600 font-bold">Generated Prompt:</span>
-            </div>
-            <div className="text-xs leading-relaxed">
-              "back view of a Black woman with dark, glowing skin showcasing Bantu knots 
-              arranged in a neat, symmetrical pattern across the entire scalp with tight, 
-              compact coils. The hairstyle is shoulder-length with clear definition and 
-              authentic styling. Shot from back/3-4 view angle focusing on the hairstyle 
-              detail. soft indoor natural window light, warm tones, intimate comfortable 
-              setting. The hairstyle must be clearly visible and authentic to African hair 
-              styling. High detail, photorealistic, professional hair photography with minimal 
-              face visibility."
-            </div>
-          </div>
-        </div>
-
-        {/* Technical Highlights */}
-        <div className="bg-gray-50 rounded-2xl border-2 border-[#E9A96A] p-12 mb-20">
-          <h2 className="text-3xl font-bold mb-8 text-center text-[#C87726]">Technical Highlights</h2>
+        {/* Key Features Section */}
+        <div className="mb-20 bg-white/60 backdrop-blur-sm rounded-3xl border-2 shadow-lg p-10"
+          style={{ borderColor: '#CE935F' }}>
+          <h2 className="text-3xl font-bold mb-8 text-center" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+            Key Features
+          </h2>
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {[
-              "Multi-AI orchestration with GPT-4o + Gemini",
-              "150+ lines of bias-countering prompt logic",
-              "Differentiation between protective and natural styles",
-              "Secure authentication with Supabase",
-              "Ethnicity, length, and vibe-based image generation",
-              "Culturally-specific hair type support (1a-4c)",
-              "Responsive Next.js 15 architecture",
-              "Real-time fallback to curated images"
+              "AI-powered hair health analysis with Gemini",
+              "Personalized product recommendations from Supabase catalog",
+              "AI style detection from uploaded photos",
+              "Salon matching with real pricing",
+              "Save and track your hair care routines",
+              "Profile management for personalized experience",
+              "Verified salon database",
+              "Secure data storage with Supabase"
             ].map((feature, idx) => (
               <div key={idx} className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <p className="text-[#E9A96A]">{feature}</p>
+                <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#914600' }} />
+                <p style={{ color: '#643100' }}>{feature}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Impact Section */}
-        <div className="mb-20 bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl border-2 border-[#E9A96A] shadow-lg p-10">
-          <h2 className="text-3xl font-bold text-[#C87726] mb-6 text-center">Our Impact</h2>
-          <p className="text-lg text-[#C87726] text-center max-w-4xl mx-auto mb-8">
-            By correcting these biases at the prompt level and implementing culturally-informed AI architecture, we're making AI more inclusive and useful for African women worldwide. Our hybrid approach—combining GPT-4o for recommendations, Gemini 2.5 Flash Image for visualizations, and Supabase for secure data management—ensures that technology serves all communities equitably and accurately represents the beauty and complexity of African hair.
+        <div className="mb-20 rounded-3xl border-2 shadow-lg p-10 text-white"
+          style={{ background: 'linear-gradient(135deg, #914600 0%, #AF5500 100%)', borderColor: '#CE935F' }}>
+          <h2 className="text-3xl font-bold mb-6 text-center" style={{ fontFamily: 'Caprasimo, serif' }}>
+            Why Nywele.ai?
+          </h2>
+          <p className="text-lg text-center max-w-4xl mx-auto mb-8">
+            We're building the complete platform for African hair care—from AI-powered health analysis to finding the perfect salon for your next style. Our mission is to make hair care accessible, personalized, and connected to the community.
           </p>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 border-[#E9A96A] shadow-lg p-8 text-center">
-              <div className="text-4xl font-bold text-[#C87726] mb-2">150+</div>
-              <p className="text-[#E9A96A]">Lines of Bias-Countering Code</p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg p-8 text-center">
+              <div className="text-4xl font-bold mb-2">2</div>
+              <p className="text-sm">Core Features</p>
+              <p className="text-xs mt-1 opacity-80">Hair Care + Booking</p>
             </div>
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 border-[#E9A96A] shadow-lg p-8 text-center">
-              <div className="text-4xl font-bold text-[#C87726] mb-2">12 Types</div>
-              <p className="text-[#E9A96A]">Hair Textures Supported (1a-4c)</p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg p-8 text-center">
+              <div className="text-4xl font-bold mb-2">AI</div>
+              <p className="text-sm">Gemini-Powered</p>
+              <p className="text-xs mt-1 opacity-80">Analysis + Detection</p>
             </div>
-            <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 border-[#E9A96A] shadow-lg p-8 text-center">
-              <div className="text-4xl font-bold text-[#C87726] mb-2">2 AI Models</div>
-              <p className="text-[#E9A96A]">GPT-4o + Gemini 2.5 Flash Image</p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg p-8 text-center">
+              <div className="text-4xl font-bold mb-2">100%</div>
+              <p className="text-sm">For African Hair</p>
+              <p className="text-xs mt-1 opacity-80">Built with you in mind</p>
             </div>
           </div>
         </div>
 
         {/* CTA */}
         <div className="text-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link 
+              href="/hair-care"
+              className="inline-flex items-center justify-center gap-2 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg"
+              style={{ backgroundColor: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+            >
+              <Heart className="w-5 h-5" />
+              Analyze My Hair
+            </Link>
           <Link 
-            href="/"
-            className="inline-flex items-center gap-2 bg-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-purple-700 transition-colors shadow-lg"
+              href="/booking-flow"
+              className="inline-flex items-center justify-center gap-2 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg"
+              style={{ backgroundColor: '#AF5500', fontFamily: 'Bricolage Grotesque, sans-serif' }}
           >
-            Try It Yourself
-            <ArrowRight className="w-5 h-5" />
+              <Calendar className="w-5 h-5" />
+              Book a Style
           </Link>
+          </div>
         </div>
       </div>
     </div>
