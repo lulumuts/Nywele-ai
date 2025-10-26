@@ -13,6 +13,7 @@ export default function Home() {
   useEffect(() => {
     const introTl = gsap.timeline({
       onComplete: () => {
+        console.log('Intro complete, redirecting...');
         // Redirect to how it works page
         router.push('/how-it-works');
       }
@@ -26,34 +27,34 @@ export default function Home() {
       stagger: 0.4
     }, 0);
 
-    // 2. Blob pulsing animations (continuous)
+    // 2. Blob pulsing animations (continuous, but limited to 2 cycles)
     gsap.to('.intro-blob-1', {
       scale: 1.05,
       opacity: 0.4,
-      duration: 4,
+      duration: 2,
       ease: 'sine.inOut',
-      repeat: -1,
+      repeat: 2,
       yoyo: true
     });
 
     gsap.to('.intro-blob-2', {
       scale: 1.03,
       opacity: 0.6,
-      duration: 3.5,
+      duration: 1.8,
       ease: 'sine.inOut',
-      repeat: -1,
+      repeat: 2,
       yoyo: true,
-      delay: 1.75
+      delay: 0.5
     });
 
     gsap.to('.intro-blob-3', {
       scale: 1.04,
       opacity: 0.8,
-      duration: 3.8,
+      duration: 1.9,
       ease: 'sine.inOut',
-      repeat: -1,
+      repeat: 2,
       yoyo: true,
-      delay: 0.8
+      delay: 0.3
     });
 
     // 3. Show loading bar
@@ -100,10 +101,13 @@ export default function Home() {
     introTl.to('.intro-overlay-content', {
       opacity: 0,
       duration: 1,
-      ease: 'power2.inOut'
+      ease: 'power2.inOut',
+      onComplete: () => {
+        console.log('Fade out complete');
+      }
     }, 4.2);
 
-  }, []);
+  }, [router]);
 
   return (
     <>
