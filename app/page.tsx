@@ -37,44 +37,23 @@ export default function Home() {
       duration: 0.5
     }, 1.2);
 
-    // 3. Fill loading bar
+    // 3. Fill loading bar and redirect when done
     introTl.to('.loading-bar', {
       width: '100%',
-      duration: 2,
-      ease: 'power1.inOut'
-    }, 1.0);
-
-    // 4. Show title
-    introTl.to('.intro-title', {
-      opacity: 1,
-      y: 0,
-      duration: 1,
-      ease: 'power3.out'
-    }, 1.5);
-
-    // 5. Show subtitle
-    introTl.to('.intro-subtitle', {
-      opacity: 1,
-      duration: 0.8,
-      ease: 'power2.out'
-    }, 2.0);
-
-    // 6. Scale up coil and title slightly
-    introTl.to(['.intro-coil', '.intro-title'], {
-      scale: 1.05,
-      duration: 0.5,
-      ease: 'power2.inOut'
-    }, 3.0);
-
-    // 7. Fade out everything
-    introTl.to('.intro-overlay-content', {
-      opacity: 0,
-      duration: 1,
-      ease: 'power2.inOut',
+      duration: 1.5,
+      ease: 'power1.inOut',
       onComplete: () => {
-        console.log('Fade out complete');
+        // Fade out and redirect immediately after loading bar fills
+        gsap.to('.intro-overlay-content', {
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power2.inOut',
+          onComplete: () => {
+            setShowIntro(false);
+          }
+        });
       }
-    }, 14.2);
+    }, 0.8);
 
   }, [router]);
 
