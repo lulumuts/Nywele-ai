@@ -1095,7 +1095,10 @@ export default function BookingFlow() {
                   </a>
                 )}
                 <button
-                  onClick={() => router.push('/')}
+                  onClick={() => {
+                    // Clear the current booking data and reload the page
+                    window.location.href = '/booking-flow';
+                  }}
                   className="py-3 rounded-xl font-semibold transition-all"
                   style={{ background: '#FDF4E8', color: '#914600', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
