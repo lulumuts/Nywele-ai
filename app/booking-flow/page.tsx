@@ -66,12 +66,13 @@ export default function BookingFlow() {
     sessionStorage.removeItem('inspirationPhoto');
     sessionStorage.removeItem('hairAnalysis');
     
-    // If missing data, we'll show step 0 (initial form) instead of redirecting
-    if (!desiredStyle || !budget || !timePreference) {
-      console.log('⚠️ Missing booking data - user needs to provide details first');
-      setCurrentStep(0); // New step 0 for collecting initial data
-      return;
-    }
+    // Always start at step 0 so user can control the flow
+    setCurrentStep(0);
+  }, []);
+
+  // Generate job spec and load stylists when moving to step 1
+  useEffect(() => {
+    if (currentStep !== 1 || !desiredStyle) return;
 
     // Get uploaded photos from sessionStorage
     const photo = sessionStorage.getItem('userHairPhoto');
@@ -83,28 +84,27 @@ export default function BookingFlow() {
     const analysisStr = sessionStorage.getItem('hairAnalysis');
     if (analysisStr) {
       try {
-      const analysis = JSON.parse(analysisStr);
-      setHairType(analysis.hairType || '');
+        const analysis = JSON.parse(analysisStr);
+        setHairType(analysis.hairType || '');
       } catch (error) {
         console.error('Error parsing hair analysis:', error);
       }
     }
 
-    // Generate job spec if we have a style
-    if (desiredStyle) {
+    // Generate job spec
     const styleSlug = mapStyleToTemplateSlug(desiredStyle.toLowerCase().replace(/\s+/g, '-'));
     const spec = generateJobSpec(styleSlug);
     if (spec) {
       setJobSpec(spec);
-        setCurrentStep(1); // Move to confirmation step
-      } else {
-        console.warn('⚠️ Could not generate job spec for style:', desiredStyle);
-      }
+    } else {
+      console.warn('⚠️ Could not generate job spec for style:', desiredStyle);
     }
 
     // Load matched stylists based on desired style, budget, and time
-    loadMatchedStylists();
-  }, [desiredStyle, budget, timePreference]);
+    if (budget && timePreference) {
+      loadMatchedStylists();
+    }
+  }, [currentStep, desiredStyle, budget, timePreference]);
 
   const loadMatchedStylists = () => {
     // Mock stylists with skills and availability

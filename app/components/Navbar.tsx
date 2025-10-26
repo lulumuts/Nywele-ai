@@ -50,8 +50,7 @@ export default function Navbar() {
       name: 'Book Style',
       href: '/booking-flow',
       icon: Sparkles,
-      description: 'Book your hairstyle',
-      highlight: true
+      description: 'Book your hairstyle'
     },
     {
       name: 'Find Stylists',
