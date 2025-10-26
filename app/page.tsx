@@ -66,10 +66,7 @@ export default function Home() {
       ease: 'power2.inOut'
     }, 3.0);
 
-    // 7.5. HOLD STATE LONGER FOR DEBUGGING (10 seconds hold)
-    introTl.to({}, { duration: 10 }, 4.0);
-
-    // 8. Fade out everything
+    // 7. Fade out everything
     introTl.to('.intro-overlay-content', {
       opacity: 0,
       duration: 1,
