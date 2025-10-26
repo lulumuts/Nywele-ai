@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, MapPin, Star, Phone, Instagram, DollarSign, Check, ArrowRight, ArrowLeft, Clock, Sparkles } from 'lucide-react';
+import { Calendar, MapPin, Star, Phone, Instagram, DollarSign, Check, ArrowRight, ArrowLeft, Clock, Sparkles, Upload, Loader, X, Image as ImageIcon } from 'lucide-react';
 import { generateJobSpec, mapStyleToTemplateSlug, JobSpec } from '@/lib/specs';
 import SpecSummary from '@/app/components/SpecSummary';
 import Navbar from '@/app/components/Navbar';
@@ -34,6 +34,11 @@ export default function BookingFlow() {
   const [desiredStyleInput, setDesiredStyleInput] = useState('');
   const [budgetInput, setBudgetInput] = useState('');
   const [timePreferenceInput, setTimePreferenceInput] = useState('');
+  
+  // Image upload for style detection
+  const [uploadedStyleImage, setUploadedStyleImage] = useState<string | null>(null);
+  const [analyzingImage, setAnalyzingImage] = useState(false);
+  const [styleDetectionResult, setStyleDetectionResult] = useState<any>(null);
   
   const desiredStyle = desiredStyleInput;
   const budget = budgetInput;
@@ -84,8 +89,8 @@ export default function BookingFlow() {
     const analysisStr = sessionStorage.getItem('hairAnalysis');
     if (analysisStr) {
       try {
-        const analysis = JSON.parse(analysisStr);
-        setHairType(analysis.hairType || '');
+      const analysis = JSON.parse(analysisStr);
+      setHairType(analysis.hairType || '');
       } catch (error) {
         console.error('Error parsing hair analysis:', error);
       }
@@ -102,7 +107,7 @@ export default function BookingFlow() {
 
     // Load matched stylists based on desired style, budget, and time
     if (budget && timePreference) {
-      loadMatchedStylists();
+    loadMatchedStylists();
     }
   }, [currentStep, desiredStyle, budget, timePreference]);
 
@@ -299,6 +304,53 @@ export default function BookingFlow() {
 
   const styleCost = getStyleCost(desiredStyle);
 
+  // Handle style image upload and analysis
+  const handleStyleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Read file as base64
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Image = reader.result as string;
+      setUploadedStyleImage(base64Image);
+      setAnalyzingImage(true);
+      setStyleDetectionResult(null);
+
+      try {
+        // Call API to analyze image
+        const response = await fetch('/api/analyze-style', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: base64Image })
+        });
+
+        const data = await response.json();
+        
+        if (data.success && data.analysis) {
+          setStyleDetectionResult(data.analysis);
+          
+          // Auto-fill the style if detected with high confidence
+          if (data.analysis.confidence !== 'low' && data.analysis.detectedStyle !== 'Unknown') {
+            setDesiredStyleInput(data.analysis.detectedStyle);
+          }
+        }
+      } catch (error) {
+        console.error('Error analyzing style image:', error);
+        alert('Failed to analyze image. Please try selecting from the dropdown.');
+      } finally {
+        setAnalyzingImage(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearStyleImage = () => {
+    setUploadedStyleImage(null);
+    setStyleDetectionResult(null);
+    setDesiredStyleInput('');
+  };
+
   return (
     <div className="min-h-screen" style={{ background: '#FDF4E8' }}>
       {/* Use the same Navbar as other pages */}
@@ -368,7 +420,7 @@ export default function BookingFlow() {
                     </h2>
                     
                     <div className="space-y-6">
-                      <div>
+                <div>
                         <label className="block text-base font-medium mb-3" 
                           style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                           Desired Style
@@ -377,15 +429,17 @@ export default function BookingFlow() {
                           value={desiredStyleInput}
                           onChange={(e) => setDesiredStyleInput(e.target.value)}
                           className="w-full px-6 py-4 pr-12 rounded-xl text-lg appearance-none"
+                          disabled={!!uploadedStyleImage}
                           style={{ 
-                            background: '#FDF4E8', 
+                            background: uploadedStyleImage ? '#E5D4C1' : '#FDF4E8', 
                             border: '2px solid #914600',
                             color: '#643100',
                             fontFamily: 'Bricolage Grotesque, sans-serif',
                             backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23914600' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
                             backgroundPosition: 'right 1rem center',
                             backgroundRepeat: 'no-repeat',
-                            backgroundSize: '1.5em 1.5em'
+                            backgroundSize: '1.5em 1.5em',
+                            opacity: uploadedStyleImage ? 0.6 : 1
                           }}
                         >
                           <option value="">Select a style...</option>
@@ -398,9 +452,75 @@ export default function BookingFlow() {
                           <option value="Passion Twists">Passion Twists</option>
                           <option value="Goddess Locs">Goddess Locs</option>
                         </select>
-                      </div>
 
-                      <div>
+                        {/* OR Divider */}
+                        <div className="flex items-center gap-3 my-4">
+                          <div className="flex-1 h-px" style={{ background: '#CE935F' }}></div>
+                          <span className="text-sm font-medium" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>OR</span>
+                          <div className="flex-1 h-px" style={{ background: '#CE935F' }}></div>
+                        </div>
+
+                        {/* Image Upload */}
+                        {!uploadedStyleImage ? (
+                          <label className="block cursor-pointer">
+                            <div className="border-2 border-dashed rounded-xl p-6 text-center transition-all hover:border-solid hover:shadow-md"
+                              style={{ borderColor: '#914600', background: '#FDF4E8' }}>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleStyleImageUpload}
+                                className="hidden"
+                              />
+                              <Upload size={32} style={{ color: '#914600' }} className="mx-auto mb-2" />
+                              <p className="text-base font-medium mb-1" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                Upload a photo of your desired style
+                              </p>
+                              <p className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                AI will identify the hairstyle for you
+                              </p>
+                            </div>
+                          </label>
+                        ) : (
+                          <div className="rounded-xl p-4" style={{ background: 'rgba(206, 147, 95, 0.2)', border: '2px solid #914600' }}>
+                            <div className="flex items-start gap-4">
+                              <img src={uploadedStyleImage} alt="Uploaded style" className="w-24 h-24 rounded-lg object-cover" />
+                              <div className="flex-1">
+                                {analyzingImage ? (
+                                  <div className="flex items-center gap-2">
+                                    <Loader className="animate-spin" size={20} style={{ color: '#914600' }} />
+                                    <p className="text-sm font-medium" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                      Analyzing your photo...
+                                    </p>
+                                  </div>
+                                ) : styleDetectionResult ? (
+                                  <div>
+                                    <p className="text-sm font-bold mb-1" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                      Detected: {styleDetectionResult.detectedStyle}
+                                    </p>
+                                    <p className="text-xs mb-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                      Confidence: {styleDetectionResult.confidence}
+                                    </p>
+                                    {styleDetectionResult.description && (
+                                      <p className="text-xs" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                        {styleDetectionResult.description}
+                                      </p>
+                                    )}
+                  </div>
+                                ) : null}
+                              </div>
+                              <button
+                                onClick={clearStyleImage}
+                                className="p-2 rounded-lg hover:bg-white/50 transition-colors"
+                                style={{ color: '#914600' }}
+                              >
+                                <X size={20} />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                </div>
+
+                <div>
                         <label className="block text-base font-medium mb-3" 
                           style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                           Budget
