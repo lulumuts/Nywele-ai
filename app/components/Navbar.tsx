@@ -79,8 +79,8 @@ export default function Navbar() {
             >
               <img src="/coil.svg" alt="Nywele.ai" className="w-8 h-8" />
             </motion.div>
-            <span className="text-xl font-bold" style={{ fontFamily: 'Caprasimo, serif', color: '#9E6240' }}>
-              nywele.ai
+            <span className="text-xl font-bold" style={{ fontFamily: 'Caprasimo, serif', color: '#AF5500' }}>
+              Nywele.ai
             </span>
           </Link>
 
@@ -98,11 +98,11 @@ export default function Navbar() {
                     relative px-4 py-2 rounded-lg font-medium text-sm transition-all
                     flex items-center space-x-2
                     ${active 
-                      ? 'bg-[#9E6240] bg-opacity-20' 
-                      : 'hover:bg-[#9E6240] hover:bg-opacity-10'
+                      ? 'bg-[#AF5500] bg-opacity-20' 
+                      : 'hover:bg-[#AF5500] hover:bg-opacity-10'
                     }
                   `}
-                  style={{ color: '#9E6240' }}
+                  style={{ color: '#AF5500' }}
                 >
                   <Icon className="w-4 h-4" />
                   <span>{link.name}</span>
@@ -117,18 +117,18 @@ export default function Navbar() {
               <Link
                 href="/profile"
                 className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors"
-                style={{ backgroundColor: 'rgba(158, 98, 64, 0.1)', color: '#9E6240' }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(158, 98, 64, 0.2)'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(158, 98, 64, 0.1)'}
+                style={{ backgroundColor: 'rgba(175, 85, 0, 0.1)', color: '#AF5500' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(175, 85, 0, 0.2)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(175, 85, 0, 0.1)'}
               >
-                <User className="w-4 h-4" style={{ color: '#9E6240' }} />
+                <User className="w-4 h-4" style={{ color: '#AF5500' }} />
                 <span className="text-sm font-medium">{userName}</span>
               </Link>
             ) : (
               <Link
                 href="/profile"
                 className="px-4 py-2 rounded-lg text-white text-sm font-medium hover:shadow-lg transition-shadow"
-                style={{ backgroundColor: '#9E6240' }}
+                style={{ backgroundColor: '#AF5500' }}
               >
                 Get Started
               </Link>
@@ -139,8 +139,8 @@ export default function Navbar() {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-lg transition-colors"
-            style={{ color: '#9E6240' }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(158, 98, 64, 0.1)'}
+            style={{ color: '#AF5500' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(175, 85, 0, 0.1)'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             {mobileMenuOpen ? (
@@ -160,7 +160,7 @@ export default function Navbar() {
           exit={{ opacity: 0, y: -10 }}
           className="md:hidden border-t"
           style={{ 
-            borderColor: 'rgba(158, 98, 64, 0.2)',
+            borderColor: 'rgba(175, 85, 0, 0.2)',
             backgroundColor: 'rgba(254, 244, 230, 0.95)'
           }}
         >
@@ -177,30 +177,30 @@ export default function Navbar() {
                   className={`
                     flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors
                     ${active 
-                      ? 'bg-[#9E6240] bg-opacity-20' 
-                      : 'hover:bg-[#9E6240] hover:bg-opacity-10'
+                      ? 'bg-[#AF5500] bg-opacity-20' 
+                      : 'hover:bg-[#AF5500] hover:bg-opacity-10'
                     }
                   `}
-                  style={{ color: '#9E6240' }}
+                  style={{ color: '#AF5500' }}
                 >
                   <Icon className="w-5 h-5" />
                   <div>
                     <div className="font-medium">{link.name}</div>
-                    <div className="text-xs" style={{ color: '#B87D48' }}>{link.description}</div>
+                    <div className="text-xs" style={{ color: '#CE935F' }}>{link.description}</div>
                   </div>
                 </Link>
               );
             })}
             
-            <div className="pt-4 border-t" style={{ borderColor: 'rgba(158, 98, 64, 0.2)' }}>
+            <div className="pt-4 border-t" style={{ borderColor: 'rgba(175, 85, 0, 0.2)' }}>
               {userName ? (
                 <Link
                   href="/profile"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center space-x-3 px-4 py-3 rounded-lg"
-                  style={{ backgroundColor: 'rgba(158, 98, 64, 0.1)', color: '#9E6240' }}
+                  style={{ backgroundColor: 'rgba(175, 85, 0, 0.1)', color: '#AF5500' }}
                 >
-                  <User className="w-5 h-5" style={{ color: '#9E6240' }} />
+                  <User className="w-5 h-5" style={{ color: '#AF5500' }} />
                   <span className="font-medium">{userName}</span>
                 </Link>
               ) : (
@@ -208,7 +208,7 @@ export default function Navbar() {
                   href="/profile"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block text-center px-4 py-3 rounded-lg text-white font-medium"
-                  style={{ backgroundColor: '#9E6240' }}
+                  style={{ backgroundColor: '#AF5500' }}
                 >
                   Get Started
                 </Link>
