@@ -224,6 +224,8 @@ export default function Home() {
           width: 300px;
           height: 300px;
           margin-bottom: 60px;
+          transform: scale(0);
+          opacity: 0;
         }
 
         .welcome-text {
@@ -232,6 +234,7 @@ export default function Home() {
           font-family: 'Caprasimo', serif;
           font-weight: 400;
           text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+          opacity: 0;
         }
 
         .home-container {
