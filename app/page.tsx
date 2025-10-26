@@ -26,18 +26,33 @@ export default function Home() {
       ease: 'power2.out'
     }, 0);
 
-    // 2. Show loading bar
+    // 2. Show title
+    introTl.to('.intro-title', {
+      opacity: 1,
+      y: 0,
+      duration: 1,
+      ease: 'power3.out'
+    }, 0.5);
+
+    // 3. Show subtitle
+    introTl.to('.intro-subtitle', {
+      opacity: 1,
+      duration: 0.8,
+      ease: 'power2.out'
+    }, 1.3);
+
+    // 4. Show loading bar (after text is loaded)
     introTl.to('.loading-bar-container', {
       opacity: 1,
       duration: 0.5
-    }, 1.2);
+    }, 2.3);
 
     introTl.to('.loading-text', {
       opacity: 1,
       duration: 0.5
-    }, 1.2);
+    }, 2.3);
 
-    // 3. Fill loading bar and redirect when done
+    // 5. Fill loading bar and redirect when done
     introTl.to('.loading-bar', {
       width: '100%',
       duration: 1.5,
@@ -53,7 +68,7 @@ export default function Home() {
           }
         });
       }
-    }, 0.8);
+    }, 2.8);
 
   }, [router]);
 
