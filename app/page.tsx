@@ -26,8 +26,7 @@ export default function Home() {
       });
     })
     .to('.intro-blob', {
-      opacity: 1,
-      visibility: 'visible',
+      scale: 1,
       duration: 1.5,
       ease: 'power2.out',
       stagger: 0.4
@@ -292,16 +291,14 @@ export default function Home() {
 
         .intro-blob {
           position: absolute;
-          width: 350px;
-          height: 350px;
-          opacity: 0;
-          visibility: hidden;
-          display: none;
+          width: 280px;
+          height: 280px;
+          opacity: 0 !important;
+          transform: scale(0);
         }
         
         .intro-blob.visible {
-          display: block;
-          visibility: visible;
+          opacity: 1 !important;
         }
 
         .intro-content {
