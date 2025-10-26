@@ -277,10 +277,11 @@ export default function Home() {
 
         .blob-container {
           position: absolute;
-          width: 100%;
-          height: 100%;
-          top: 0;
-          left: 0;
+          width: 200%;
+          height: 200%;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -289,8 +290,8 @@ export default function Home() {
 
         .intro-blob {
           position: absolute;
-          width: 400px;
-          height: 400px;
+          width: 700px;
+          height: 700px;
           opacity: 0;
           visibility: hidden;
           display: none;
