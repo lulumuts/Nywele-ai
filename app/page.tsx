@@ -276,7 +276,8 @@ export default function Home() {
         .intro-coil {
           width: 100px;
           height: 95px;
-          margin-bottom: 30px;
+          margin: 0 auto 30px auto;
+          display: block;
           opacity: 0;
         }
 
@@ -423,7 +424,7 @@ export default function Home() {
                 />
               </svg>
               
-              <h1 className="intro-title">Nywele.AI</h1>
+              <h1 className="intro-title">Nywele.ai</h1>
               <p className="intro-subtitle">African Hair Care Powered by AI</p>
             </div>
 
