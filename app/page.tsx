@@ -6,58 +6,105 @@ import { gsap } from 'gsap';
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
-  const coilRef = useRef<SVGSVGElement>(null);
-  const welcomeTextRef = useRef<HTMLDivElement>(null);
   const homeContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // GSAP Timeline for intro animation
-    const tl = gsap.timeline({
+    const introTl = gsap.timeline({
       onComplete: () => {
         setShowIntro(false);
+        // Show main content
+        gsap.to(homeContainerRef.current, {
+          opacity: 1,
+          duration: 1,
+          ease: "power2.out"
+        });
       }
     });
 
-    // Trigger coil drawing animation
-    tl.add(() => {
-      if (coilRef.current) {
-        const path = coilRef.current.querySelector('path');
-        if (path) {
-          path.style.animation = 'drawCoil 2s ease-out forwards';
-        }
-      }
-    })
-    // Start typing animation after coil draws
-    .to({}, { duration: 2.2 })
-    .add(() => {
-      // Trigger CSS typing animation
-      if (welcomeTextRef.current) {
-        // 37 characters in "lets start your hair care journey."
-        welcomeTextRef.current.style.animation = 'typing 2.5s steps(37, end) forwards, removeCursor 0.1s 2.5s forwards';
-      }
-    })
-    // Hold for a moment after typing completes
-    .to({}, { duration: 1.0 })
-    // Fade out everything
-    .to([coilRef.current, welcomeTextRef.current],
-      {
-        opacity: 0,
-        duration: 0.6,
-        ease: "power2.in"
-      }
-    );
+    // 1. Fade in blobs with stagger
+    introTl.to('.intro-blob', {
+      opacity: 1,
+      duration: 1.5,
+      ease: 'power2.out',
+      stagger: 0.4
+    }, 0);
 
-    // Animate home container when intro completes
-    gsap.fromTo(homeContainerRef.current,
-      { opacity: 0, scale: 0.98 },
-      { 
-        opacity: 1, 
-        scale: 1,
-        duration: 0.8,
-        ease: "power2.out",
-        delay: 6.0
-      }
-    );
+    // 2. Blob pulsing animations (continuous)
+    gsap.to('.intro-blob-1', {
+      scale: 1.05,
+      opacity: 0.4,
+      duration: 4,
+      ease: 'sine.inOut',
+      repeat: -1,
+      yoyo: true
+    });
+
+    gsap.to('.intro-blob-2', {
+      scale: 1.03,
+      opacity: 0.6,
+      duration: 3.5,
+      ease: 'sine.inOut',
+      repeat: -1,
+      yoyo: true,
+      delay: 1.75
+    });
+
+    gsap.to('.intro-blob-3', {
+      scale: 1.04,
+      opacity: 0.8,
+      duration: 3.8,
+      ease: 'sine.inOut',
+      repeat: -1,
+      yoyo: true,
+      delay: 0.8
+    });
+
+    // 3. Show loading bar
+    introTl.to('.loading-bar-container', {
+      opacity: 1,
+      duration: 0.5
+    }, 1.2);
+
+    introTl.to('.loading-text', {
+      opacity: 1,
+      duration: 0.5
+    }, 1.2);
+
+    // 4. Fill loading bar
+    introTl.to('.loading-bar', {
+      width: '100%',
+      duration: 2,
+      ease: 'power1.inOut'
+    }, 1.5);
+
+    // 5. Show title
+    introTl.to('.intro-title', {
+      opacity: 1,
+      y: 0,
+      duration: 1,
+      ease: 'power3.out'
+    }, 1.8);
+
+    // 6. Show subtitle
+    introTl.to('.intro-subtitle', {
+      opacity: 1,
+      duration: 0.8,
+      ease: 'power2.out'
+    }, 2.3);
+
+    // 7. Scale up title slightly
+    introTl.to('.intro-title', {
+      scale: 1.05,
+      duration: 0.5,
+      ease: 'power2.inOut'
+    }, 3.5);
+
+    // 8. Fade out everything
+    introTl.to('.intro-overlay-content', {
+      opacity: 0,
+      duration: 1,
+      ease: 'power2.inOut'
+    }, 4.2);
 
   }, []);
 
@@ -205,62 +252,95 @@ export default function Home() {
           height: 100vh;
           background: #FDF4E8;
           display: flex;
-          flex-direction: column;
-          align-items: center;
           justify-content: center;
+          align-items: center;
           z-index: 9999;
         }
 
-        .intro-coil {
-          width: 120px;
-          height: 114px;
-          margin-bottom: 40px;
-          opacity: 1;
+        .intro-overlay-content {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
 
-        .intro-coil path {
-          fill: none;
-          stroke: #7d3d00;
-          stroke-width: 3;
-          stroke-linecap: round;
-          stroke-dasharray: 350;
-          stroke-dashoffset: 350;
-          animation: none;
+        .blob-container {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
 
-        @keyframes drawCoil {
-          to {
-            stroke-dashoffset: 0;
-          }
+        .intro-blob {
+          position: absolute;
+          width: 400px;
+          height: 400px;
+          opacity: 0;
         }
 
-        .welcome-text {
+        .intro-content {
+          position: relative;
+          text-align: center;
+          z-index: 10;
+        }
+
+        .intro-title {
+          font-size: 6em;
+          font-weight: 700;
+          letter-spacing: -3px;
+          opacity: 0;
+          transform: translateY(50px);
           color: #7d3d00;
-          font-size: 48px;
           font-family: 'Caprasimo', serif;
-          font-weight: 400;
-          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-          white-space: nowrap;
+        }
+
+        .intro-subtitle {
+          font-size: 1.5em;
+          font-weight: 300;
+          margin-top: 20px;
+          opacity: 0;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: #914600;
+          font-family: 'Bricolage Grotesque', sans-serif;
+        }
+
+        .loading-bar-container {
+          position: absolute;
+          bottom: 100px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 300px;
+          height: 2px;
+          background: rgba(145, 70, 0, 0.2);
+          border-radius: 2px;
           overflow: hidden;
-          border-right: 4px solid #7d3d00;
-          width: 0;
-          animation: none;
-          display: inline-block;
+          opacity: 0;
         }
 
-        @keyframes typing {
-          from {
-            width: 0;
-          }
-          to {
-            width: 100%;
-          }
+        .loading-bar {
+          width: 0%;
+          height: 100%;
+          background: linear-gradient(90deg, #7d3d00, #914600);
+          border-radius: 2px;
         }
 
-        @keyframes removeCursor {
-          to {
-            border-right: none;
-          }
+        .loading-text {
+          position: absolute;
+          bottom: 120px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 0.9em;
+          letter-spacing: 2px;
+          opacity: 0;
+          color: #914600;
+          font-family: 'Bricolage Grotesque', sans-serif;
         }
 
         .home-container {
@@ -334,23 +414,69 @@ export default function Home() {
       {/* Intro Animation Screen */}
       {showIntro && (
         <div className="intro-screen">
-          {/* Coil SVG with draw animation */}
-          <svg 
-            ref={coilRef}
-            className="intro-coil"
-            width="120" 
-            height="114" 
-            viewBox="0 0 81 77" 
-            fill="none"
-          >
-            <path 
-              d="M26.4168 1.50037C26.3153 1.546 18.9202 4.51235 16.9078 5.85052C14.8953 7.18868 12.4202 8.01234 10.9202 9.51236C9.42023 11.0124 8.92019 11.5124 6.92021 14.0124C4.92022 16.5124 3.29872 21.0124 2.42021 24.0124C1.54169 27.0124 1.41483 30.8501 1.54169 33.0124C1.67903 35.3533 2.35945 38.7601 4.92022 43.5124C6.74414 46.8972 11.2442 49.4796 13.8322 49.996C16.4202 50.5124 18.6592 51.5876 27.3516 51.4065C30.5874 51.3391 33.5272 50.3174 37.6659 48.861C42.8112 47.0503 45.8731 45.2287 46.7952 44.6319C49.4202 42.9329 50.6765 40.1097 51.39 37.8C51.9398 36.0201 51.1792 34.1978 50.0834 32.8321C48.2852 30.5912 43.5142 29.5747 38.9202 33.5124C35.4202 36.5124 35.0981 37.9497 33.2465 42.0648C31.0265 46.9984 30.649 50.9027 30.5387 52.7799C30.3967 55.1959 30.8062 57.0755 31.4161 58.8381C32.5781 62.1963 34.0986 64.9976 35.3568 66.8227C38.8309 71.8617 42.3911 73.0787 44.3932 73.7446C47.1911 74.6752 52.6891 73.4 57.825 71.8084C61.138 70.7816 65.6434 68.5963 68.0727 67.405C70.5019 66.2138 70.6566 65.9003 70.7175 65.5417C70.8435 64.7991 70.4997 63.933 69.9976 63.1524C69.7559 62.7767 69.3057 62.6225 68.9462 62.5451C66.9408 62.1136 64.4581 64.1761 63.6793 65.2848C62.124 67.499 65.2366 70.8731 66.8107 72.2277C69.7286 73.768 71.0565 74.011 72.9323 74.0274C74.2194 74.016 76.1871 73.9648 78.5749 73.4734" 
-            />
-          </svg>
+          <div className="intro-overlay-content">
+            {/* Background Blobs (centered, stacked) */}
+            <div className="blob-container">
+              {/* Blob 1 - Outer */}
+              <svg 
+                className="intro-blob intro-blob-1"
+                viewBox="0 0 620 603" 
+                fill="none"
+              >
+                <path 
+                  fillRule="evenodd" 
+                  clipRule="evenodd" 
+                  d="M336.327 1.48572C414.231 9.60864 473.115 66.7872 518.604 130.55C574.65 209.11 638.43 296.033 612.844 389.082C584.309 492.855 495.991 583.359 389.609 599.667C291.749 614.669 219.14 525.124 143.712 460.998C79.7729 406.64 -0.331203 353.001 0.761041 269.085C1.81384 188.2 85.2711 142.397 148.515 91.962C205.675 46.3795 263.612 -6.09616 336.327 1.48572Z" 
+                  stroke="#643100" 
+                  strokeWidth="2"
+                  fill="none"
+                />
+              </svg>
 
-          {/* Typewriter text */}
-          <div ref={welcomeTextRef} className="welcome-text">
-            lets start your hair care journey.
+              {/* Blob 2 - Middle */}
+              <svg 
+                className="intro-blob intro-blob-2"
+                viewBox="0 0 604 606" 
+                fill="none"
+              >
+                <path 
+                  fillRule="evenodd" 
+                  clipRule="evenodd" 
+                  d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
+                  stroke="#643100" 
+                  strokeWidth="2"
+                  fill="none"
+                />
+              </svg>
+
+              {/* Blob 3 - Inner */}
+              <svg 
+                className="intro-blob intro-blob-3"
+                viewBox="0 0 624 605" 
+                fill="none"
+              >
+                <path 
+                  fillRule="evenodd" 
+                  clipRule="evenodd" 
+                  d="M390.524 3.70487C463.396 17.8137 515.846 77.3794 554.759 140.765C602.232 218.935 657.832 306.799 638.118 397.175C615.532 500.107 533.028 589.582 428.839 602.686C333.506 614.635 256.959 528.525 178.009 468.089C109.669 416.261 23.8254 368.185 7.61277 286.486C-7.94113 207.589 65.6438 152.13 128.074 97.3488C184.523 47.5069 322.675 -9.48221 390.524 3.70487Z" 
+                  stroke="#643100" 
+                  strokeWidth="2"
+                  fill="none"
+                />
+              </svg>
+            </div>
+
+            {/* Intro Content */}
+            <div className="intro-content">
+              <h1 className="intro-title">nywele.ai</h1>
+              <p className="intro-subtitle">Hair Care Powered by AI</p>
+            </div>
+
+            {/* Loading Bar */}
+            <div className="loading-text">Loading Experience</div>
+            <div className="loading-bar-container">
+              <div className="loading-bar"></div>
+            </div>
           </div>
         </div>
       )}
