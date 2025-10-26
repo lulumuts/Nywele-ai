@@ -270,8 +270,10 @@ export default function Home() {
 
         .intro-overlay-content {
           position: relative;
-          width: 100%;
-          height: 100%;
+          width: 150vw;
+          height: 150vh;
+          left: -25vw;
+          top: -25vh;
           display: flex;
           justify-content: center;
           align-items: center;
