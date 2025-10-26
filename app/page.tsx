@@ -288,13 +288,14 @@ export default function Home() {
           position: absolute;
           width: 550px;
           height: 550px;
-          opacity: 0 !important;
-          visibility: hidden !important;
+          opacity: 0;
+          visibility: hidden;
           display: none;
         }
         
         .intro-blob.visible {
           display: block;
+          visibility: visible;
         }
 
         .intro-content {
