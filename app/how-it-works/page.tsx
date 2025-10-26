@@ -292,6 +292,57 @@ export default function HowItWorks() {
           </div>
         </div>
 
+        {/* API Integration Section */}
+        <div className="mb-20 bg-white/60 backdrop-blur-sm rounded-3xl border-2 shadow-lg p-10"
+          style={{ borderColor: '#CE935F' }}>
+          <h2 className="text-3xl font-bold mb-6 text-center" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+            API Integration
+          </h2>
+          <p className="text-lg text-center max-w-4xl mx-auto mb-8" style={{ color: '#914600' }}>
+            Nywele.ai is exportable as an API, allowing your business to plug our AI-powered hair care analysis and recommendations directly into your existing services.
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <div className="rounded-xl p-6" style={{ backgroundColor: 'rgba(175, 85, 0, 0.05)' }}>
+              <h3 className="font-bold text-lg mb-4" style={{ color: '#643100' }}>
+                🔌 Available Endpoints
+              </h3>
+              <ul className="space-y-2" style={{ color: '#914600' }}>
+                <li>• <strong>Hair Analysis API</strong> - Detect hair type, health & styling needs</li>
+                <li>• <strong>Routine Generation API</strong> - Personalised care routines with products</li>
+                <li>• <strong>Style Detection API</strong> - Identify hairstyles from photos</li>
+                <li>• <strong>Product Recommendations API</strong> - AI-curated product matching</li>
+              </ul>
+            </div>
+            
+            <div className="rounded-xl p-6" style={{ backgroundColor: 'rgba(175, 85, 0, 0.05)' }}>
+              <h3 className="font-bold text-lg mb-4" style={{ color: '#643100' }}>
+                🏢 Perfect For
+              </h3>
+              <ul className="space-y-2" style={{ color: '#914600' }}>
+                <li>• Salon booking platforms</li>
+                <li>• E-commerce beauty stores</li>
+                <li>• Mobile hair care apps</li>
+                <li>• Hair product retailers</li>
+                <li>• Corporate wellness platforms</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="text-center mt-8">
+            <p className="text-sm mb-4" style={{ color: '#AF5500' }}>
+              Interested in integrating Nywele.ai into your platform?
+            </p>
+            <Link 
+              href="/profile"
+              className="inline-flex items-center justify-center gap-2 text-white px-8 py-3 rounded-xl font-semibold transition-colors shadow-lg"
+              style={{ backgroundColor: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+            >
+              Get API Access
+            </Link>
+          </div>
+        </div>
+
         {/* CTA */}
         <div className="text-center">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
