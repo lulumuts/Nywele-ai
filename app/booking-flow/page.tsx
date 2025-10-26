@@ -55,6 +55,13 @@ export default function BookingFlow() {
   const [quote, setQuote] = useState<any>(null);
 
   useEffect(() => {
+    // Check if we have required data from URL params
+    if (!desiredStyle || !budget || !timePreference) {
+      console.log('⚠️ Missing booking data, redirecting to home');
+      router.push('/');
+      return;
+    }
+
     // Get uploaded photos from sessionStorage
     const photo = sessionStorage.getItem('userHairPhoto');
     const inspiration = sessionStorage.getItem('inspirationPhoto');
@@ -64,8 +71,12 @@ export default function BookingFlow() {
     // Get hair analysis if available
     const analysisStr = sessionStorage.getItem('hairAnalysis');
     if (analysisStr) {
-      const analysis = JSON.parse(analysisStr);
-      setHairType(analysis.hairType || '');
+      try {
+        const analysis = JSON.parse(analysisStr);
+        setHairType(analysis.hairType || '');
+      } catch (error) {
+        console.error('Error parsing hair analysis:', error);
+      }
     }
 
     // Generate job spec
@@ -73,11 +84,13 @@ export default function BookingFlow() {
     const spec = generateJobSpec(styleSlug);
     if (spec) {
       setJobSpec(spec);
+    } else {
+      console.warn('⚠️ Could not generate job spec for style:', desiredStyle);
     }
 
     // Load matched stylists based on desired style, budget, and time
     loadMatchedStylists();
-  }, [desiredStyle, budget, timePreference]);
+  }, [desiredStyle, budget, timePreference, router]);
 
   const loadMatchedStylists = () => {
     // Mock stylists with skills and availability
@@ -273,17 +286,18 @@ export default function BookingFlow() {
   const styleCost = getStyleCost(desiredStyle);
 
   return (
-    <div className="min-h-screen bg-peach">
+    <div className="min-h-screen" style={{ background: '#FDF4E8' }}>
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-white/80 backdrop-blur-sm sticky top-0 z-10" style={{ borderBottom: '2px solid #914600' }}>
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
               Nywele.ai
             </h1>
             <button
               onClick={() => router.push('/')}
-              className="text-gray-600 hover:text-gray-800 text-sm font-medium"
+              className="text-sm font-medium hover:opacity-80 transition-opacity"
+              style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
             >
               ← Start Over
             </button>
@@ -293,20 +307,21 @@ export default function BookingFlow() {
           <div className="mt-4 flex items-center justify-center gap-2">
             {[1, 2, 3, 4].map(step => (
               <div key={step} className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                  currentStep >= step
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-gray-200 text-gray-500'
-                }`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold`}
+                  style={{
+                    background: currentStep >= step ? '#643100' : '#E5D4C1',
+                    color: currentStep >= step ? 'white' : '#914600',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}>
                   {step}
                 </div>
                 {step < 4 && (
-                  <div className={`w-12 h-1 ${currentStep > step ? 'bg-purple-600' : 'bg-gray-200'}`} />
+                  <div className={`w-12 h-1`} style={{ background: currentStep > step ? '#643100' : '#E5D4C1' }} />
                 )}
               </div>
             ))}
           </div>
-          <div className="mt-2 text-center text-sm text-gray-600">
+          <div className="mt-2 text-center text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
             {currentStep === 1 && 'Confirm Your Style'}
             {currentStep === 2 && 'Choose Date & Time'}
             {currentStep === 3 && 'Select Your Stylist'}
@@ -324,9 +339,10 @@ export default function BookingFlow() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100"
+              className="bg-white rounded-2xl shadow-2xl p-8"
+              style={{ border: '2px solid #914600' }}
             >
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">Your Style Choice</h2>
+              <h2 className="text-3xl font-bold mb-6" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>Your Style Choice</h2>
               
               <div className="grid md:grid-cols-2 gap-8 mb-8">
                 <div>
@@ -359,10 +375,10 @@ export default function BookingFlow() {
                       className="w-full h-64 object-cover rounded-xl mb-4"
                     />
                   )}
-                  <h4 className="text-2xl font-bold text-purple-600 mb-2">
+                  <h4 className="text-2xl font-bold mb-2" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
                     {desiredStyle === 'custom-style' ? 'Custom Style' : desiredStyle}
                   </h4>
-                  <div className="space-y-2 text-gray-600">
+                  <div className="space-y-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     <p><strong>Duration:</strong> Lasts {styleCost.duration}</p>
                     <p><strong>Maintenance:</strong> Low</p>
                   </div>
@@ -378,7 +394,8 @@ export default function BookingFlow() {
 
               <button
                 onClick={() => setCurrentStep(2)}
-                className="w-full mt-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                className="w-full mt-8 py-4 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                style={{ background: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
               >
                 Continue to Date Selection
                 <ArrowRight size={24} />
@@ -393,48 +410,59 @@ export default function BookingFlow() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100"
+              className="bg-white rounded-2xl shadow-2xl p-8"
+              style={{ border: '2px solid #914600' }}
             >
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">When Would You Like Your Appointment?</h2>
+              <h2 className="text-3xl font-bold mb-6" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>When Would You Like Your Appointment?</h2>
               
               <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Choose a Date</h3>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Choose a Date</h3>
                 <div className="grid grid-cols-7 gap-2">
-                  {getAvailableDates().map(date => (
-                    <button
-                      key={date.toISOString()}
-                      onClick={() => setSelectedDate(date.toISOString().split('T')[0])}
-                      className={`p-3 rounded-lg border-2 text-center transition-all ${
-                        selectedDate === date.toISOString().split('T')[0]
-                          ? 'border-purple-600 bg-purple-50'
-                          : 'border-gray-200 hover:border-purple-300'
-                      }`}
-                    >
-                      <p className="text-xs text-gray-500">{date.toLocaleDateString('en', { weekday: 'short' })}</p>
-                      <p className="text-lg font-bold text-gray-800">{date.getDate()}</p>
-                    </button>
-                  ))}
+                  {getAvailableDates().map(date => {
+                    const dateString = date.toISOString().split('T')[0];
+                    const isSelected = selectedDate === dateString;
+                    return (
+                      <button
+                        key={date.toISOString()}
+                        onClick={() => setSelectedDate(dateString)}
+                        className="p-3 rounded-lg border-2 text-center transition-all"
+                        style={{
+                          borderColor: isSelected ? '#643100' : '#E5D4C1',
+                          background: isSelected ? 'rgba(206, 147, 95, 0.2)' : 'white',
+                          fontFamily: 'Bricolage Grotesque, sans-serif'
+                        }}
+                      >
+                        <p className="text-xs" style={{ color: '#914600' }}>{date.toLocaleDateString('en', { weekday: 'short' })}</p>
+                        <p className="text-lg font-bold" style={{ color: '#643100' }}>{date.getDate()}</p>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               {selectedDate && (
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Preferred Time</h3>
+                  <h3 className="text-lg font-semibold mb-4" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Preferred Time</h3>
                   <div className="grid grid-cols-4 gap-3">
-                    {['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'].map(time => (
-                      <button
-                        key={time}
-                        onClick={() => setSelectedTime(time)}
-                        className={`p-3 rounded-lg border-2 font-semibold flex items-center justify-center gap-2 transition-all ${
-                          selectedTime === time
-                            ? 'border-purple-600 bg-purple-50 text-purple-700'
-                            : 'border-gray-200 hover:border-purple-300 text-gray-700'
-                        }`}
-                      >
-                        <Clock size={16} />
-                        {time}
-                      </button>
-                    ))}
+                    {['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'].map(time => {
+                      const isSelected = selectedTime === time;
+                      return (
+                        <button
+                          key={time}
+                          onClick={() => setSelectedTime(time)}
+                          className="p-3 rounded-lg border-2 font-semibold flex items-center justify-center gap-2 transition-all"
+                          style={{
+                            borderColor: isSelected ? '#643100' : '#E5D4C1',
+                            background: isSelected ? 'rgba(206, 147, 95, 0.2)' : 'white',
+                            color: isSelected ? '#643100' : '#914600',
+                            fontFamily: 'Bricolage Grotesque, sans-serif'
+                          }}
+                        >
+                          <Clock size={16} />
+                          {time}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -442,7 +470,8 @@ export default function BookingFlow() {
               <div className="flex gap-4">
                 <button
                   onClick={() => setCurrentStep(1)}
-                  className="flex-1 py-4 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-all flex items-center justify-center gap-2"
+                  className="flex-1 py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                  style={{ background: '#FDF4E8', color: '#914600', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   <ArrowLeft size={20} />
                   Back
@@ -450,7 +479,8 @@ export default function BookingFlow() {
                 <button
                   onClick={() => setCurrentStep(3)}
                   disabled={!selectedDate || !selectedTime}
-                  className="flex-1 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 py-4 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  style={{ background: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   Find Stylists
                   <ArrowRight size={20} />
