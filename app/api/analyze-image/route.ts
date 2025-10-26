@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeHairImage, detectHairType, detectHairstyle, analyzeHairHealth } from '@/lib/vision';
+import { requireAuth } from '@/lib/apiAuth';
 
 export async function POST(request: NextRequest) {
+  // Check authentication (allows internal requests OR valid API key)
+  const authError = await requireAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { image, imageType } = body;
