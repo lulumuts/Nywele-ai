@@ -3,24 +3,28 @@
 @tailwind utilities;
 
 :root {
-  --background: #FEF4E6;
+  --background: #FDF4E8;
   --foreground: #171717;
+  --primary: #AF5500;
+  --primary-dark: #643100;
+  --accent: #CE935F;
+  --cream: #FDF4E8;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #FEF4E6;
+    --background: #FDF4E8;
     --foreground: #171717;
   }
 }
 
 html {
-  background: #FEF4E6;
+  background: #FDF4E8;
 }
 
 body {
   color: var(--foreground);
-  background: #FEF4E6;
+  background: #FDF4E8;
   overflow-x: hidden;
   min-height: 100vh;
 }

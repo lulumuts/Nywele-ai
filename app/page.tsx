@@ -1,225 +1,285 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function Home() {
   return (
     <>
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Caprasimo&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
         
         body {
           margin: 0;
           padding: 0;
           min-height: 100vh;
           width: 100vw;
-          background: #FEF4E6;
-          font-family: 'Arial', sans-serif;
+          background: #FDF4E8;
+          font-family: 'Bricolage Grotesque', sans-serif;
           overflow: hidden;
         }
 
-        .animation-container {
+        .home-container {
           position: relative;
           width: 100vw;
           height: 100vh;
-          display: flex;
-          justify-content: center;
-          align-items: center;
+          background: #FDF4E8;
+          overflow: hidden;
         }
 
-        .blob {
+        /* Wavy Hair Pattern Background Image */
+        .wave-patterns {
           position: absolute;
-          width: min(700px, 80vw);
-          height: min(700px, 80vh);
-          top: 53%;
+          width: 150vmax;
+          height: 150vmax;
+          left: 27%;
+          top: 103%;
+          transform: translate(-50%, -50%) rotate(10deg);
+          z-index: 1;
+          background-image: url("data:image/svg+xml,%3Csvg width='500' height='1024' viewBox='0 0 500 1024' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M136.159 -64.5C495.422 135 532.329 334.5 246.879 534C-38.5715 733.5 -75.4781 933 136.159 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M149.069 -64.5C495.646 135 526.209 334.5 240.759 534C-44.6907 733.5 -75.2541 933 149.069 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M162.277 -64.5C496.167 135 520.387 334.5 234.937 534C-50.5129 733.5 -74.7329 933 162.277 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M175.761 -64.5C496.964 135 514.841 334.5 229.391 534C-56.0589 733.5 -73.9356 933 175.761 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M189.502 -64.5C498.019 135 509.552 334.5 224.102 534C-61.3482 733.5 -72.8815 933 189.502 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M203.482 -64.5C499.312 135 504.502 334.5 219.052 534C-66.3979 733.5 -71.5879 933 203.482 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M217.686 -64.5C500.829 135 499.676 334.5 214.226 534C-71.224 733.5 -70.0707 933 217.686 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M232.099 -64.5C502.556 135 495.059 334.5 209.609 534C-75.841 733.5 -68.3444 933 232.099 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M246.708 -64.5C504.478 135 490.638 334.5 205.188 534C-80.2623 733.5 -66.4223 933 246.708 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M261.5 -64.5C506.583 135 486.4 334.5 200.95 534C-84.4999 733.5 -64.3166 933 261.5 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M276.465 -64.5C508.862 135 482.335 334.5 196.885 534C-88.5651 733.5 -62.0384 933 276.465 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M291.592 -64.5C511.302 135 478.432 334.5 192.982 534C-92.4681 733.5 -59.5981 933 291.592 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M306.871 -64.5C513.895 135 474.681 334.5 189.231 534C-96.2186 733.5 -57.0052 933 306.871 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M322.295 -64.5C516.631 135 471.075 334.5 185.625 534C-99.8252 733.5 -54.2686 933 322.295 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M337.854 -64.5C519.504 135 467.604 334.5 182.154 534C-103.296 733.5 -51.3962 933 337.854 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M353.541 -64.5C522.504 135 464.261 334.5 178.811 534C-106.639 733.5 -48.3956 933 353.541 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M369.345 -64.5C525.622 135 461.035 334.5 175.585 534C-109.865 733.5 -45.2779 933 369.345 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M385.268 -64.5C528.858 135 457.928 334.5 172.478 534C-112.972 733.5 -42.0421 933 385.268 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M401.299 -64.5C532.202 135 454.929 334.5 169.479 534C-115.971 733.5 -38.6976 933 401.299 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M417.433 -64.5C535.65 135 452.033 334.5 166.583 534C-118.867 733.5 -35.25 933 417.433 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M433.665 -64.5C539.195 135 449.235 334.5 163.785 534C-121.665 733.5 -31.7046 933 433.665 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M449.991 -64.5C542.834 135 446.531 334.5 161.081 534C-124.369 733.5 -28.0661 933 449.991 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M466.404 -64.5C546.561 135 443.914 334.5 158.464 534C-126.986 733.5 -24.3393 933 466.404 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3C/svg%3E");
+          background-position: center center;
+          background-repeat: no-repeat;
+          background-size: 100% 100%;
+        }
+
+        /* Organic Blob Shapes - Centered */
+        .blob-shape-outer {
+          position: absolute;
           left: 50%;
+          top: 50%;
           transform: translate(-50%, -50%);
-        }
-
-        .blob-1 {
-          opacity: 0.5;
-          z-index: 3;
-        }
-
-        .blob-2 {
-          opacity: 0.5;
+          animation: blobPulse 8s ease-in-out infinite;
           z-index: 2;
         }
 
-        .blob-3 {
-          opacity: 0.5;
-          z-index: 1;
-        }
-
-        .blob path {
-          animation: blobMorph 12s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-          transform-origin: center;
-        }
-
-        .blob-2 path {
-          animation: blobMorph 12s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-          animation-delay: -1.5s;
-        }
-
-        .blob-3 path {
-          animation: blobMorph 12s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-          animation-delay: -3s;
-        }
-
-        @keyframes blobMorph {
-          0% {
-            d: path("M130,-140C165,-120,185,-75,195,-25C205,25,205,75,180,115C155,155,110,185,60,195C10,205,-40,195,-85,170C-130,145,-170,105,-185,55C-200,5,-190,-55,-160,-100C-130,-145,-80,-175,-25,-185C30,-195,95,-160,130,-140Z");
-          }
-          20% {
-            d: path("M90,-155C130,-145,165,-110,185,-65C205,-20,210,30,190,75C170,120,135,160,90,175C45,190,0,180,-45,160C-90,140,-135,110,-160,65C-185,20,-190,-35,-170,-85C-150,-135,-110,-180,-55,-195C0,-210,50,-165,90,-155Z");
-          }
-          40% {
-            d: path("M145,-115C175,-90,195,-45,200,5C205,55,195,110,165,145C135,180,85,195,30,195C-25,195,-80,180,-120,150C-160,120,-185,75,-190,20C-195,-35,-180,-95,-145,-135C-110,-175,-55,-195,5,-190C65,-185,115,-140,145,-115Z");
-          }
-          60% {
-            d: path("M105,-160C145,-150,180,-115,195,-70C210,-25,205,25,185,70C165,115,130,155,85,175C40,195,-5,195,-55,175C-105,155,-160,115,-185,65C-210,15,-215,-45,-190,-95C-165,-145,-110,-185,-50,-190C10,-195,65,-170,105,-160Z");
-          }
-          80% {
-            d: path("M135,-130C170,-105,190,-55,195,-5C200,45,190,100,160,140C130,180,80,205,25,205C-30,205,-85,180,-130,145C-175,110,-210,65,-215,10C-220,-45,-195,-105,-155,-145C-115,-185,-60,-205,0,-200C60,-195,100,-155,135,-130Z");
-          }
-          100% {
-            d: path("M130,-140C165,-120,185,-75,195,-25C205,25,205,75,180,115C155,155,110,185,60,195C10,205,-40,195,-85,170C-130,145,-170,105,-185,55C-200,5,-190,-55,-160,-100C-130,-145,-80,-175,-25,-185C30,-195,95,-160,130,-140Z");
-          }
-        }
-
-        .landing-content {
+        .blob-shape-middle {
           position: absolute;
-          top: 50%;
           left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          animation: blobPulse 8s ease-in-out infinite;
+          animation-delay: -2s;
+          z-index: 3;
+        }
+
+        .blob-shape-inner {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          animation: blobPulse 8s ease-in-out infinite;
+          animation-delay: -4s;
+          z-index: 2;
+        }
+
+        @keyframes blobPulse {
+          0%, 100% {
+            transform: translate(-50%, -50%) scale(1) rotate(0deg);
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(1.05) rotate(2deg);
+          }
+        }
+
+        /* Content Area */
+        .content-area {
+          position: absolute;
+          left: 50%;
+          top: 50%;
           transform: translate(-50%, -50%);
           z-index: 10;
-          text-align: center;
-          color: #9E6240;
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: center;
-          width: 100%;
-          max-width: 90%;
+          text-align: center;
+          max-width: 600px;
         }
 
-        .logo-img {
-          width: clamp(60px, 10vw, 80px);
-          height: clamp(60px, 10vw, 80px);
-          margin: 0 0 20px 0;
+        .curl-icon {
+          width: 81px;
+          height: 77px;
+          margin-bottom: 30px;
         }
 
-        .landing-content h1 {
-          font-size: clamp(2rem, 6vw, 2.5em);
-          margin: 0;
-          padding: 0;
-          width: 100%;
-          font-family: "Caprasimo", serif;
+        .logo-text {
+          color: #FDF4E8;
+          font-size: 48px;
+          font-family: 'Caprasimo', serif;
+          font-weight: 400;
+          margin-bottom: 16px;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .landing-content .subtitle {
-          font-size: clamp(0.9rem, 2.5vw, 1.1em);
-          margin: 15px 0 25px 0;
-          padding: 0;
-          opacity: 0.85;
-          width: 100%;
-          letter-spacing: 0.5px;
+        .tagline {
+          color: #FDF4E8;
+          font-size: 24px;
+          font-family: 'Bricolage Grotesque', sans-serif;
+          font-weight: 400;
+          margin-bottom: 40px;
+          line-height: 1.4;
         }
 
-        .landing-content .cta-button {
+        .cta-button {
           display: inline-block;
-          margin-top: 20px;
-          padding: 10px 24px;
-          background-color: #9E6240;
-          color: #FEF4E6;
+          padding: 16px 40px;
+          background: #643100;
+          border-radius: 16px;
+          color: white;
+          font-size: 16px;
+          font-family: 'Caprasimo', serif;
+          font-weight: 400;
           text-decoration: none;
-          border-radius: 20px;
-          font-size: clamp(0.85rem, 2vw, 0.95em);
-          font-weight: 500;
-          font-family: 'Arial', sans-serif;
           transition: all 0.3s ease;
-          border: 2px solid #9E6240;
+          box-shadow: 0 4px 12px rgba(100, 49, 0, 0.3);
         }
 
-        .landing-content .cta-button:hover {
-          background-color: #644536;
-          border-color: #644536;
+        .cta-button:hover {
+          background: #7d3d00;
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(100, 69, 54, 0.3);
+          box-shadow: 0 6px 20px rgba(100, 49, 0, 0.4);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+          .content-area {
+            max-width: 500px;
+            padding: 0 20px;
+          }
         }
 
         @media (max-width: 768px) {
-          .blob {
-            width: min(550px, 85vw);
-            height: min(550px, 85vh);
+          .wave-patterns {
+            background-size: cover;
+          }
+
+          .blob-shape-outer,
+          .blob-shape-middle,
+          .blob-shape-inner {
+            left: 50%;
+            top: 50%;
+          }
+          
+          @keyframes blobPulse {
+            0%, 100% {
+              transform: translate(-50%, -50%) scale(0.6) rotate(0deg);
+            }
+            50% {
+              transform: translate(-50%, -50%) scale(0.63) rotate(2deg);
+            }
+          }
+
+          .content-area {
+            padding: 0 20px;
+            max-width: 90%;
+          }
+
+          .logo-text {
+            font-size: 36px;
+          }
+
+          .tagline {
+            font-size: 18px;
           }
         }
 
         @media (max-width: 480px) {
-          .blob {
-            width: min(400px, 90vw);
-            height: min(400px, 90vh);
+          .logo-text {
+            font-size: 28px;
           }
-          
-          .logo-img {
-            width: 50px;
-            height: 50px;
-            margin-bottom: 15px;
+
+          .tagline {
+            font-size: 16px;
+          }
+
+          .cta-button {
+            font-size: 14px;
+            padding: 12px 32px;
+          }
+
+          .curl-icon {
+            width: 60px;
+            height: 56px;
           }
         }
       `}</style>
 
-      <div className="animation-container">
-        {/* SVG Blob 1 */}
-        <svg className="blob blob-1" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-          <g transform="translate(300,300)">
-            <path 
-              d="M130,-140C165,-120,185,-75,195,-25C205,25,205,75,180,115C155,155,110,185,60,195C10,205,-40,195,-85,170C-130,145,-170,105,-185,55C-200,5,-190,-55,-160,-100C-130,-145,-80,-175,-25,-185C30,-195,95,-160,130,-140Z" 
+      <div className="home-container">
+        {/* Wavy Hair Patterns - Background Image */}
+        <div className="wave-patterns"></div>
+
+        {/* Organic Blob Shape - Outer */}
+        <svg 
+          className="blob-shape-outer"
+          width="620" 
+          height="603" 
+          viewBox="0 0 620 603" 
               fill="none" 
-              stroke="#9E6240" 
-              strokeWidth="3" 
-            />
-          </g>
+        >
+          <path 
+            fillRule="evenodd" 
+            clipRule="evenodd" 
+            d="M336.327 1.48572C414.231 9.60864 473.115 66.7872 518.604 130.55C574.65 209.11 638.43 296.033 612.844 389.082C584.309 492.855 495.991 583.359 389.609 599.667C291.749 614.669 219.14 525.124 143.712 460.998C79.7729 406.64 -0.331203 353.001 0.761041 269.085C1.81384 188.2 85.2711 142.397 148.515 91.962C205.675 46.3795 263.612 -6.09616 336.327 1.48572Z" 
+            stroke="#AF5500" 
+            strokeWidth="1.5"
+          />
         </svg>
 
-        {/* SVG Blob 2 */}
-        <svg className="blob blob-2" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-          <g transform="translate(300,300)">
+        {/* Organic Blob Shape - Middle (Filled) */}
+        <svg 
+          className="blob-shape-middle"
+          width="604" 
+          height="606" 
+          viewBox="0 0 604 606" 
+          fill="none"
+        >
             <path 
-              d="M130,-140C165,-120,185,-75,195,-25C205,25,205,75,180,115C155,155,110,185,60,195C10,205,-40,195,-85,170C-130,145,-170,105,-185,55C-200,5,-190,-55,-160,-100C-130,-145,-80,-175,-25,-185C30,-195,95,-160,130,-140Z" 
-              fill="none" 
-              stroke="#9E6240" 
-              strokeWidth="1" 
-            />
-          </g>
+            fillRule="evenodd" 
+            clipRule="evenodd" 
+            d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
+            fill="#AF5500" 
+            fillOpacity="0.8" 
+            stroke="#AF5500" 
+            strokeWidth="2"
+          />
         </svg>
 
-        {/* SVG Blob 3 */}
-        <svg className="blob blob-3" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-          <g transform="translate(300,300)">
+        {/* Organic Blob Shape - Inner */}
+        <svg 
+          className="blob-shape-inner"
+          width="597" 
+          height="607" 
+          viewBox="0 0 597 607" 
+          fill="none"
+        >
             <path 
-              d="M130,-140C165,-120,185,-75,195,-25C205,25,205,75,180,115C155,155,110,185,60,195C10,205,-40,195,-85,170C-130,145,-170,105,-185,55C-200,5,-190,-55,-160,-100C-130,-145,-80,-175,-25,-185C30,-195,95,-160,130,-140Z" 
-              fill="none" 
-              stroke="#9E6240" 
-              strokeWidth="1" 
-            />
-          </g>
+            fillRule="evenodd" 
+            clipRule="evenodd" 
+            d="M394.019 9.67684C467.955 35.5323 512.078 104.741 541.651 177.27C578.087 266.63 620.121 365.91 573.783 450.559C522.103 544.965 415.308 612.683 308.03 604.039C209.347 596.087 159.326 492.221 100.704 412.441C51.0106 344.812 -14.5781 274.158 5.82117 192.752C25.4836 114.286 117.249 88.9462 190.413 54.4418C256.538 23.2571 325.007 -14.4565 394.019 9.67684Z" 
+            stroke="#AF5500" 
+            strokeWidth="4"
+          />
         </svg>
 
         {/* Content */}
-        <div className="landing-content">
-          <Image 
-            src="/coil.svg" 
-            alt="Nywele.ai Logo" 
-            width={80}
-            height={80}
-            className="logo-img"
-            priority
-            unoptimized
-          />
-          <h1>nywele.ai</h1>
-          <p className="subtitle">AI-Powered African Hair Care</p>
+        <div className="content-area">
+          {/* Curl Icon */}
+          <svg 
+            className="curl-icon"
+            width="81" 
+            height="77" 
+            viewBox="0 0 81 77" 
+            fill="none"
+          >
+            <path 
+              d="M26.4168 1.50037C26.3153 1.546 18.9202 4.51235 16.9078 5.85052C14.8953 7.18868 12.4202 8.01234 10.9202 9.51236C9.42023 11.0124 8.92019 11.5124 6.92021 14.0124C4.92022 16.5124 3.29872 21.0124 2.42021 24.0124C1.54169 27.0124 1.41483 30.8501 1.54169 33.0124C1.67903 35.3533 2.35945 38.7601 4.92022 43.5124C6.74414 46.8972 11.2442 49.4796 13.8322 49.996C16.4202 50.5124 18.6592 51.5876 27.3516 51.4065C30.5874 51.3391 33.5272 50.3174 37.6659 48.861C42.8112 47.0503 45.8731 45.2287 46.7952 44.6319C49.4202 42.9329 50.6765 40.1097 51.39 37.8C51.9398 36.0201 51.1792 34.1978 50.0834 32.8321C48.2852 30.5912 43.5142 29.5747 38.9202 33.5124C35.4202 36.5124 35.0981 37.9497 33.2465 42.0648C31.0265 46.9984 30.649 50.9027 30.5387 52.7799C30.3967 55.1959 30.8062 57.0755 31.4161 58.8381C32.5781 62.1963 34.0986 64.9976 35.3568 66.8227C38.8309 71.8617 42.3911 73.0787 44.3932 73.7446C47.1911 74.6752 52.6891 73.4 57.825 71.8084C61.138 70.7816 65.6434 68.5963 68.0727 67.405C70.5019 66.2138 70.6566 65.9003 70.7175 65.5417C70.8435 64.7991 70.4997 63.933 69.9976 63.1524C69.7559 62.7767 69.3057 62.6225 68.9462 62.5451C66.9408 62.1136 64.4581 64.1761 63.6793 65.2848C62.124 67.499 65.2366 70.8731 66.8107 72.2277C69.7286 73.768 71.0565 74.011 72.9323 74.0274C74.2194 74.016 76.1871 73.9648 78.5749 73.4734" 
+              stroke="#FDF4E8" 
+              strokeWidth="3" 
+              strokeLinecap="round"
+            />
+          </svg>
+
+          <h1 className="logo-text">Nywele.ai</h1>
+          <p className="tagline">AI-Powered African Hair care</p>
+          
           <Link href="/hair-care" className="cta-button">
             Get Started
           </Link>

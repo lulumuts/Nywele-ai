@@ -11,10 +11,21 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        'peach': '#FEF4E6',
+        'cream': '#FDF4E8',
+        'primary': '#AF5500',
+        'primary-dark': '#643100',
+        'accent': '#CE935F',
+        'peach': '#FDF4E8', // Updated to match new design
       },
       backgroundColor: {
-        'peach': '#FEF4E6',
+        'cream': '#FDF4E8',
+        'peach': '#FDF4E8',
+        'primary': '#AF5500',
+        'primary-dark': '#643100',
+      },
+      fontFamily: {
+        'caprasimo': ['Caprasimo', 'serif'],
+        'bricolage': ['Bricolage Grotesque', 'sans-serif'],
       },
     },
   },

@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, MapPin, Star, Phone, Instagram, DollarSign, Check, ArrowRight, ArrowLeft, Clock, Sparkles } from 'lucide-react';
 import { generateJobSpec, mapStyleToTemplateSlug, JobSpec } from '@/lib/specs';
 import SpecSummary from '@/app/components/SpecSummary';
+import Navbar from '@/app/components/Navbar';
 
 interface Stylist {
   id: string;
@@ -27,12 +28,17 @@ interface Stylist {
 export default function BookingFlow() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0); // Start at 0 now
   
-  // User data from home page
-  const desiredStyle = searchParams?.get('desiredStyle') || '';
-  const budget = searchParams?.get('budget') || '';
-  const timePreference = searchParams?.get('timePreference') || '';
+  // User data from home page or form - start fresh without pre-filling
+  const [desiredStyleInput, setDesiredStyleInput] = useState('');
+  const [budgetInput, setBudgetInput] = useState('');
+  const [timePreferenceInput, setTimePreferenceInput] = useState('');
+  
+  const desiredStyle = desiredStyleInput;
+  const budget = budgetInput;
+  const timePreference = timePreferenceInput;
+  
   const [userPhoto, setUserPhoto] = useState<string | null>(null);
   const [inspirationPhoto, setInspirationPhoto] = useState<string | null>(null);
   const [hairType, setHairType] = useState<string>('');
@@ -55,10 +61,15 @@ export default function BookingFlow() {
   const [quote, setQuote] = useState<any>(null);
 
   useEffect(() => {
-    // Check if we have required data from URL params
+    // Clear any previous booking data to start fresh
+    sessionStorage.removeItem('userHairPhoto');
+    sessionStorage.removeItem('inspirationPhoto');
+    sessionStorage.removeItem('hairAnalysis');
+    
+    // If missing data, we'll show step 0 (initial form) instead of redirecting
     if (!desiredStyle || !budget || !timePreference) {
-      console.log('⚠️ Missing booking data, redirecting to home');
-      router.push('/');
+      console.log('⚠️ Missing booking data - user needs to provide details first');
+      setCurrentStep(0); // New step 0 for collecting initial data
       return;
     }
 
@@ -72,25 +83,28 @@ export default function BookingFlow() {
     const analysisStr = sessionStorage.getItem('hairAnalysis');
     if (analysisStr) {
       try {
-        const analysis = JSON.parse(analysisStr);
-        setHairType(analysis.hairType || '');
+      const analysis = JSON.parse(analysisStr);
+      setHairType(analysis.hairType || '');
       } catch (error) {
         console.error('Error parsing hair analysis:', error);
       }
     }
 
-    // Generate job spec
+    // Generate job spec if we have a style
+    if (desiredStyle) {
     const styleSlug = mapStyleToTemplateSlug(desiredStyle.toLowerCase().replace(/\s+/g, '-'));
     const spec = generateJobSpec(styleSlug);
     if (spec) {
       setJobSpec(spec);
-    } else {
-      console.warn('⚠️ Could not generate job spec for style:', desiredStyle);
+        setCurrentStep(1); // Move to confirmation step
+      } else {
+        console.warn('⚠️ Could not generate job spec for style:', desiredStyle);
+      }
     }
 
     // Load matched stylists based on desired style, budget, and time
     loadMatchedStylists();
-  }, [desiredStyle, budget, timePreference, router]);
+  }, [desiredStyle, budget, timePreference]);
 
   const loadMatchedStylists = () => {
     // Mock stylists with skills and availability
@@ -287,51 +301,183 @@ export default function BookingFlow() {
 
   return (
     <div className="min-h-screen" style={{ background: '#FDF4E8' }}>
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm sticky top-0 z-10" style={{ borderBottom: '2px solid #914600' }}>
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-              Nywele.ai
-            </h1>
-            <button
-              onClick={() => router.push('/')}
-              className="text-sm font-medium hover:opacity-80 transition-opacity"
-              style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-            >
-              ← Start Over
-            </button>
-          </div>
-          
-          {/* Progress Steps */}
-          <div className="mt-4 flex items-center justify-center gap-2">
-            {[1, 2, 3, 4].map(step => (
-              <div key={step} className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold`}
-                  style={{
-                    background: currentStep >= step ? '#643100' : '#E5D4C1',
-                    color: currentStep >= step ? 'white' : '#914600',
-                    fontFamily: 'Bricolage Grotesque, sans-serif'
-                  }}>
-                  {step}
+      {/* Use the same Navbar as other pages */}
+      <Navbar />
+      
+      {/* Progress Steps - Only show when past step 0 */}
+      {currentStep > 0 && (
+        <div className="bg-white/80 backdrop-blur-sm border-b" style={{ borderColor: 'rgba(145, 70, 0, 0.2)' }}>
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-center gap-2">
+              {[1, 2, 3, 4].map(step => (
+                <div key={step} className="flex items-center">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold`}
+                    style={{
+                      background: currentStep >= step ? '#643100' : '#E5D4C1',
+                      color: currentStep >= step ? 'white' : '#914600',
+                      fontFamily: 'Bricolage Grotesque, sans-serif'
+                    }}>
+                    {step}
+                  </div>
+                  {step < 4 && (
+                    <div className={`w-12 h-1`} style={{ background: currentStep > step ? '#643100' : '#E5D4C1' }} />
+                  )}
                 </div>
-                {step < 4 && (
-                  <div className={`w-12 h-1`} style={{ background: currentStep > step ? '#643100' : '#E5D4C1' }} />
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="mt-2 text-center text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-            {currentStep === 1 && 'Confirm Your Style'}
-            {currentStep === 2 && 'Choose Date & Time'}
-            {currentStep === 3 && 'Select Your Stylist'}
-            {currentStep === 4 && 'Confirm Booking'}
+              ))}
+            </div>
+            <div className="mt-2 text-center text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              {currentStep === 1 && 'Confirm Your Style'}
+              {currentStep === 2 && 'Choose Date & Time'}
+              {currentStep === 3 && 'Select Your Stylist'}
+              {currentStep === 4 && 'Confirm Booking'}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="max-w-6xl mx-auto px-4 py-12">
         <AnimatePresence mode="wait">
+          {/* Step 0: Initial Booking Form */}
+          {currentStep === 0 && (
+            <motion.div
+              key="step0"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="w-full min-h-[calc(100vh-200px)] flex items-center justify-center"
+            >
+              <div className="rounded-2xl shadow-2xl p-12 md:p-16 w-full max-w-[1300px]"
+                style={{ background: '#FFFBF5', border: '2px solid #914600', minHeight: '750px' }}>
+                <div className="grid md:grid-cols-2 gap-12 w-full">
+                  {/* Left Section */}
+                  <div className="flex flex-col justify-center">
+                    <h1 className="text-5xl md:text-6xl font-bold mb-6" 
+                      style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                      Book Your<br />Perfect<br />Braiding<br />Style
+                    </h1>
+                    <p className="text-xl" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                      Connect with expert stylists<br />and get your dream hairstyle
+                    </p>
+                  </div>
+
+                  {/* Right Section - Form */}
+                  <div className="flex flex-col justify-center">
+                    <h2 className="text-3xl font-bold mb-8" 
+                      style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                      Let's Get Started
+                    </h2>
+                    
+                    <div className="space-y-6">
+                      <div>
+                        <label className="block text-base font-medium mb-3" 
+                          style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          Desired Style
+                        </label>
+                        <select
+                          value={desiredStyleInput}
+                          onChange={(e) => setDesiredStyleInput(e.target.value)}
+                          className="w-full px-6 py-4 pr-12 rounded-xl text-lg appearance-none"
+                          style={{ 
+                            background: '#FDF4E8', 
+                            border: '2px solid #914600',
+                            color: '#643100',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23914600' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                            backgroundPosition: 'right 1rem center',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundSize: '1.5em 1.5em'
+                          }}
+                        >
+                          <option value="">Select a style...</option>
+                          <option value="Box Braids">Box Braids</option>
+                          <option value="Knotless Braids">Knotless Braids</option>
+                          <option value="Senegalese Twists">Senegalese Twists</option>
+                          <option value="Faux Locs">Faux Locs</option>
+                          <option value="Cornrows">Cornrows</option>
+                          <option value="Two-Strand Twists">Two-Strand Twists</option>
+                          <option value="Passion Twists">Passion Twists</option>
+                          <option value="Goddess Locs">Goddess Locs</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-base font-medium mb-3" 
+                          style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          Budget
+                        </label>
+                        <select
+                          value={budgetInput}
+                          onChange={(e) => setBudgetInput(e.target.value)}
+                          className="w-full px-6 py-4 pr-12 rounded-xl text-lg appearance-none"
+                          style={{ 
+                            background: '#FDF4E8', 
+                            border: '2px solid #914600',
+                            color: '#643100',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23914600' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                            backgroundPosition: 'right 1rem center',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundSize: '1.5em 1.5em'
+                          }}
+                        >
+                          <option value="">Select your budget...</option>
+                          <option value="Under KES 3,000">Under KES 3,000</option>
+                          <option value="KES 3,000-5,000">KES 3,000-5,000</option>
+                          <option value="KES 5,000-8,000">KES 5,000-8,000</option>
+                          <option value="KES 8,000+">KES 8,000+</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-base font-medium mb-3" 
+                          style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          Time Preference
+                        </label>
+                        <select
+                          value={timePreferenceInput}
+                          onChange={(e) => setTimePreferenceInput(e.target.value)}
+                          className="w-full px-6 py-4 pr-12 rounded-xl text-lg appearance-none"
+                          style={{ 
+                            background: '#FDF4E8', 
+                            border: '2px solid #914600',
+                            color: '#643100',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23914600' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                            backgroundPosition: 'right 1rem center',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundSize: '1.5em 1.5em'
+                          }}
+                        >
+                          <option value="">Select preferred time...</option>
+                          <option value="Morning">Morning (9AM-12PM)</option>
+                          <option value="Afternoon">Afternoon (12PM-5PM)</option>
+                          <option value="Evening">Evening (5PM-8PM)</option>
+                          <option value="Flexible">Flexible</option>
+                        </select>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          if (!desiredStyleInput || !budgetInput || !timePreferenceInput) {
+                            alert('Please fill in all fields');
+                            return;
+                          }
+                          // Trigger re-render with new data
+                          setCurrentStep(1);
+                        }}
+                        disabled={!desiredStyleInput || !budgetInput || !timePreferenceInput}
+                        className="w-full py-4 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{ background: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                      >
+                        Continue to Booking
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* Step 1: Style Confirmation */}
           {currentStep === 1 && (
             <motion.div
@@ -422,8 +568,8 @@ export default function BookingFlow() {
                     const dateString = date.toISOString().split('T')[0];
                     const isSelected = selectedDate === dateString;
                     return (
-                      <button
-                        key={date.toISOString()}
+                    <button
+                      key={date.toISOString()}
                         onClick={() => setSelectedDate(dateString)}
                         className="p-3 rounded-lg border-2 text-center transition-all"
                         style={{
@@ -434,7 +580,7 @@ export default function BookingFlow() {
                       >
                         <p className="text-xs" style={{ color: '#914600' }}>{date.toLocaleDateString('en', { weekday: 'short' })}</p>
                         <p className="text-lg font-bold" style={{ color: '#643100' }}>{date.getDate()}</p>
-                      </button>
+                    </button>
                     );
                   })}
                 </div>
@@ -447,9 +593,9 @@ export default function BookingFlow() {
                     {['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'].map(time => {
                       const isSelected = selectedTime === time;
                       return (
-                        <button
-                          key={time}
-                          onClick={() => setSelectedTime(time)}
+                      <button
+                        key={time}
+                        onClick={() => setSelectedTime(time)}
                           className="p-3 rounded-lg border-2 font-semibold flex items-center justify-center gap-2 transition-all"
                           style={{
                             borderColor: isSelected ? '#643100' : '#E5D4C1',
@@ -457,10 +603,10 @@ export default function BookingFlow() {
                             color: isSelected ? '#643100' : '#914600',
                             fontFamily: 'Bricolage Grotesque, sans-serif'
                           }}
-                        >
-                          <Clock size={16} />
-                          {time}
-                        </button>
+                      >
+                        <Clock size={16} />
+                        {time}
+                      </button>
                       );
                     })}
                   </div>
@@ -508,82 +654,82 @@ export default function BookingFlow() {
                 {matchedStylists.map(stylist => {
                   const isSelected = selectedStylist?.id === stylist.id;
                   return (
-                    <div
-                      key={stylist.id}
+                  <div
+                    key={stylist.id}
                       className="border-2 rounded-xl p-6 cursor-pointer transition-all hover:shadow-md"
                       style={{
                         borderColor: isSelected ? '#643100' : '#E5D4C1',
                         background: isSelected ? 'rgba(206, 147, 95, 0.1)' : 'white'
                       }}
-                      onClick={() => setSelectedStylist(stylist)}
-                    >
-                      <div className="flex gap-6">
-                        <img
-                          src={stylist.profile_image_url}
-                          alt={stylist.name}
-                          className="w-24 h-24 rounded-xl object-cover"
-                        />
-                        <div className="flex-1">
+                    onClick={() => setSelectedStylist(stylist)}
+                  >
+                    <div className="flex gap-6">
+                      <img
+                        src={stylist.profile_image_url}
+                        alt={stylist.name}
+                        className="w-24 h-24 rounded-xl object-cover"
+                      />
+                      <div className="flex-1">
                           <h3 className="text-xl font-bold" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{stylist.name}</h3>
                           <p className="font-medium mb-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{stylist.business_name}</p>
-                          
+                        
                           <div className="flex items-center gap-4 text-sm mb-3" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                            <span className="flex items-center gap-1">
-                              <Star className="text-yellow-400 fill-yellow-400" size={16} />
-                              {stylist.average_rating} ({stylist.total_reviews} reviews)
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <MapPin size={16} />
-                              {stylist.location_city}
-                            </span>
-                            <span className="font-semibold">
-                              {priceRangeLabels[stylist.price_range as keyof typeof priceRangeLabels]}
-                            </span>
-                          </div>
-
-                          <div className="flex gap-2 mb-3">
-                            {stylist.specialties.slice(0, 3).map(specialty => (
-                              <span
-                                key={specialty}
-                                className="text-xs px-2 py-1 rounded-full"
-                                style={{ background: 'rgba(206, 147, 95, 0.2)', color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                              >
-                                {specialty}
-                              </span>
-                            ))}
-                          </div>
-
-                          <div className="flex gap-2">
-                            <a
-                              href={`tel:${stylist.phone}`}
-                              className="flex items-center gap-1 text-sm hover:opacity-80 transition-opacity"
-                              style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                            >
-                              <Phone size={14} />
-                              Call
-                            </a>
-                            <a
-                              href={`https://instagram.com/${stylist.instagram_handle.replace('@', '')}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-1 text-sm hover:opacity-80 transition-opacity"
-                              style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                            >
-                              <Instagram size={14} />
-                              Instagram
-                            </a>
-                          </div>
+                          <span className="flex items-center gap-1">
+                            <Star className="text-yellow-400 fill-yellow-400" size={16} />
+                            {stylist.average_rating} ({stylist.total_reviews} reviews)
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MapPin size={16} />
+                            {stylist.location_city}
+                          </span>
+                          <span className="font-semibold">
+                            {priceRangeLabels[stylist.price_range as keyof typeof priceRangeLabels]}
+                          </span>
                         </div>
 
-                        {isSelected && (
-                          <div className="flex items-center">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: '#643100' }}>
-                              <Check className="text-white" size={20} />
-                            </div>
-                          </div>
-                        )}
+                        <div className="flex gap-2 mb-3">
+                          {stylist.specialties.slice(0, 3).map(specialty => (
+                            <span
+                              key={specialty}
+                                className="text-xs px-2 py-1 rounded-full"
+                                style={{ background: 'rgba(206, 147, 95, 0.2)', color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                            >
+                              {specialty}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="flex gap-2">
+                          <a
+                            href={`tel:${stylist.phone}`}
+                              className="flex items-center gap-1 text-sm hover:opacity-80 transition-opacity"
+                              style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                          >
+                            <Phone size={14} />
+                            Call
+                          </a>
+                          <a
+                            href={`https://instagram.com/${stylist.instagram_handle.replace('@', '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-sm hover:opacity-80 transition-opacity"
+                              style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                          >
+                            <Instagram size={14} />
+                            Instagram
+                          </a>
+                        </div>
                       </div>
+
+                        {isSelected && (
+                        <div className="flex items-center">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: '#643100' }}>
+                            <Check className="text-white" size={20} />
+                          </div>
+                        </div>
+                      )}
                     </div>
+                  </div>
                   );
                 })}
               </div>
@@ -718,7 +864,7 @@ export default function BookingFlow() {
                       : 'rgba(22, 163, 74, 0.2)',
                     color: bookingStatus === 'pending_quote'
                       ? '#92400e'
-                      : bookingStatus === 'quote_submitted'
+                    : bookingStatus === 'quote_submitted'
                       ? '#1e40af'
                       : '#15803d',
                     fontFamily: 'Bricolage Grotesque, sans-serif'
