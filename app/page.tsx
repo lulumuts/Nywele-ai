@@ -318,7 +318,7 @@ export default function Home() {
         }
 
         .intro-subtitle {
-          font-size: 1.5em;
+          font-size: 1.1em;
           font-weight: 300;
           margin-top: 20px;
           opacity: 0;
