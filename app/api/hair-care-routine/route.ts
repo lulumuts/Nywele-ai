@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateHairCareRoutine, type HairCareProfile } from '@/lib/hairCare';
 import { recommendProductsForRoutine } from '@/lib/products';
+import { requireAuth } from '@/lib/apiAuth';
 
 export async function POST(request: NextRequest) {
+  // Check authentication
+  const authError = await requireAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
 
