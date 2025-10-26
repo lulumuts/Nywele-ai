@@ -6,7 +6,7 @@ import { gsap } from 'gsap';
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
-  const introBlobRef = useRef<SVGSVGElement>(null);
+  const introBlobRef = useRef<HTMLDivElement>(null);
   const welcomeTextRef = useRef<HTMLDivElement>(null);
   const homeContainerRef = useRef<HTMLDivElement>(null);
 
