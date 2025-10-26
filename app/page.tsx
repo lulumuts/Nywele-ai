@@ -277,8 +277,8 @@ export default function Home() {
 
         .blob-container {
           position: absolute;
-          width: 200%;
-          height: 200%;
+          width: 300%;
+          height: 300%;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
@@ -290,8 +290,8 @@ export default function Home() {
 
         .intro-blob {
           position: absolute;
-          width: 450px;
-          height: 450px;
+          width: 600px;
+          height: 600px;
           opacity: 0;
           visibility: hidden;
           display: none;
