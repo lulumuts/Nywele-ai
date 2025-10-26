@@ -11,6 +11,11 @@ export default function Home() {
   const homeContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Get all three blobs
+    const blobs = introBlobRef.current?.querySelectorAll('.blob-layer');
+    
+    if (!blobs) return;
+
     // GSAP Timeline for intro animation
     const tl = gsap.timeline({
       onComplete: () => {
@@ -18,50 +23,59 @@ export default function Home() {
       }
     });
 
-    // Intro sequence with ripple effect
-    tl.fromTo(introBlobRef.current, 
-      { 
-        scale: 0, 
-        opacity: 0
-      },
-      { 
-        scale: 1, 
-        opacity: 1,
-        duration: 0.8,
-        ease: "back.out(1.7)"
-      }
-    )
-    // Ripple effect - scale up and down once
-    .to(introBlobRef.current, {
-      scale: 1.15,
-      duration: 0.6,
-      ease: "power2.out"
+    // Animate each blob with stagger and ripple
+    blobs.forEach((blob, index) => {
+      // Entry animation
+      tl.fromTo(blob, 
+        { 
+          scale: 0, 
+          opacity: 0
+        },
+        { 
+          scale: 1, 
+          opacity: [0.3, 0.4, 0.5][index],
+          duration: 0.6,
+          ease: "back.out(1.7)"
+        },
+        index * 0.15 // Stagger each blob
+      );
+    });
+
+    // Ripple effect on all blobs simultaneously
+    tl.to(blobs, {
+      scale: 1.1,
+      duration: 0.5,
+      ease: "power2.out",
+      stagger: 0.1
     })
-    .to(introBlobRef.current, {
+    .to(blobs, {
       scale: 1,
-      duration: 0.6,
-      ease: "elastic.out(1, 0.3)"
+      duration: 0.5,
+      ease: "elastic.out(1, 0.3)",
+      stagger: 0.1
     })
+    // Welcome text
     .fromTo(welcomeTextRef.current,
       {
         opacity: 0,
-        y: 30
+        y: 20
       },
       {
         opacity: 1,
         y: 0,
-        duration: 0.6,
+        duration: 0.5,
         ease: "power3.out"
       },
-      "-=0.8" // Overlap with ripple
+      "-=0.6"
     )
+    // Fade out everything
     .to([introBlobRef.current, welcomeTextRef.current],
       {
         opacity: 0,
-        scale: 1.1,
-        duration: 0.6,
+        scale: 1.05,
+        duration: 0.5,
         ease: "power2.in",
-        delay: 0.8 // Hold for 0.8 seconds
+        delay: 0.6
       }
     );
 
@@ -71,9 +85,9 @@ export default function Home() {
       { 
         opacity: 1, 
         scale: 1,
-        duration: 1,
+        duration: 0.8,
         ease: "power2.out",
-        delay: 3.8 // Start when intro finishes
+        delay: 3.5
       }
     );
 
@@ -229,12 +243,21 @@ export default function Home() {
           z-index: 9999;
         }
 
-        .intro-blob {
-          width: 300px;
-          height: 300px;
-          margin-bottom: 60px;
-          transform: scale(0);
+        .intro-blob-container {
+          position: relative;
+          width: 200px;
+          height: 200px;
+          margin-bottom: 40px;
+        }
+
+        .blob-layer {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%) scale(0);
           opacity: 0;
+          width: 100%;
+          height: 100%;
         }
 
         .welcome-text {
@@ -317,23 +340,50 @@ export default function Home() {
       {/* Intro Animation Screen */}
       {showIntro && (
         <div className="intro-screen">
-          {/* Animated Intro Blob - matches homepage blob */}
-          <svg 
-            ref={introBlobRef}
-            className="intro-blob"
-            viewBox="0 0 604 606" 
-            fill="none"
-          >
-            <path 
-              fillRule="evenodd" 
-              clipRule="evenodd" 
-              d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
-              fill="#AF5500" 
-              fillOpacity="0.5" 
-              stroke="#AF5500" 
-              strokeWidth="2"
-            />
-          </svg>
+          {/* Three-layer blob animation like loading screen */}
+          <div ref={introBlobRef} className="intro-blob-container">
+            {/* Blob 1 */}
+            <svg 
+              className="blob-layer"
+              viewBox="0 0 604 606" 
+              fill="none"
+            >
+              <path 
+                fillRule="evenodd" 
+                clipRule="evenodd" 
+                d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
+                fill="#AF5500" 
+              />
+            </svg>
+
+            {/* Blob 2 */}
+            <svg 
+              className="blob-layer"
+              viewBox="0 0 604 606" 
+              fill="none"
+            >
+              <path 
+                fillRule="evenodd" 
+                clipRule="evenodd" 
+                d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
+                fill="#AF5500" 
+              />
+            </svg>
+
+            {/* Blob 3 */}
+            <svg 
+              className="blob-layer"
+              viewBox="0 0 604 606" 
+              fill="none"
+            >
+              <path 
+                fillRule="evenodd" 
+                clipRule="evenodd" 
+                d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
+                fill="#AF5500" 
+              />
+            </svg>
+          </div>
           
           <div ref={welcomeTextRef} className="welcome-text">
             Welcome
