@@ -1,8 +1,20 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function Home() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Show loading screen for 2.5 seconds
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <>
       <style jsx global>{`
@@ -138,6 +150,87 @@ export default function Home() {
           box-shadow: 0 6px 20px rgba(100, 49, 0, 0.4);
         }
 
+        /* Loading Screen */
+        .loading-screen {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: #FDF4E8;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          animation: fadeOut 0.8s ease-out forwards;
+          animation-delay: 2.3s;
+        }
+
+        @keyframes fadeOut {
+          from {
+            opacity: 1;
+          }
+          to {
+            opacity: 0;
+            visibility: hidden;
+          }
+        }
+
+        .loading-icon {
+          width: 120px;
+          height: 114px;
+          margin-bottom: 40px;
+          animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.05);
+            opacity: 0.8;
+          }
+        }
+
+        .loading-text {
+          color: #7d3d00;
+          font-size: 32px;
+          font-family: 'Caprasimo', serif;
+          font-weight: 400;
+          animation: fadeInOut 1.5s ease-in-out infinite;
+        }
+
+        @keyframes fadeInOut {
+          0%, 100% {
+            opacity: 0.4;
+          }
+          50% {
+            opacity: 1;
+          }
+        }
+
+        .loading-dots {
+          display: inline-block;
+          width: 60px;
+          text-align: left;
+        }
+
+        .home-container.fade-in {
+          animation: fadeIn 0.8s ease-in forwards;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
         /* Responsive Design */
         @media (max-width: 1200px) {
           .content-area {
@@ -202,7 +295,32 @@ export default function Home() {
         }
       `}</style>
 
-      <div className="home-container">
+      {/* Loading Screen */}
+      {isLoading && (
+        <div className="loading-screen">
+          {/* Large Curl Icon */}
+          <svg 
+            className="loading-icon"
+            width="120" 
+            height="114" 
+            viewBox="0 0 81 77" 
+            fill="none"
+          >
+            <path 
+              d="M26.4168 1.50037C26.3153 1.546 18.9202 4.51235 16.9078 5.85052C14.8953 7.18868 12.4202 8.01234 10.9202 9.51236C9.42023 11.0124 8.92019 11.5124 6.92021 14.0124C4.92022 16.5124 3.29872 21.0124 2.42021 24.0124C1.54169 27.0124 1.41483 30.8501 1.54169 33.0124C1.67903 35.3533 2.35945 38.7601 4.92022 43.5124C6.74414 46.8972 11.2442 49.4796 13.8322 49.996C16.4202 50.5124 18.6592 51.5876 27.3516 51.4065C30.5874 51.3391 33.5272 50.3174 37.6659 48.861C42.8112 47.0503 45.8731 45.2287 46.7952 44.6319C49.4202 42.9329 50.6765 40.1097 51.39 37.8C51.9398 36.0201 51.1792 34.1978 50.0834 32.8321C48.2852 30.5912 43.5142 29.5747 38.9202 33.5124C35.4202 36.5124 35.0981 37.9497 33.2465 42.0648C31.0265 46.9984 30.649 50.9027 30.5387 52.7799C30.3967 55.1959 30.8062 57.0755 31.4161 58.8381C32.5781 62.1963 34.0986 64.9976 35.3568 66.8227C38.8309 71.8617 42.3911 73.0787 44.3932 73.7446C47.1911 74.6752 52.6891 73.4 57.825 71.8084C61.138 70.7816 65.6434 68.5963 68.0727 67.405C70.5019 66.2138 70.6566 65.9003 70.7175 65.5417C70.8435 64.7991 70.4997 63.933 69.9976 63.1524C69.7559 62.7767 69.3057 62.6225 68.9462 62.5451C66.9408 62.1136 64.4581 64.1761 63.6793 65.2848C62.124 67.499 65.2366 70.8731 66.8107 72.2277C69.7286 73.768 71.0565 74.011 72.9323 74.0274C74.2194 74.016 76.1871 73.9648 78.5749 73.4734" 
+              stroke="#AF5500" 
+              strokeWidth="4" 
+              strokeLinecap="round"
+            />
+          </svg>
+          
+          <div className="loading-text">
+            Loading<span className="loading-dots">...</span>
+          </div>
+        </div>
+      )}
+
+      <div className={`home-container ${!isLoading ? 'fade-in' : ''}`}>
         {/* Wavy Hair Patterns - Background Image */}
         <div className="wave-patterns"></div>
 
