@@ -490,43 +490,29 @@ export default function BookingFlow() {
             >
               <h2 className="text-3xl font-bold mb-6" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>Your Style Choice</h2>
               
-              <div className="grid md:grid-cols-2 gap-8 mb-8">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Your Current Hair</h3>
-                  {userPhoto && (
-                    <img
-                      src={userPhoto}
-                      alt="Your hair"
-                      className="w-full h-64 object-cover rounded-xl mb-4"
-                    />
-                  )}
-                  <div className="space-y-2 text-gray-600">
-                    <p><strong>Budget:</strong> {budget}</p>
-                    <p><strong>Time Preference:</strong> {timePreference}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Your Desired Style</h3>
+              <div className="max-w-xl mx-auto mb-8">
+                <div className="text-center">
                   {desiredStyle === 'custom-style' && inspirationPhoto ? (
                     <img
                       src={inspirationPhoto}
                       alt="Your inspiration"
-                      className="w-full h-64 object-cover rounded-xl mb-4"
+                      className="w-full h-80 object-cover rounded-xl mb-6 shadow-lg"
                     />
                   ) : (
                     <img
                       src={getStyleImage(desiredStyle)}
                       alt={desiredStyle}
-                      className="w-full h-64 object-cover rounded-xl mb-4"
+                      className="w-full h-80 object-cover rounded-xl mb-6 shadow-lg"
                     />
                   )}
-                  <h4 className="text-2xl font-bold mb-2" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                  <h3 className="text-3xl font-bold mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
                     {desiredStyle === 'custom-style' ? 'Custom Style' : desiredStyle}
-                  </h4>
+                  </h3>
                   <div className="space-y-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     <p><strong>Duration:</strong> Lasts {styleCost.duration}</p>
                     <p><strong>Maintenance:</strong> Low</p>
+                    <p><strong>Budget:</strong> {budget}</p>
+                    <p><strong>Time Preference:</strong> {timePreference}</p>
                   </div>
                 </div>
               </div>
