@@ -486,7 +486,7 @@ export default function Home() {
             {/* Intro Content */}
             <div className="intro-content">
               <h1 className="intro-title">nywele.ai</h1>
-              <p className="intro-subtitle">Hair Care Powered by AI</p>
+              <p className="intro-subtitle">African Hair Care Powered by AI</p>
             </div>
 
             {/* Loading Bar */}
