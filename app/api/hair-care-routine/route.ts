@@ -48,7 +48,8 @@ export async function POST(request: NextRequest) {
       confidence: recommendation.confidence,
       hairType: profile.hairAnalysis.type,
       goals: profile.goals,
-      productCount: productRecommendations.essential.length + productRecommendations.optional.length,
+      productCount: (recommendation.productRecommendations?.essential?.length || 0) + 
+                    (recommendation.productRecommendations?.optional?.length || 0),
     });
 
     return NextResponse.json(recommendation);
