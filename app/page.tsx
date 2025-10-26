@@ -290,8 +290,8 @@ export default function Home() {
 
         .intro-blob {
           position: absolute;
-          width: 520px;
-          height: 520px;
+          width: 420px;
+          height: 420px;
           opacity: 0;
           visibility: hidden;
           display: none;
@@ -321,7 +321,7 @@ export default function Home() {
         .intro-subtitle {
           font-size: 1.1em;
           font-weight: 300;
-          margin-top: 20px;
+          margin-top: 8px;
           opacity: 0;
           letter-spacing: 2px;
           text-transform: uppercase;
