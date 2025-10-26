@@ -199,7 +199,7 @@ export default function HowItWorks() {
                   <p className="text-sm" style={{ color: '#AF5500' }}>{item.description}</p>
                 </div>
                 {idx < 3 && (
-                  <div className="hidden md:block absolute top-1/2 right-0 transform translate-x-1/2 z-10">
+                  <div className="hidden md:block absolute top-1/2 -right-3 transform translate-x-1/2 -translate-y-1/2 z-10">
                     <ArrowRight className="w-6 h-6" style={{ color: '#914600' }} />
                   </div>
                 )}
@@ -230,7 +230,7 @@ export default function HowItWorks() {
                   <p className="text-sm" style={{ color: '#AF5500' }}>{item.description}</p>
                 </div>
                 {idx < 3 && (
-                  <div className="hidden md:block absolute top-1/2 right-0 transform translate-x-1/2 z-10">
+                  <div className="hidden md:block absolute top-1/2 -right-3 transform translate-x-1/2 -translate-y-1/2 z-10">
                     <ArrowRight className="w-6 h-6" style={{ color: '#AF5500' }} />
                   </div>
                 )}
