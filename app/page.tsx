@@ -103,6 +103,9 @@ export default function Home() {
       ease: 'power2.inOut'
     }, 3.5);
 
+    // 7.5. HOLD STATE LONGER FOR DEBUGGING (10 seconds hold)
+    introTl.to({}, { duration: 10 }, 4.0);
+
     // 8. Fade out everything
     introTl.to('.intro-overlay-content', {
       opacity: 0,
@@ -111,7 +114,7 @@ export default function Home() {
       onComplete: () => {
         console.log('Fade out complete');
       }
-    }, 4.2);
+    }, 14.2);
 
   }, [router]);
 
