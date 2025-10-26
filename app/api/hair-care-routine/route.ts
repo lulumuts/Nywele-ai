@@ -42,9 +42,25 @@ export async function POST(request: NextRequest) {
     // Generate routine
     const recommendation = generateHairCareRoutine(profile);
 
+    // Transform profile to match products.ts HairCareProfile interface
+    const productsProfile = {
+      hairType: profile.hairAnalysis.type,
+      porosity: profile.hairAnalysis.porosity,
+      currentCondition: {
+        health: profile.hairAnalysis.health,
+        moisture: profile.hairAnalysis.health, // Use health as proxy for moisture
+        strength: profile.hairAnalysis.health  // Use health as proxy for strength
+      },
+      concerns: profile.concerns,
+      goals: profile.goals,
+      lifestyle: {
+        budget: profile.lifestyle.budget
+      }
+    };
+
     // Generate product recommendations
     const productRecommendations = recommendProductsForRoutine(
-      profile,
+      productsProfile,
       recommendation,
       profile.lifestyle.budget
     );
