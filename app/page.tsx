@@ -290,8 +290,8 @@ export default function Home() {
 
         .intro-blob {
           position: absolute;
-          width: 600px;
-          height: 600px;
+          width: 520px;
+          height: 520px;
           opacity: 0;
           visibility: hidden;
           display: none;
