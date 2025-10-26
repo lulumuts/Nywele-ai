@@ -18,38 +18,32 @@ export default function Home() {
       }
     });
 
-    // Fade in the entire intro container
+    // Fade in the blobs
     tl.fromTo(introBlobRef.current,
       {
         opacity: 0
       },
       {
         opacity: 1,
-        duration: 0.4,
+        duration: 0.5,
         ease: "power2.out"
       }
     )
-    // Welcome text
-    .fromTo(welcomeTextRef.current,
-      {
-        opacity: 0,
-        y: 20
-      },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
-        ease: "power3.out"
-      },
-      "-=0.2"
-    )
-    // Hold for a moment
-    .to({}, { duration: 1.5 })
+    // Start typing animation after blobs appear
+    .to({}, { duration: 0.3 })
+    .add(() => {
+      // Trigger CSS typing animation
+      if (welcomeTextRef.current) {
+        welcomeTextRef.current.style.animation = 'typing 1.5s steps(7, end) forwards';
+      }
+    })
+    // Hold for a moment after typing completes
+    .to({}, { duration: 2.0 })
     // Fade out everything
     .to([introBlobRef.current, welcomeTextRef.current],
       {
         opacity: 0,
-        duration: 0.5,
+        duration: 0.6,
         ease: "power2.in"
       }
     );
@@ -60,9 +54,9 @@ export default function Home() {
       { 
         opacity: 1, 
         scale: 1,
-        duration: 0.8,
+        duration: 1,
         ease: "power2.out",
-        delay: 3.0
+        delay: 4.5
       }
     );
 
@@ -220,9 +214,8 @@ export default function Home() {
 
         .intro-blob-container {
           position: relative;
-          width: 240px;
-          height: 240px;
-          margin-bottom: 40px;
+          width: 400px;
+          height: 400px;
           opacity: 0;
         }
 
@@ -236,12 +229,35 @@ export default function Home() {
         }
 
         .welcome-text {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
           color: #7d3d00;
-          font-size: 64px;
+          font-size: 72px;
           font-family: 'Caprasimo', serif;
           font-weight: 400;
           text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-          opacity: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          border-right: 3px solid #7d3d00;
+          width: 0;
+          animation: none;
+        }
+
+        @keyframes typing {
+          from {
+            width: 0;
+          }
+          to {
+            width: 100%;
+          }
+        }
+
+        @keyframes blink {
+          50% {
+            border-color: transparent;
+          }
         }
 
         .home-container {
@@ -315,7 +331,7 @@ export default function Home() {
       {/* Intro Animation Screen */}
       {showIntro && (
         <div className="intro-screen">
-          {/* Three-blob pulsing loader - matches loading screens */}
+          {/* Three-blob pulsing loader with centered text */}
           <div ref={introBlobRef} className="intro-blob-container">
             {/* Outer Blob - Stroke Only */}
             <svg 
@@ -325,8 +341,8 @@ export default function Home() {
                 top: '50%',
                 transform: 'translate(-50%, -50%)',
                 animation: 'blobPulse 2s ease-in-out infinite',
-                width: '240px',
-                height: '240px',
+                width: '400px',
+                height: '400px',
                 overflow: 'visible',
                 opacity: 0.3
               }}
@@ -339,7 +355,7 @@ export default function Home() {
                 clipRule="evenodd" 
                 d="M336.327 1.48572C414.231 9.60864 473.115 66.7872 518.604 130.55C574.65 209.11 638.43 296.033 612.844 389.082C584.309 492.855 495.991 583.359 389.609 599.667C291.749 614.669 219.14 525.124 143.712 460.998C79.7729 406.64 -0.331203 353.001 0.761041 269.085C1.81384 188.2 85.2711 142.397 148.515 91.962C205.675 46.3795 263.612 -6.09616 336.327 1.48572Z" 
                 stroke="#643100" 
-                strokeWidth="2"
+                strokeWidth="4"
                 fill="none"
               />
             </svg>
@@ -352,8 +368,8 @@ export default function Home() {
                 top: '50%',
                 transform: 'translate(-50%, -50%)',
                 animation: 'blobPulse 2s ease-in-out infinite 0.3s',
-                width: '240px',
-                height: '240px',
+                width: '400px',
+                height: '400px',
                 overflow: 'visible',
                 opacity: 0.5
               }}
@@ -366,7 +382,7 @@ export default function Home() {
                 clipRule="evenodd" 
                 d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
                 stroke="#643100" 
-                strokeWidth="2"
+                strokeWidth="4"
                 fill="none"
               />
             </svg>
@@ -379,8 +395,8 @@ export default function Home() {
                 top: '50%',
                 transform: 'translate(-50%, -50%)',
                 animation: 'blobPulse 2s ease-in-out infinite 0.6s',
-                width: '240px',
-                height: '240px',
+                width: '400px',
+                height: '400px',
                 overflow: 'visible',
                 opacity: 0.7
               }}
@@ -393,14 +409,15 @@ export default function Home() {
                 clipRule="evenodd" 
                 d="M390.524 3.70487C463.396 17.8137 515.846 77.3794 554.759 140.765C602.232 218.935 657.832 306.799 638.118 397.175C615.532 500.107 533.028 589.582 428.839 602.686C333.506 614.635 256.959 528.525 178.009 468.089C109.669 416.261 23.8254 368.185 7.61277 286.486C-7.94113 207.589 65.6438 152.13 128.074 97.3488C184.523 47.5069 322.675 -9.48221 390.524 3.70487Z" 
                 stroke="#643100" 
-                strokeWidth="2"
+                strokeWidth="4"
                 fill="none"
               />
             </svg>
-          </div>
-          
-          <div ref={welcomeTextRef} className="welcome-text">
-            Welcome
+
+            {/* Welcome text centered inside blobs with typing animation */}
+            <div ref={welcomeTextRef} className="welcome-text">
+              Welcome
+            </div>
           </div>
         </div>
       )}
