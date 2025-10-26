@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { openai } from '@/lib/openai';
 import { supabase } from '@/lib/supabase';
 import { trackRecommendation } from '@/lib/analytics';
+import { requireAuth } from '@/lib/apiAuth';
 
 interface Product {
   id: string;
@@ -15,6 +16,10 @@ interface Product {
 }
 
 export async function POST(request: NextRequest) {
+  // Check authentication
+  const authError = await requireAuth(request);
+  if (authError) return authError;
+
   try {
     // Check if services are available
     if (!openai || !supabase) {

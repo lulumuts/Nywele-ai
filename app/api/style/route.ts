@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { generateImagePrompt } from '@/lib/promptGenerator';
 import { trackStyleGeneration } from '@/lib/analytics';
 import { findStyleImage, getStyleCostEstimate, getStyleInfo } from '@/lib/imageLibrary';
+import { requireAuth } from '@/lib/apiAuth';
 
 // Initialize Google GenAI client for Gemini Native Image Generation (Nano Banana)
 const genAI = process.env.GEMINI_API_KEY 
@@ -10,6 +11,10 @@ const genAI = process.env.GEMINI_API_KEY
   : null;
 
 export async function POST(request: NextRequest) {
+  // Check authentication
+  const authError = await requireAuth(request);
+  if (authError) return authError;
+
   try {
     const body = await request.json();
     const { hairType, styleName, ethnicity, length, vibe } = body;
