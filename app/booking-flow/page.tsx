@@ -431,7 +431,7 @@ export default function BookingFlow() {
                           className="w-full px-6 py-4 pr-12 rounded-xl text-lg appearance-none"
                           disabled={!!uploadedStyleImage}
                           style={{ 
-                            background: uploadedStyleImage ? '#E5D4C1' : '#FDF4E8', 
+                            backgroundColor: uploadedStyleImage ? '#E5D4C1' : '#FDF4E8', 
                             border: '2px solid #914600',
                             color: '#643100',
                             fontFamily: 'Bricolage Grotesque, sans-serif',
@@ -464,7 +464,7 @@ export default function BookingFlow() {
                         {!uploadedStyleImage ? (
                           <label className="block cursor-pointer">
                             <div className="border-2 border-dashed rounded-xl p-6 text-center transition-all hover:border-solid hover:shadow-md"
-                              style={{ borderColor: '#914600', background: '#FDF4E8' }}>
+                              style={{ borderColor: '#914600', backgroundColor: '#FDF4E8' }}>
                               <input
                                 type="file"
                                 accept="image/*"
@@ -530,7 +530,7 @@ export default function BookingFlow() {
                           onChange={(e) => setBudgetInput(e.target.value)}
                           className="w-full px-6 py-4 pr-12 rounded-xl text-lg appearance-none"
                           style={{ 
-                            background: '#FDF4E8', 
+                            backgroundColor: '#FDF4E8', 
                             border: '2px solid #914600',
                             color: '#643100',
                             fontFamily: 'Bricolage Grotesque, sans-serif',
@@ -558,7 +558,7 @@ export default function BookingFlow() {
                           onChange={(e) => setTimePreferenceInput(e.target.value)}
                           className="w-full px-6 py-4 pr-12 rounded-xl text-lg appearance-none"
                           style={{ 
-                            background: '#FDF4E8', 
+                            backgroundColor: '#FDF4E8', 
                             border: '2px solid #914600',
                             color: '#643100',
                             fontFamily: 'Bricolage Grotesque, sans-serif',

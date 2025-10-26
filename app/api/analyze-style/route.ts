@@ -24,7 +24,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Use Gemini Vision model
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    // Try gemini-1.5-flash first, fallback to gemini-pro-vision if not available
+    let model;
+    try {
+      model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    } catch {
+      model = genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
+    }
 
     // Remove data URL prefix if present
     const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
@@ -89,8 +95,18 @@ Please respond in JSON format with:
 
   } catch (error: any) {
     console.error('Error analyzing style image:', error);
+    
+    // Provide more detailed error information
+    const errorMessage = error.message || 'Failed to analyze image';
+    const errorDetails = error.response?.data || error.toString();
+    
+    console.error('Full error details:', errorDetails);
+    
     return NextResponse.json(
-      { error: error.message || 'Failed to analyze image' },
+      { 
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? errorDetails : undefined
+      },
       { status: 500 }
     );
   }
