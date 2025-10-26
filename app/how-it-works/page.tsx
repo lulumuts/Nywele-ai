@@ -9,9 +9,9 @@ export default function HowItWorks() {
     {
       icon: Brain,
       name: "AI Hair Care Analysis",
-      description: "Upload a photo of your hair and let Gemini AI analyze your hair health, type, and condition.",
+      description: "Upload a photo of your hair and let Gemini AI analyse your hair health, type, and condition.",
       color: "bg-[#914600]",
-      details: "Get personalized routines and product recommendations tailored to your specific hair needs."
+      details: "Get personalised routines and product recommendations tailored to your specific hair needs."
     },
     {
       icon: Calendar,
@@ -25,7 +25,7 @@ export default function HowItWorks() {
       name: "Saved Routines",
       description: "Save your favorite hair care routines and revisit them anytime from your profile.",
       color: "bg-[#CE935F]",
-      details: "Track your hair care journey and keep all your personalized recommendations in one place."
+      details: "Track your hair care journey and keep all your personalised recommendations in one place."
     }
   ];
 
@@ -39,13 +39,13 @@ export default function HowItWorks() {
     {
       step: 2,
       title: "Gemini AI Analysis",
-      description: "Our AI analyzes your hair type, health, porosity, and condition.",
+      description: "Our AI analyses your hair type, health, porosity, and condition.",
       icon: "🧠"
     },
     {
       step: 3,
       title: "Get Your Routine",
-      description: "Receive a personalized hair care routine with product recommendations from our Supabase catalog.",
+      description: "Receive a personalised hair care routine with product recommendations from our Supabase catalogue.",
       icon: "✨"
     },
     {
@@ -88,20 +88,20 @@ export default function HowItWorks() {
       icon: Brain,
       name: "Gemini AI",
       role: "Hair Analysis & Style Detection",
-      description: "Analyzes hair photos to determine health, type, and styling needs. Also identifies desired hairstyles from photos.",
+      description: "Analyses hair photos to determine health, type, and styling needs. Also identifies desired hairstyles from photos.",
       color: "bg-[#914600]"
     },
     {
       icon: Database,
       name: "Supabase",
       role: "Product & Salon Database",
-      description: "Stores our curated catalog of hair care products and verified salons with their services and pricing.",
+      description: "Stores our curated catalogue of hair care products and verified salons with their services and pricing.",
       color: "bg-[#AF5500]"
     },
     {
       icon: Save,
       name: "User Profiles",
-      role: "Personalized Experience",
+      role: "Personalised Experience",
       description: "Save your routines, track your hair care journey, and access your recommendations anytime.",
       color: "bg-[#CE935F]"
     }
@@ -127,7 +127,7 @@ export default function HowItWorks() {
             Your complete AI-powered platform for African hair care and styling
           </p>
           <p className="text-lg max-w-4xl mx-auto" style={{ color: '#AF5500' }}>
-            From personalized hair care routines to booking your next hairstyle, Nywele.ai uses advanced AI to help you manage and celebrate your African hair.
+            From personalised hair care routines to booking your next hairstyle, Nywele.ai uses advanced AI to help you manage and celebrate your African hair.
           </p>
         </div>
 
@@ -183,7 +183,7 @@ export default function HowItWorks() {
             Hair Care Analysis Flow
           </h2>
           <p className="text-center mb-12" style={{ color: '#914600' }}>
-            Get personalized hair care routines powered by Gemini AI
+            Get personalised hair care routines powered by Gemini AI
           </p>
           <div className="grid md:grid-cols-4 gap-6">
             {hairCareFlow.map((item, idx) => (
@@ -248,11 +248,11 @@ export default function HowItWorks() {
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {[
               "AI-powered hair health analysis with Gemini",
-              "Personalized product recommendations from Supabase catalog",
+              "Personalised product recommendations from Supabase catalogue",
               "AI style detection from uploaded photos",
               "Salon matching with real pricing",
               "Save and track your hair care routines",
-              "Profile management for personalized experience",
+              "Profile management for personalised experience",
               "Verified salon database",
               "Secure data storage with Supabase"
             ].map((feature, idx) => (
@@ -271,7 +271,7 @@ export default function HowItWorks() {
             Why Nywele.ai?
           </h2>
           <p className="text-lg text-center max-w-4xl mx-auto mb-8">
-            We're building the complete platform for African hair care—from AI-powered health analysis to finding the perfect salon for your next style. Our mission is to make hair care accessible, personalized, and connected to the community.
+            We're building the complete platform for African hair care—from AI-powered health analysis to finding the perfect salon for your next style. Our mission is to make hair care accessible, personalised, and connected to the community.
           </p>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg p-8 text-center">
@@ -301,7 +301,7 @@ export default function HowItWorks() {
               style={{ backgroundColor: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
             >
               <Heart className="w-5 h-5" />
-              Analyze My Hair
+              Analyse My Hair
             </Link>
           <Link 
               href="/booking-flow"
