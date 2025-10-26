@@ -90,8 +90,6 @@ export default function Navbar() {
               const Icon = link.icon;
               const active = isActive(link.href);
               
-              const isHairCare = link.href === '/hair-care';
-              
               return (
                 <Link
                   key={link.href}
@@ -99,29 +97,15 @@ export default function Navbar() {
                   className={`
                     relative px-4 py-2 rounded-lg font-medium text-sm transition-all
                     flex items-center space-x-2
-                    ${isHairCare 
-                      ? '' 
-                      : active 
-                        ? 'bg-[#9E6240] bg-opacity-20' 
-                        : 'hover:bg-[#9E6240] hover:bg-opacity-10'
+                    ${active 
+                      ? 'bg-[#9E6240] bg-opacity-20' 
+                      : 'hover:bg-[#9E6240] hover:bg-opacity-10'
                     }
-                    ${link.highlight ? 'ring-2 ring-[#9E6240] ring-opacity-30' : ''}
                   `}
-                  style={isHairCare 
-                    ? { backgroundColor: '#9E6240', color: '#FEF4E6' } 
-                    : { color: '#9E6240' }
-                  }
+                  style={{ color: '#9E6240' }}
                 >
                   <Icon className="w-4 h-4" />
                   <span>{link.name}</span>
-                  {active && !isHairCare && (
-                    <motion.div
-                      layoutId="activeTab"
-                      className="absolute inset-0 rounded-lg -z-10"
-                      style={{ backgroundColor: 'rgba(158, 98, 64, 0.2)' }}
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                    />
-                  )}
                 </Link>
               );
             })}
@@ -184,7 +168,6 @@ export default function Navbar() {
             {navLinks.map((link) => {
               const Icon = link.icon;
               const active = isActive(link.href);
-              const isHairCare = link.href === '/hair-care';
               
               return (
                 <Link
@@ -193,22 +176,17 @@ export default function Navbar() {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`
                     flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors
-                    ${isHairCare
-                      ? ''
-                      : active 
-                        ? 'bg-[#9E6240] bg-opacity-20' 
-                        : 'hover:bg-[#9E6240] hover:bg-opacity-10'
+                    ${active 
+                      ? 'bg-[#9E6240] bg-opacity-20' 
+                      : 'hover:bg-[#9E6240] hover:bg-opacity-10'
                     }
                   `}
-                  style={isHairCare 
-                    ? { backgroundColor: '#9E6240', color: '#FEF4E6' } 
-                    : { color: '#9E6240' }
-                  }
+                  style={{ color: '#9E6240' }}
                 >
                   <Icon className="w-5 h-5" />
                   <div>
                     <div className="font-medium">{link.name}</div>
-                    <div className="text-xs" style={{ color: isHairCare ? '#FEF4E6' : '#B87D48' }}>{link.description}</div>
+                    <div className="text-xs" style={{ color: '#B87D48' }}>{link.description}</div>
                   </div>
                 </Link>
               );
