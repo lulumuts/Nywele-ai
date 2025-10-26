@@ -270,10 +270,8 @@ export default function Home() {
 
         .intro-overlay-content {
           position: relative;
-          width: 150vw;
-          height: 150vh;
-          left: -25vw;
-          top: -25vh;
+          width: 100%;
+          height: 100%;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -282,11 +280,10 @@ export default function Home() {
 
         .blob-container {
           position: absolute;
-          width: 500%;
-          height: 500%;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -295,8 +292,8 @@ export default function Home() {
 
         .intro-blob {
           position: absolute;
-          width: 420px;
-          height: 420px;
+          width: 350px;
+          height: 350px;
           opacity: 0;
           visibility: hidden;
           display: none;
