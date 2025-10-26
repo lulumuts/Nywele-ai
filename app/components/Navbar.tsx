@@ -41,10 +41,10 @@ export default function Navbar() {
 
   const navLinks = [
     {
-      name: 'Home',
-      href: '/',
+      name: 'How It Works',
+      href: '/how-it-works',
       icon: Home,
-      description: 'Home'
+      description: 'Learn about Nywele.ai'
     },
     {
       name: 'Book Style',
@@ -53,33 +53,15 @@ export default function Navbar() {
       description: 'Book your hairstyle'
     },
     {
-      name: 'Find Stylists',
-      href: '/stylists',
-      icon: Search,
-      description: 'Browse stylists'
-    },
-    {
       name: 'Hair Care',
       href: '/hair-care',
       icon: Heart,
       description: 'Get recommendations'
-    },
-    {
-      name: 'Budget Tracker',
-      href: '/cost-tracker',
-      icon: DollarSign,
-      description: 'Track spending'
-    },
-    {
-      name: 'For Stylists',
-      href: '/braiders',
-      icon: Briefcase,
-      description: 'Stylist dashboard'
     }
   ];
 
   const isActive = (href: string) => {
-    if (href === '/') return pathname === '/';
+    if (href === '/how-it-works') return pathname === '/how-it-works' || pathname === '/';
     if (href === '/booking-flow') return pathname.startsWith('/booking');
     return pathname.startsWith(href);
   };
@@ -89,7 +71,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 group">
+          <Link href="/how-it-works" className="flex items-center space-x-2 group">
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.5 }}
