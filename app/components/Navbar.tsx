@@ -48,7 +48,7 @@ export default function Navbar() {
     },
     {
       name: 'Book Style',
-      href: '/booking',
+      href: '/booking-flow',
       icon: Sparkles,
       description: 'Book your hairstyle',
       highlight: true
@@ -81,7 +81,7 @@ export default function Navbar() {
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
-    if (href === '/booking') return pathname.startsWith('/booking');
+    if (href === '/booking-flow') return pathname.startsWith('/booking');
     return pathname.startsWith(href);
   };
 
