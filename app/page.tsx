@@ -11,52 +11,60 @@ export default function Home() {
   const homeContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Get all path elements
-    const paths = introBlobRef.current?.querySelectorAll('path');
-    
-    if (!paths) return;
-
-    // Set up paths for drawing animation
-    paths.forEach((path) => {
-      const length = path.getTotalLength();
-      path.style.strokeDasharray = `${length}`;
-      path.style.strokeDashoffset = `${length}`;
-    });
-
     // GSAP Timeline for intro animation
     const tl = gsap.timeline({
       onComplete: () => {
-        setTimeout(() => setShowIntro(false), 300);
+        setShowIntro(false);
       }
     });
 
-    // Animate each path drawing in sequence with slight stagger
-    paths.forEach((path, index) => {
-      const length = path.getTotalLength();
-      tl.to(path, {
-        strokeDashoffset: 0,
+    // Intro sequence
+    tl.fromTo(introBlobRef.current, 
+      { 
+        scale: 0, 
+        opacity: 0,
+        rotation: -180
+      },
+      { 
+        scale: 1, 
+        opacity: 1,
+        rotation: 0,
+        duration: 1.5,
+        ease: "elastic.out(1, 0.5)"
+      }
+    )
+    .fromTo(welcomeTextRef.current,
+      {
+        opacity: 0,
+        y: 50
+      },
+      {
+        opacity: 1,
+        y: 0,
         duration: 0.8,
-        ease: "power2.inOut"
-      }, index * 0.05); // Stagger by 0.05s
-    });
-
-    // Fade out intro screen
-    tl.to(introBlobRef.current, {
-      opacity: 0,
-      duration: 0.6,
-      ease: "power2.in",
-      delay: 0.5 // Hold briefly after drawing completes
-    });
+        ease: "power3.out"
+      },
+      "-=0.5" // Start slightly before blob finishes
+    )
+    .to([introBlobRef.current, welcomeTextRef.current],
+      {
+        opacity: 0,
+        scale: 1.2,
+        duration: 0.8,
+        ease: "power2.in",
+        delay: 1.2 // Hold for 1.2 seconds
+      }
+    );
 
     // Animate home container when intro completes
     gsap.fromTo(homeContainerRef.current,
-      { opacity: 0, scale: 0.98 },
+      { opacity: 0, scale: 0.95 },
       { 
         opacity: 1, 
         scale: 1,
         duration: 1,
         ease: "power2.out",
-        delay: 3.5 // Start when intro finishes
+        delay: 4.2 // Start when intro finishes
       }
     );
 
@@ -206,26 +214,24 @@ export default function Home() {
           height: 100vh;
           background: #FDF4E8;
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
           z-index: 9999;
-          overflow: hidden;
         }
 
-        .intro-wave-svg {
-          position: absolute;
-          width: 100vw;
-          height: 100vh;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%);
+        .intro-blob {
+          width: 300px;
+          height: 300px;
+          margin-bottom: 60px;
         }
 
-        .intro-wave-svg path {
-          fill: none;
-          stroke: #CE935F;
-          stroke-width: 2;
-          stroke-linecap: round;
+        .welcome-text {
+          color: #7d3d00;
+          font-size: 64px;
+          font-family: 'Caprasimo', serif;
+          font-weight: 400;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .home-container {
@@ -299,37 +305,25 @@ export default function Home() {
       {/* Intro Animation Screen */}
       {showIntro && (
         <div className="intro-screen">
-          {/* Animated Wavy Hair Pattern Lines */}
+          {/* Animated Intro Blob */}
           <svg 
             ref={introBlobRef}
-            className="intro-wave-svg"
-            viewBox="0 0 500 1024" 
-            preserveAspectRatio="xMidYMid slice"
+            className="intro-blob"
+            viewBox="0 0 604 606" 
+            fill="none"
           >
-            <path d="M136.159 -64.5C495.422 135 532.329 334.5 246.879 534C-38.5715 733.5 -75.4781 933 136.159 1132.5" />
-            <path d="M149.069 -64.5C495.646 135 526.209 334.5 240.759 534C-44.6907 733.5 -75.2541 933 149.069 1132.5" />
-            <path d="M162.277 -64.5C496.167 135 520.387 334.5 234.937 534C-50.5129 733.5 -74.7329 933 162.277 1132.5" />
-            <path d="M175.761 -64.5C496.964 135 514.841 334.5 229.391 534C-56.0589 733.5 -73.9356 933 175.761 1132.5" />
-            <path d="M189.502 -64.5C498.019 135 509.552 334.5 224.102 534C-61.3482 733.5 -72.8815 933 189.502 1132.5" />
-            <path d="M203.482 -64.5C499.312 135 504.502 334.5 219.052 534C-66.3979 733.5 -71.5879 933 203.482 1132.5" />
-            <path d="M217.686 -64.5C500.829 135 499.676 334.5 214.226 534C-71.224 733.5 -70.0707 933 217.686 1132.5" />
-            <path d="M232.099 -64.5C502.556 135 495.059 334.5 209.609 534C-75.841 733.5 -68.3444 933 232.099 1132.5" />
-            <path d="M246.708 -64.5C504.478 135 490.638 334.5 205.188 534C-80.2623 733.5 -66.4223 933 246.708 1132.5" />
-            <path d="M261.5 -64.5C506.583 135 486.4 334.5 200.95 534C-84.4999 733.5 -64.3166 933 261.5 1132.5" />
-            <path d="M276.465 -64.5C508.862 135 482.335 334.5 196.885 534C-88.5651 733.5 -62.0384 933 276.465 1132.5" />
-            <path d="M291.592 -64.5C511.302 135 478.432 334.5 192.982 534C-92.4681 733.5 -59.5981 933 291.592 1132.5" />
-            <path d="M306.871 -64.5C513.895 135 474.681 334.5 189.231 534C-96.2186 733.5 -57.0052 933 306.871 1132.5" />
-            <path d="M322.295 -64.5C516.631 135 471.075 334.5 185.625 534C-99.8252 733.5 -54.2686 933 322.295 1132.5" />
-            <path d="M337.854 -64.5C519.504 135 467.604 334.5 182.154 534C-103.296 733.5 -51.3962 933 337.854 1132.5" />
-            <path d="M353.541 -64.5C522.504 135 464.261 334.5 178.811 534C-106.639 733.5 -48.3956 933 353.541 1132.5" />
-            <path d="M369.345 -64.5C525.622 135 461.035 334.5 175.585 534C-109.865 733.5 -45.2779 933 369.345 1132.5" />
-            <path d="M385.268 -64.5C528.858 135 457.928 334.5 172.478 534C-112.972 733.5 -42.0421 933 385.268 1132.5" />
-            <path d="M401.299 -64.5C532.202 135 454.929 334.5 169.479 534C-115.971 733.5 -38.6976 933 401.299 1132.5" />
-            <path d="M417.433 -64.5C535.65 135 452.033 334.5 166.583 534C-118.867 733.5 -35.25 933 417.433 1132.5" />
-            <path d="M433.665 -64.5C539.195 135 449.235 334.5 163.785 534C-121.665 733.5 -31.7046 933 433.665 1132.5" />
-            <path d="M449.991 -64.5C542.834 135 446.531 334.5 161.081 534C-124.369 733.5 -28.0661 933 449.991 1132.5" />
-            <path d="M466.404 -64.5C546.561 135 443.914 334.5 158.464 534C-126.986 733.5 -24.3393 933 466.404 1132.5" />
+            <path 
+              fillRule="evenodd" 
+              clipRule="evenodd" 
+              d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
+              fill="#AF5500" 
+              fillOpacity="0.6" 
+            />
           </svg>
+          
+          <div ref={welcomeTextRef} className="welcome-text">
+            Welcome
+          </div>
         </div>
       )}
 
