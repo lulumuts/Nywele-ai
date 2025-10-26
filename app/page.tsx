@@ -32,8 +32,8 @@ export default function Home() {
     .add(() => {
       // Trigger CSS typing animation
       if (welcomeTextRef.current) {
-        // 36 characters in "lets start your hair care journey"
-        welcomeTextRef.current.style.animation = 'typing 2.5s steps(36, end) forwards';
+        // 37 characters in "lets start your hair care journey."
+        welcomeTextRef.current.style.animation = 'typing 2.5s steps(37, end) forwards, removeCursor 0.1s 2.5s forwards';
       }
     })
     // Hold for a moment after typing completes
@@ -257,6 +257,12 @@ export default function Home() {
           }
         }
 
+        @keyframes removeCursor {
+          to {
+            border-right: none;
+          }
+        }
+
         .home-container {
           opacity: 0;
         }
@@ -344,7 +350,7 @@ export default function Home() {
 
           {/* Typewriter text */}
           <div ref={welcomeTextRef} className="welcome-text">
-            lets start your hair care journey
+            lets start your hair care journey.
           </div>
         </div>
       )}
