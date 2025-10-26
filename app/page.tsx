@@ -262,6 +262,7 @@ export default function Home() {
           justify-content: center;
           align-items: center;
           z-index: 9999;
+          overflow: hidden;
         }
 
         .intro-overlay-content {
@@ -271,6 +272,7 @@ export default function Home() {
           display: flex;
           justify-content: center;
           align-items: center;
+          overflow: visible;
         }
 
         .blob-container {
@@ -282,12 +284,13 @@ export default function Home() {
           display: flex;
           justify-content: center;
           align-items: center;
+          overflow: visible;
         }
 
         .intro-blob {
           position: absolute;
-          width: 550px;
-          height: 550px;
+          width: 500px;
+          height: 500px;
           opacity: 0;
           visibility: hidden;
           display: none;
