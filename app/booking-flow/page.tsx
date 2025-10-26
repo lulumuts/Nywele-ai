@@ -496,95 +496,103 @@ export default function BookingFlow() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100"
+              className="bg-white rounded-2xl shadow-2xl p-8"
+              style={{ border: '2px solid #914600' }}
             >
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">Available Stylists for {desiredStyle}</h2>
-              <p className="text-gray-600 mb-6">
+              <h2 className="text-3xl font-bold mb-2" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>Available Stylists for {desiredStyle}</h2>
+              <p className="mb-6" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 {new Date(selectedDate).toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' })} at {selectedTime}
               </p>
 
               <div className="space-y-4 mb-8">
-                {matchedStylists.map(stylist => (
-                  <div
-                    key={stylist.id}
-                    className={`border-2 rounded-xl p-6 cursor-pointer transition-all ${
-                      selectedStylist?.id === stylist.id
-                        ? 'border-purple-600 bg-purple-50'
-                        : 'border-gray-200 hover:border-purple-300 hover:shadow-md'
-                    }`}
-                    onClick={() => setSelectedStylist(stylist)}
-                  >
-                    <div className="flex gap-6">
-                      <img
-                        src={stylist.profile_image_url}
-                        alt={stylist.name}
-                        className="w-24 h-24 rounded-xl object-cover"
-                      />
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-800">{stylist.name}</h3>
-                        <p className="text-purple-600 font-medium mb-2">{stylist.business_name}</p>
-                        
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                          <span className="flex items-center gap-1">
-                            <Star className="text-yellow-400 fill-yellow-400" size={16} />
-                            {stylist.average_rating} ({stylist.total_reviews} reviews)
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MapPin size={16} />
-                            {stylist.location_city}
-                          </span>
-                          <span className="font-semibold">
-                            {priceRangeLabels[stylist.price_range as keyof typeof priceRangeLabels]}
-                          </span>
-                        </div>
-
-                        <div className="flex gap-2 mb-3">
-                          {stylist.specialties.slice(0, 3).map(specialty => (
-                            <span
-                              key={specialty}
-                              className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-full"
-                            >
-                              {specialty}
+                {matchedStylists.map(stylist => {
+                  const isSelected = selectedStylist?.id === stylist.id;
+                  return (
+                    <div
+                      key={stylist.id}
+                      className="border-2 rounded-xl p-6 cursor-pointer transition-all hover:shadow-md"
+                      style={{
+                        borderColor: isSelected ? '#643100' : '#E5D4C1',
+                        background: isSelected ? 'rgba(206, 147, 95, 0.1)' : 'white'
+                      }}
+                      onClick={() => setSelectedStylist(stylist)}
+                    >
+                      <div className="flex gap-6">
+                        <img
+                          src={stylist.profile_image_url}
+                          alt={stylist.name}
+                          className="w-24 h-24 rounded-xl object-cover"
+                        />
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{stylist.name}</h3>
+                          <p className="font-medium mb-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{stylist.business_name}</p>
+                          
+                          <div className="flex items-center gap-4 text-sm mb-3" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                            <span className="flex items-center gap-1">
+                              <Star className="text-yellow-400 fill-yellow-400" size={16} />
+                              {stylist.average_rating} ({stylist.total_reviews} reviews)
                             </span>
-                          ))}
-                        </div>
+                            <span className="flex items-center gap-1">
+                              <MapPin size={16} />
+                              {stylist.location_city}
+                            </span>
+                            <span className="font-semibold">
+                              {priceRangeLabels[stylist.price_range as keyof typeof priceRangeLabels]}
+                            </span>
+                          </div>
 
-                        <div className="flex gap-2">
-                          <a
-                            href={`tel:${stylist.phone}`}
-                            className="flex items-center gap-1 text-sm text-purple-600 hover:text-purple-700"
-                          >
-                            <Phone size={14} />
-                            Call
-                          </a>
-                          <a
-                            href={`https://instagram.com/${stylist.instagram_handle.replace('@', '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-sm text-purple-600 hover:text-purple-700"
-                          >
-                            <Instagram size={14} />
-                            Instagram
-                          </a>
-                        </div>
-                      </div>
+                          <div className="flex gap-2 mb-3">
+                            {stylist.specialties.slice(0, 3).map(specialty => (
+                              <span
+                                key={specialty}
+                                className="text-xs px-2 py-1 rounded-full"
+                                style={{ background: 'rgba(206, 147, 95, 0.2)', color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                              >
+                                {specialty}
+                              </span>
+                            ))}
+                          </div>
 
-                      {selectedStylist?.id === stylist.id && (
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                            <Check className="text-white" size={20} />
+                          <div className="flex gap-2">
+                            <a
+                              href={`tel:${stylist.phone}`}
+                              className="flex items-center gap-1 text-sm hover:opacity-80 transition-opacity"
+                              style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                            >
+                              <Phone size={14} />
+                              Call
+                            </a>
+                            <a
+                              href={`https://instagram.com/${stylist.instagram_handle.replace('@', '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-sm hover:opacity-80 transition-opacity"
+                              style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                            >
+                              <Instagram size={14} />
+                              Instagram
+                            </a>
                           </div>
                         </div>
-                      )}
+
+                        {isSelected && (
+                          <div className="flex items-center">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: '#643100' }}>
+                              <Check className="text-white" size={20} />
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="flex gap-4">
                 <button
                   onClick={() => setCurrentStep(2)}
-                  className="flex-1 py-4 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-all flex items-center justify-center gap-2"
+                  className="flex-1 py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                  style={{ background: '#FDF4E8', color: '#914600', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   <ArrowLeft size={20} />
                   Back
@@ -592,7 +600,8 @@ export default function BookingFlow() {
                 <button
                   onClick={() => setCurrentStep(4)}
                   disabled={!selectedStylist}
-                  className="flex-1 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 py-4 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  style={{ background: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   Continue to Confirmation
                   <ArrowRight size={20} />
@@ -608,31 +617,32 @@ export default function BookingFlow() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-100"
+              className="bg-white rounded-2xl shadow-2xl p-8"
+              style={{ border: '2px solid #914600' }}
             >
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">Confirm Your Booking</h2>
+              <h2 className="text-3xl font-bold mb-6" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>Confirm Your Booking</h2>
 
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 mb-6">
+              <div className="rounded-xl p-6 mb-6" style={{ background: 'linear-gradient(135deg, rgba(206, 147, 95, 0.2), rgba(175, 85, 0, 0.1))' }}>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <h3 className="font-semibold text-gray-800 mb-3">Style</h3>
-                    <p className="text-2xl font-bold text-purple-600">{desiredStyle}</p>
-                    <p className="text-gray-600 mt-2">Estimated: ${styleCost.min} - ${styleCost.max}</p>
+                    <h3 className="font-semibold mb-3" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Style</h3>
+                    <p className="text-2xl font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>{desiredStyle}</p>
+                    <p className="mt-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Estimated: ${styleCost.min} - ${styleCost.max}</p>
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-gray-800 mb-3">Date & Time</h3>
-                    <p className="text-lg font-semibold text-gray-800">
+                    <h3 className="font-semibold mb-3" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Date & Time</h3>
+                    <p className="text-lg font-semibold" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                       {new Date(selectedDate).toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                     </p>
-                    <p className="text-lg text-gray-600">{selectedTime}</p>
+                    <p className="text-lg" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{selectedTime}</p>
                   </div>
                 </div>
               </div>
 
               {selectedStylist && (
-                <div className="border-2 border-purple-200 rounded-xl p-6 mb-6">
-                  <h3 className="font-semibold text-gray-800 mb-4">Your Stylist</h3>
+                <div className="rounded-xl p-6 mb-6" style={{ border: '2px solid #CE935F' }}>
+                  <h3 className="font-semibold mb-4" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Your Stylist</h3>
                   <div className="flex items-center gap-4">
                     <img
                       src={selectedStylist.profile_image_url}
@@ -640,9 +650,9 @@ export default function BookingFlow() {
                       className="w-20 h-20 rounded-xl object-cover"
                     />
                     <div>
-                      <p className="text-xl font-bold text-gray-800">{selectedStylist.name}</p>
-                      <p className="text-purple-600 font-medium">{selectedStylist.business_name}</p>
-                      <p className="text-gray-600 flex items-center gap-1 mt-1">
+                      <p className="text-xl font-bold" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{selectedStylist.name}</p>
+                      <p className="font-medium" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{selectedStylist.business_name}</p>
+                      <p className="flex items-center gap-1 mt-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                         <MapPin size={14} />
                         {selectedStylist.location_city}
                       </p>
@@ -651,8 +661,8 @@ export default function BookingFlow() {
                 </div>
               )}
 
-              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
-                <p className="text-sm text-gray-700">
+              <div className="rounded-xl p-4 mb-6" style={{ background: 'rgba(255, 200, 100, 0.2)', border: '2px solid rgba(255, 200, 100, 0.5)' }}>
+                <p className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   <strong>Note:</strong> This booking will be saved to your calendar and expenses will be tracked automatically. 
                   Contact the stylist directly to confirm availability.
                 </p>
@@ -661,14 +671,16 @@ export default function BookingFlow() {
               <div className="flex gap-4">
                 <button
                   onClick={() => setCurrentStep(3)}
-                  className="flex-1 py-4 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-all flex items-center justify-center gap-2"
+                  className="flex-1 py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                  style={{ background: '#FDF4E8', color: '#914600', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   <ArrowLeft size={20} />
                   Back
                 </button>
                 <button
                   onClick={handleConfirmBooking}
-                  className="flex-1 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                  className="flex-1 py-4 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                  style={{ background: 'linear-gradient(135deg, #16a34a 0%, #059669 100%)', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   <Check size={24} />
                   Confirm Booking
@@ -683,26 +695,34 @@ export default function BookingFlow() {
               key="success"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-2xl shadow-2xl p-12 border border-gray-100 text-center"
+              className="bg-white rounded-2xl shadow-2xl p-12 text-center"
+              style={{ border: '2px solid #914600' }}
             >
-              <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: 'rgba(22, 163, 74, 0.1)' }}>
                 <Check className="text-green-600" size={48} />
               </div>
 
-              <h2 className="text-4xl font-bold text-gray-800 mb-4">Booking Confirmed! 🎉</h2>
-              <p className="text-xl text-gray-600 mb-4">
+              <h2 className="text-4xl font-bold mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>Booking Confirmed! 🎉</h2>
+              <p className="text-xl mb-4" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 Your appointment has been saved
               </p>
 
               {/* Status Badge */}
               <div className="flex items-center justify-center gap-2 mb-8">
-                <div className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                  bookingStatus === 'pending_quote' 
-                    ? 'bg-yellow-100 text-yellow-700' 
-                    : bookingStatus === 'quote_submitted'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-green-100 text-green-700'
-                }`}>
+                <div className={`px-4 py-2 rounded-full text-sm font-semibold`}
+                  style={{
+                    background: bookingStatus === 'pending_quote' 
+                      ? 'rgba(255, 200, 100, 0.3)' 
+                      : bookingStatus === 'quote_submitted'
+                      ? 'rgba(59, 130, 246, 0.2)'
+                      : 'rgba(22, 163, 74, 0.2)',
+                    color: bookingStatus === 'pending_quote'
+                      ? '#92400e'
+                      : bookingStatus === 'quote_submitted'
+                      ? '#1e40af'
+                      : '#15803d',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}>
                   {bookingStatus === 'pending_quote' && '⏳ Waiting for Quote'}
                   {bookingStatus === 'quote_submitted' && '💰 Quote Received'}
                   {bookingStatus === 'confirmed' && '✅ Confirmed'}
@@ -713,18 +733,19 @@ export default function BookingFlow() {
                       const bookingInfo = JSON.parse(localStorage.getItem('nywele-latest-booking') || '{}');
                       setQuote(bookingInfo.quote);
                     }}
-                    className="text-sm text-purple-600 hover:text-purple-700 font-medium underline"
+                    className="text-sm font-medium underline hover:opacity-80 transition-opacity"
+                    style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
                     View Quote
                   </button>
                 )}
               </div>
 
-              <div className="bg-purple-50 rounded-xl p-6 mb-8 text-left max-w-md mx-auto">
-                <p className="text-gray-700 mb-2"><strong>Style:</strong> {desiredStyle}</p>
-                <p className="text-gray-700 mb-2"><strong>Date:</strong> {new Date(selectedDate).toLocaleDateString()}</p>
-                <p className="text-gray-700 mb-2"><strong>Time:</strong> {selectedTime}</p>
-                <p className="text-gray-700"><strong>Stylist:</strong> {selectedStylist?.name}</p>
+              <div className="rounded-xl p-6 mb-8 text-left max-w-md mx-auto" style={{ background: 'rgba(206, 147, 95, 0.1)', border: '2px solid #CE935F' }}>
+                <p className="mb-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}><strong>Style:</strong> {desiredStyle}</p>
+                <p className="mb-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}><strong>Date:</strong> {new Date(selectedDate).toLocaleDateString()}</p>
+                <p className="mb-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}><strong>Time:</strong> {selectedTime}</p>
+                <p style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}><strong>Stylist:</strong> {selectedStylist?.name}</p>
               </div>
 
               {/* Quote Details Modal */}
@@ -798,7 +819,8 @@ export default function BookingFlow() {
               <div className="flex flex-col gap-3 max-w-md mx-auto">
                 <button
                   onClick={() => router.push('/recommendations')}
-                  className="py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                  className="py-3 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                  style={{ background: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   <Sparkles size={20} />
                   Get Hair Care Tips
@@ -807,13 +829,15 @@ export default function BookingFlow() {
                   <a
                     href={`tel:${selectedStylist.phone}`}
                     className="py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-all flex items-center justify-center gap-2"
+                    style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
                     📞 Call {selectedStylist.name}
                   </a>
                 )}
                 <button
                   onClick={() => router.push('/')}
-                  className="py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-all"
+                  className="py-3 rounded-xl font-semibold transition-all"
+                  style={{ background: '#FDF4E8', color: '#914600', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   Book Another Style
                 </button>
