@@ -277,8 +277,8 @@ export default function Home() {
 
         .blob-container {
           position: absolute;
-          width: 300%;
-          height: 300%;
+          width: 500%;
+          height: 500%;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
