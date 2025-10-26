@@ -2,22 +2,19 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { gsap } from 'gsap';
 
 export default function Home() {
+  const router = useRouter();
   const [showIntro, setShowIntro] = useState(true);
   const homeContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const introTl = gsap.timeline({
       onComplete: () => {
-        setShowIntro(false);
-        // Show main content
-        gsap.to(homeContainerRef.current, {
-          opacity: 1,
-          duration: 1,
-          ease: "power2.out"
-        });
+        // Redirect to how it works page
+        router.push('/how-it-works');
       }
     });
 
