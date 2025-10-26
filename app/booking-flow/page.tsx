@@ -306,33 +306,33 @@ export default function BookingFlow() {
       
       {/* Progress Steps - Only show when past step 0 */}
       {currentStep > 0 && (
-        <div className="bg-white/80 backdrop-blur-sm border-b" style={{ borderColor: 'rgba(145, 70, 0, 0.2)' }}>
+        <div className="backdrop-blur-sm border-b" style={{ borderColor: 'rgba(145, 70, 0, 0.2)' }}>
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-center gap-2">
-              {[1, 2, 3, 4].map(step => (
-                <div key={step} className="flex items-center">
+            {[1, 2, 3, 4].map(step => (
+              <div key={step} className="flex items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold`}
                     style={{
                       background: currentStep >= step ? '#643100' : '#E5D4C1',
                       color: currentStep >= step ? 'white' : '#914600',
                       fontFamily: 'Bricolage Grotesque, sans-serif'
                     }}>
-                    {step}
-                  </div>
-                  {step < 4 && (
-                    <div className={`w-12 h-1`} style={{ background: currentStep > step ? '#643100' : '#E5D4C1' }} />
-                  )}
+                  {step}
                 </div>
-              ))}
-            </div>
+                {step < 4 && (
+                    <div className={`w-12 h-1`} style={{ background: currentStep > step ? '#643100' : '#E5D4C1' }} />
+                )}
+              </div>
+            ))}
+          </div>
             <div className="mt-2 text-center text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-              {currentStep === 1 && 'Confirm Your Style'}
-              {currentStep === 2 && 'Choose Date & Time'}
-              {currentStep === 3 && 'Select Your Stylist'}
-              {currentStep === 4 && 'Confirm Booking'}
-            </div>
+            {currentStep === 1 && 'Confirm Your Style'}
+            {currentStep === 2 && 'Choose Date & Time'}
+            {currentStep === 3 && 'Select Your Stylist'}
+            {currentStep === 4 && 'Confirm Booking'}
           </div>
         </div>
+      </div>
       )}
 
       <div className="max-w-6xl mx-auto px-4 py-12">
@@ -485,9 +485,10 @@ export default function BookingFlow() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="bg-white rounded-2xl shadow-2xl p-8"
-              style={{ border: '2px solid #914600' }}
+              className="rounded-2xl shadow-2xl"
+              style={{ background: '#FFFBF5', border: '2px solid #914600', height: 'calc(100vh - 250px)', display: 'flex', flexDirection: 'column' }}
             >
+              <div className="p-8 overflow-y-auto flex-1">
               <h2 className="text-3xl font-bold mb-6" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>Your Style Choice</h2>
               
               <div className="max-w-xl mx-auto mb-8">
@@ -532,6 +533,7 @@ export default function BookingFlow() {
                 Continue to Date Selection
                 <ArrowRight size={24} />
               </button>
+              </div>
             </motion.div>
           )}
 
@@ -542,9 +544,10 @@ export default function BookingFlow() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="bg-white rounded-2xl shadow-2xl p-8"
-              style={{ border: '2px solid #914600' }}
+              className="rounded-2xl shadow-2xl"
+              style={{ background: '#FFFBF5', border: '2px solid #914600', height: 'calc(100vh - 250px)', display: 'flex', flexDirection: 'column' }}
             >
+              <div className="p-8 overflow-y-auto flex-1">
               <h2 className="text-3xl font-bold mb-6" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>When Would You Like Your Appointment?</h2>
               
               <div className="mb-8">
@@ -560,7 +563,7 @@ export default function BookingFlow() {
                         className="p-3 rounded-lg border-2 text-center transition-all"
                         style={{
                           borderColor: isSelected ? '#643100' : '#E5D4C1',
-                          background: isSelected ? 'rgba(206, 147, 95, 0.2)' : 'white',
+                          background: isSelected ? 'rgba(206, 147, 95, 0.2)' : '#FFFBF5',
                           fontFamily: 'Bricolage Grotesque, sans-serif'
                         }}
                       >
@@ -585,7 +588,7 @@ export default function BookingFlow() {
                           className="p-3 rounded-lg border-2 font-semibold flex items-center justify-center gap-2 transition-all"
                           style={{
                             borderColor: isSelected ? '#643100' : '#E5D4C1',
-                            background: isSelected ? 'rgba(206, 147, 95, 0.2)' : 'white',
+                            background: isSelected ? 'rgba(206, 147, 95, 0.2)' : '#FFFBF5',
                             color: isSelected ? '#643100' : '#914600',
                             fontFamily: 'Bricolage Grotesque, sans-serif'
                           }}
@@ -618,6 +621,7 @@ export default function BookingFlow() {
                   <ArrowRight size={20} />
                 </button>
               </div>
+              </div>
             </motion.div>
           )}
 
@@ -628,9 +632,10 @@ export default function BookingFlow() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="bg-white rounded-2xl shadow-2xl p-8"
-              style={{ border: '2px solid #914600' }}
+              className="rounded-2xl shadow-2xl"
+              style={{ background: '#FFFBF5', border: '2px solid #914600', height: 'calc(100vh - 250px)', display: 'flex', flexDirection: 'column' }}
             >
+              <div className="p-8 overflow-y-auto flex-1">
               <h2 className="text-3xl font-bold mb-2" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>Available Stylists for {desiredStyle}</h2>
               <p className="mb-6" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 {new Date(selectedDate).toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' })} at {selectedTime}
@@ -645,7 +650,7 @@ export default function BookingFlow() {
                       className="border-2 rounded-xl p-6 cursor-pointer transition-all hover:shadow-md"
                       style={{
                         borderColor: isSelected ? '#643100' : '#E5D4C1',
-                        background: isSelected ? 'rgba(206, 147, 95, 0.1)' : 'white'
+                        background: isSelected ? 'rgba(206, 147, 95, 0.1)' : '#FFFBF5'
                       }}
                     onClick={() => setSelectedStylist(stylist)}
                   >
@@ -739,6 +744,7 @@ export default function BookingFlow() {
                   <ArrowRight size={20} />
                 </button>
               </div>
+              </div>
             </motion.div>
           )}
 
@@ -749,9 +755,10 @@ export default function BookingFlow() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="bg-white rounded-2xl shadow-2xl p-8"
-              style={{ border: '2px solid #914600' }}
+              className="rounded-2xl shadow-2xl"
+              style={{ background: '#FFFBF5', border: '2px solid #914600', height: 'calc(100vh - 250px)', display: 'flex', flexDirection: 'column' }}
             >
+              <div className="p-8 overflow-y-auto flex-1">
               <h2 className="text-3xl font-bold mb-6" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>Confirm Your Booking</h2>
 
               <div className="rounded-xl p-6 mb-6" style={{ background: 'linear-gradient(135deg, rgba(206, 147, 95, 0.2), rgba(175, 85, 0, 0.1))' }}>
@@ -818,6 +825,7 @@ export default function BookingFlow() {
                   Confirm Booking
                 </button>
               </div>
+              </div>
             </motion.div>
           )}
 
@@ -827,8 +835,8 @@ export default function BookingFlow() {
               key="success"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-2xl shadow-2xl p-12 text-center"
-              style={{ border: '2px solid #914600' }}
+              className="rounded-2xl shadow-2xl p-12 text-center"
+              style={{ background: '#FFFBF5', border: '2px solid #914600' }}
             >
               <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: 'rgba(22, 163, 74, 0.1)' }}>
                 <Check className="text-green-600" size={48} />
@@ -845,7 +853,7 @@ export default function BookingFlow() {
                   style={{
                     background: bookingStatus === 'pending_quote' 
                       ? 'rgba(255, 200, 100, 0.3)' 
-                      : bookingStatus === 'quote_submitted'
+                    : bookingStatus === 'quote_submitted'
                       ? 'rgba(59, 130, 246, 0.2)'
                       : 'rgba(22, 163, 74, 0.2)',
                     color: bookingStatus === 'pending_quote'
@@ -883,7 +891,7 @@ export default function BookingFlow() {
               {/* Quote Details Modal */}
               {quote && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setQuote(null)}>
-                  <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                  <div className="rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto" style={{ background: '#FFFBF5' }} onClick={(e) => e.stopPropagation()}>
                     <h3 className="text-2xl font-bold text-gray-800 mb-6">Quote from {selectedStylist?.name}</h3>
                     
                     {/* Products */}
@@ -903,14 +911,14 @@ export default function BookingFlow() {
                     </div>
 
                     {/* Labor */}
-                    <div className="p-4 bg-purple-50 rounded-lg mb-6">
+                    <div className="p-4 rounded-lg mb-6" style={{ background: 'rgba(206, 147, 95, 0.2)' }}>
                       <div className="flex justify-between mb-2">
-                        <span className="font-semibold">Labor Cost:</span>
-                        <span className="font-bold">KES {quote.labor_cost_kes.toLocaleString()}</span>
+                        <span className="font-semibold" style={{ color: '#643100' }}>Labor Cost:</span>
+                        <span className="font-bold" style={{ color: '#643100' }}>KES {quote.labor_cost_kes.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-lg">
-                        <span className="font-bold">Total:</span>
-                        <span className="font-bold text-purple-600">KES {quote.total_kes.toLocaleString()}</span>
+                        <span className="font-bold" style={{ color: '#643100' }}>Total:</span>
+                        <span className="font-bold" style={{ color: '#914600' }}>KES {quote.total_kes.toLocaleString()}</span>
                       </div>
                     </div>
 
