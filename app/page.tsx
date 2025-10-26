@@ -1,18 +1,73 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { gsap } from 'gsap';
 
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [showIntro, setShowIntro] = useState(true);
+  const introBlobRef = useRef<SVGSVGElement>(null);
+  const welcomeTextRef = useRef<HTMLDivElement>(null);
+  const homeContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Show loading screen for 2.5 seconds
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2500);
+    // GSAP Timeline for intro animation
+    const tl = gsap.timeline({
+      onComplete: () => {
+        setShowIntro(false);
+      }
+    });
 
-    return () => clearTimeout(timer);
+    // Intro sequence
+    tl.fromTo(introBlobRef.current, 
+      { 
+        scale: 0, 
+        opacity: 0,
+        rotation: -180
+      },
+      { 
+        scale: 1, 
+        opacity: 1,
+        rotation: 0,
+        duration: 1.5,
+        ease: "elastic.out(1, 0.5)"
+      }
+    )
+    .fromTo(welcomeTextRef.current,
+      {
+        opacity: 0,
+        y: 50
+      },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: "power3.out"
+      },
+      "-=0.5" // Start slightly before blob finishes
+    )
+    .to([introBlobRef.current, welcomeTextRef.current],
+      {
+        opacity: 0,
+        scale: 1.2,
+        duration: 0.8,
+        ease: "power2.in",
+        delay: 1.2 // Hold for 1.2 seconds
+      }
+    );
+
+    // Animate home container when intro completes
+    gsap.fromTo(homeContainerRef.current,
+      { opacity: 0, scale: 0.95 },
+      { 
+        opacity: 1, 
+        scale: 1,
+        duration: 1,
+        ease: "power2.out",
+        delay: 4.2 // Start when intro finishes
+      }
+    );
+
   }, []);
 
   return (
@@ -150,8 +205,8 @@ export default function Home() {
           box-shadow: 0 6px 20px rgba(100, 49, 0, 0.4);
         }
 
-        /* Loading Screen */
-        .loading-screen {
+        /* Intro Screen */
+        .intro-screen {
           position: fixed;
           top: 0;
           left: 0;
@@ -163,88 +218,24 @@ export default function Home() {
           align-items: center;
           justify-content: center;
           z-index: 9999;
-          animation: fadeOut 0.8s ease-out forwards;
-          animation-delay: 2.3s;
         }
 
-        @keyframes fadeOut {
-          from {
-            opacity: 1;
-          }
-          to {
-            opacity: 0;
-            visibility: hidden;
-          }
+        .intro-blob {
+          width: 300px;
+          height: 300px;
+          margin-bottom: 60px;
         }
 
-        .loading-blob-container {
-          position: relative;
-          width: 200px;
-          height: 200px;
-          margin-bottom: 40px;
-        }
-
-        .loading-blob {
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%);
-          animation: blobPulseLoading 2s ease-in-out infinite;
-        }
-
-        .loading-blob:nth-child(2) {
-          animation-delay: -0.5s;
-        }
-
-        .loading-blob:nth-child(3) {
-          animation-delay: -1s;
-        }
-
-        @keyframes blobPulseLoading {
-          0%, 100% {
-            transform: translate(-50%, -50%) scale(0.8);
-            opacity: 0.3;
-          }
-          50% {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 0.7;
-          }
-        }
-
-        .loading-text {
+        .welcome-text {
           color: #7d3d00;
-          font-size: 32px;
+          font-size: 64px;
           font-family: 'Caprasimo', serif;
           font-weight: 400;
-          animation: fadeInOut 1.5s ease-in-out infinite;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        @keyframes fadeInOut {
-          0%, 100% {
-            opacity: 0.4;
-          }
-          50% {
-            opacity: 1;
-          }
-        }
-
-        .loading-dots {
-          display: inline-block;
-          width: 60px;
-          text-align: left;
-        }
-
-        .home-container.fade-in {
-          animation: fadeIn 0.8s ease-in forwards;
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
+        .home-container {
+          opacity: 0;
         }
 
         /* Responsive Design */
@@ -311,70 +302,32 @@ export default function Home() {
         }
       `}</style>
 
-      {/* Loading Screen */}
-      {isLoading && (
-        <div className="loading-screen">
-          {/* Animated Blob Loader */}
-          <div className="loading-blob-container">
-            {/* Blob 1 */}
-            <svg 
-              className="loading-blob"
-              width="200" 
-              height="200" 
-              viewBox="0 0 604 606" 
-              fill="none"
-            >
-              <path 
-                fillRule="evenodd" 
-                clipRule="evenodd" 
-                d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
-                fill="#AF5500" 
-                fillOpacity="0.3" 
-              />
-            </svg>
-
-            {/* Blob 2 */}
-            <svg 
-              className="loading-blob"
-              width="200" 
-              height="200" 
-              viewBox="0 0 604 606" 
-              fill="none"
-            >
-              <path 
-                fillRule="evenodd" 
-                clipRule="evenodd" 
-                d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
-                fill="#AF5500" 
-                fillOpacity="0.4" 
-              />
-            </svg>
-
-            {/* Blob 3 */}
-            <svg 
-              className="loading-blob"
-              width="200" 
-              height="200" 
-              viewBox="0 0 604 606" 
-              fill="none"
-            >
-              <path 
-                fillRule="evenodd" 
-                clipRule="evenodd" 
-                d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
-                fill="#AF5500" 
-                fillOpacity="0.5" 
-              />
-            </svg>
-          </div>
+      {/* Intro Animation Screen */}
+      {showIntro && (
+        <div className="intro-screen">
+          {/* Animated Intro Blob */}
+          <svg 
+            ref={introBlobRef}
+            className="intro-blob"
+            viewBox="0 0 604 606" 
+            fill="none"
+          >
+            <path 
+              fillRule="evenodd" 
+              clipRule="evenodd" 
+              d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
+              fill="#AF5500" 
+              fillOpacity="0.6" 
+            />
+          </svg>
           
-          <div className="loading-text">
-            Loading<span className="loading-dots">...</span>
+          <div ref={welcomeTextRef} className="welcome-text">
+            Welcome
           </div>
         </div>
       )}
 
-      <div className={`home-container ${!isLoading ? 'fade-in' : ''}`}>
+      <div ref={homeContainerRef} className="home-container">
         {/* Wavy Hair Patterns - Background Image */}
         <div className="wave-patterns"></div>
 
