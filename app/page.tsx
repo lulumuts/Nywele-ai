@@ -22,6 +22,7 @@ export default function Home() {
     // 1. Fade in blobs with stagger
     introTl.to('.intro-blob', {
       opacity: 1,
+      visibility: 'visible',
       duration: 1.5,
       ease: 'power2.out',
       stagger: 0.4
@@ -280,9 +281,10 @@ export default function Home() {
 
         .intro-blob {
           position: absolute;
-          width: 400px;
-          height: 400px;
+          width: 550px;
+          height: 550px;
           opacity: 0;
+          visibility: hidden;
         }
 
         .intro-content {
@@ -328,7 +330,7 @@ export default function Home() {
         .loading-bar {
           width: 0%;
           height: 100%;
-          background: linear-gradient(90deg, #7d3d00, #914600);
+          background: linear-gradient(90deg, #AF5500, #CE935F);
           border-radius: 2px;
         }
 
@@ -428,8 +430,8 @@ export default function Home() {
                   fillRule="evenodd" 
                   clipRule="evenodd" 
                   d="M336.327 1.48572C414.231 9.60864 473.115 66.7872 518.604 130.55C574.65 209.11 638.43 296.033 612.844 389.082C584.309 492.855 495.991 583.359 389.609 599.667C291.749 614.669 219.14 525.124 143.712 460.998C79.7729 406.64 -0.331203 353.001 0.761041 269.085C1.81384 188.2 85.2711 142.397 148.515 91.962C205.675 46.3795 263.612 -6.09616 336.327 1.48572Z" 
-                  stroke="#643100" 
-                  strokeWidth="2"
+                  stroke="#AF5500" 
+                  strokeWidth="3"
                   fill="none"
                 />
               </svg>
@@ -444,8 +446,8 @@ export default function Home() {
                   fillRule="evenodd" 
                   clipRule="evenodd" 
                   d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
-                  stroke="#643100" 
-                  strokeWidth="2"
+                  stroke="#AF5500" 
+                  strokeWidth="3"
                   fill="none"
                 />
               </svg>
@@ -460,8 +462,8 @@ export default function Home() {
                   fillRule="evenodd" 
                   clipRule="evenodd" 
                   d="M390.524 3.70487C463.396 17.8137 515.846 77.3794 554.759 140.765C602.232 218.935 657.832 306.799 638.118 397.175C615.532 500.107 533.028 589.582 428.839 602.686C333.506 614.635 256.959 528.525 178.009 468.089C109.669 416.261 23.8254 368.185 7.61277 286.486C-7.94113 207.589 65.6438 152.13 128.074 97.3488C184.523 47.5069 322.675 -9.48221 390.524 3.70487Z" 
-                  stroke="#643100" 
-                  strokeWidth="2"
+                  stroke="#AF5500" 
+                  strokeWidth="3"
                   fill="none"
                 />
               </svg>
