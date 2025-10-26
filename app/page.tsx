@@ -19,8 +19,13 @@ export default function Home() {
       }
     });
 
-    // 1. Fade in blobs with stagger
-    introTl.to('.intro-blob', {
+    // 1. Show and fade in blobs with stagger
+    introTl.add(() => {
+      document.querySelectorAll('.intro-blob').forEach(blob => {
+        blob.classList.add('visible');
+      });
+    })
+    .to('.intro-blob', {
       opacity: 1,
       visibility: 'visible',
       duration: 1.5,
@@ -283,8 +288,13 @@ export default function Home() {
           position: absolute;
           width: 550px;
           height: 550px;
-          opacity: 0;
-          visibility: hidden;
+          opacity: 0 !important;
+          visibility: hidden !important;
+          display: none;
+        }
+        
+        .intro-blob.visible {
+          display: block;
         }
 
         .intro-content {
@@ -294,12 +304,12 @@ export default function Home() {
         }
 
         .intro-title {
-          font-size: 6em;
+          font-size: 4em;
           font-weight: 700;
-          letter-spacing: -3px;
+          letter-spacing: -2px;
           opacity: 0;
           transform: translateY(50px);
-          color: #7d3d00;
+          color: #AF5500;
           font-family: 'Caprasimo', serif;
         }
 
@@ -310,7 +320,7 @@ export default function Home() {
           opacity: 0;
           letter-spacing: 2px;
           text-transform: uppercase;
-          color: #914600;
+          color: #AF5500;
           font-family: 'Bricolage Grotesque', sans-serif;
         }
 
@@ -321,7 +331,7 @@ export default function Home() {
           transform: translateX(-50%);
           width: 300px;
           height: 2px;
-          background: rgba(145, 70, 0, 0.2);
+          background: rgba(175, 85, 0, 0.2);
           border-radius: 2px;
           overflow: hidden;
           opacity: 0;
@@ -330,7 +340,7 @@ export default function Home() {
         .loading-bar {
           width: 0%;
           height: 100%;
-          background: linear-gradient(90deg, #AF5500, #CE935F);
+          background: #AF5500;
           border-radius: 2px;
         }
 
@@ -342,7 +352,7 @@ export default function Home() {
           font-size: 0.9em;
           letter-spacing: 2px;
           opacity: 0;
-          color: #914600;
+          color: #AF5500;
           font-family: 'Bricolage Grotesque', sans-serif;
         }
 
