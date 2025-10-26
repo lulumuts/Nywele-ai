@@ -11,11 +11,6 @@ export default function Home() {
   const homeContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Get all three blobs
-    const blobs = introBlobRef.current?.querySelectorAll('.blob-layer');
-    
-    if (!blobs) return;
-
     // GSAP Timeline for intro animation
     const tl = gsap.timeline({
       onComplete: () => {
@@ -23,37 +18,17 @@ export default function Home() {
       }
     });
 
-    // Animate each blob with stagger and ripple
-    blobs.forEach((blob, index) => {
-      // Entry animation
-      tl.fromTo(blob, 
-        { 
-          scale: 0, 
-          opacity: 0
-        },
-        { 
-          scale: 1, 
-          opacity: [0.3, 0.4, 0.5][index],
-          duration: 0.6,
-          ease: "back.out(1.7)"
-        },
-        index * 0.15 // Stagger each blob
-      );
-    });
-
-    // Ripple effect on all blobs simultaneously
-    tl.to(blobs, {
-      scale: 1.1,
-      duration: 0.5,
-      ease: "power2.out",
-      stagger: 0.1
-    })
-    .to(blobs, {
-      scale: 1,
-      duration: 0.5,
-      ease: "elastic.out(1, 0.3)",
-      stagger: 0.1
-    })
+    // Fade in the entire intro container
+    tl.fromTo(introBlobRef.current,
+      {
+        opacity: 0
+      },
+      {
+        opacity: 1,
+        duration: 0.4,
+        ease: "power2.out"
+      }
+    )
     // Welcome text
     .fromTo(welcomeTextRef.current,
       {
@@ -63,19 +38,19 @@ export default function Home() {
       {
         opacity: 1,
         y: 0,
-        duration: 0.5,
+        duration: 0.6,
         ease: "power3.out"
       },
-      "-=0.6"
+      "-=0.2"
     )
+    // Hold for a moment
+    .to({}, { duration: 1.5 })
     // Fade out everything
     .to([introBlobRef.current, welcomeTextRef.current],
       {
         opacity: 0,
-        scale: 1.05,
         duration: 0.5,
-        ease: "power2.in",
-        delay: 0.6
+        ease: "power2.in"
       }
     );
 
@@ -87,7 +62,7 @@ export default function Home() {
         scale: 1,
         duration: 0.8,
         ease: "power2.out",
-        delay: 3.5
+        delay: 3.0
       }
     );
 
@@ -245,19 +220,19 @@ export default function Home() {
 
         .intro-blob-container {
           position: relative;
-          width: 200px;
-          height: 200px;
+          width: 240px;
+          height: 240px;
           margin-bottom: 40px;
+          opacity: 0;
         }
 
-        .blob-layer {
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%) scale(0);
-          opacity: 0;
-          width: 100%;
-          height: 100%;
+        @keyframes blobPulse {
+          0%, 100% {
+            transform: translate(-50%, -50%) scale(1);
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(1.05);
+          }
         }
 
         .welcome-text {
@@ -340,47 +315,86 @@ export default function Home() {
       {/* Intro Animation Screen */}
       {showIntro && (
         <div className="intro-screen">
-          {/* Three-layer blob animation like loading screen */}
+          {/* Three-blob pulsing loader - matches loading screens */}
           <div ref={introBlobRef} className="intro-blob-container">
-            {/* Blob 1 */}
+            {/* Outer Blob - Stroke Only */}
             <svg 
-              className="blob-layer"
-              viewBox="0 0 604 606" 
+              style={{ 
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                animation: 'blobPulse 2s ease-in-out infinite',
+                width: '240px',
+                height: '240px',
+                overflow: 'visible',
+                opacity: 0.3
+              }}
+              viewBox="0 0 620 603" 
               fill="none"
+              preserveAspectRatio="xMidYMid meet"
             >
               <path 
                 fillRule="evenodd" 
                 clipRule="evenodd" 
-                d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
-                fill="#AF5500" 
+                d="M336.327 1.48572C414.231 9.60864 473.115 66.7872 518.604 130.55C574.65 209.11 638.43 296.033 612.844 389.082C584.309 492.855 495.991 583.359 389.609 599.667C291.749 614.669 219.14 525.124 143.712 460.998C79.7729 406.64 -0.331203 353.001 0.761041 269.085C1.81384 188.2 85.2711 142.397 148.515 91.962C205.675 46.3795 263.612 -6.09616 336.327 1.48572Z" 
+                stroke="#643100" 
+                strokeWidth="2"
+                fill="none"
               />
             </svg>
 
-            {/* Blob 2 */}
+            {/* Middle Blob - Stroke Only */}
             <svg 
-              className="blob-layer"
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                animation: 'blobPulse 2s ease-in-out infinite 0.3s',
+                width: '240px',
+                height: '240px',
+                overflow: 'visible',
+                opacity: 0.5
+              }}
               viewBox="0 0 604 606" 
               fill="none"
+              preserveAspectRatio="xMidYMid meet"
             >
               <path 
                 fillRule="evenodd" 
                 clipRule="evenodd" 
                 d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
-                fill="#AF5500" 
+                stroke="#643100" 
+                strokeWidth="2"
+                fill="none"
               />
             </svg>
 
-            {/* Blob 3 */}
+            {/* Inner Blob - Stroke Only */}
             <svg 
-              className="blob-layer"
-              viewBox="0 0 604 606" 
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                animation: 'blobPulse 2s ease-in-out infinite 0.6s',
+                width: '240px',
+                height: '240px',
+                overflow: 'visible',
+                opacity: 0.7
+              }}
+              viewBox="0 0 624 605" 
               fill="none"
+              preserveAspectRatio="xMidYMid meet"
             >
               <path 
                 fillRule="evenodd" 
                 clipRule="evenodd" 
-                d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
-                fill="#AF5500" 
+                d="M390.524 3.70487C463.396 17.8137 515.846 77.3794 554.759 140.765C602.232 218.935 657.832 306.799 638.118 397.175C615.532 500.107 533.028 589.582 428.839 602.686C333.506 614.635 256.959 528.525 178.009 468.089C109.669 416.261 23.8254 368.185 7.61277 286.486C-7.94113 207.589 65.6438 152.13 128.074 97.3488C184.523 47.5069 322.675 -9.48221 390.524 3.70487Z" 
+                stroke="#643100" 
+                strokeWidth="2"
+                fill="none"
               />
             </svg>
           </div>
