@@ -39,84 +39,8 @@ export async function POST(request: NextRequest) {
       allergies: body.allergies || [],
     };
 
-    // Generate routine
+    // Generate routine (includes product recommendations already)
     const recommendation = generateHairCareRoutine(profile);
-
-    // Transform profile to match products.ts HairCareProfile interface
-    const productsProfile = {
-      hairType: profile.hairAnalysis.type,
-      porosity: profile.hairAnalysis.porosity,
-      currentCondition: {
-        health: profile.hairAnalysis.health,
-        moisture: profile.hairAnalysis.health, // Use health as proxy for moisture
-        strength: profile.hairAnalysis.health  // Use health as proxy for strength
-      },
-      concerns: profile.concerns,
-      goals: profile.goals,
-      lifestyle: {
-        budget: profile.lifestyle.budget
-      }
-    };
-
-    // Generate product recommendations
-    const productRecommendations = recommendProductsForRoutine(
-      productsProfile,
-      recommendation,
-      profile.lifestyle.budget
-    );
-
-    // Add products to recommendation
-    recommendation.productRecommendations = {
-      essential: productRecommendations.essential.map(p => ({
-        id: p.product.id,
-        name: p.product.name,
-        brand: p.product.brand,
-        category: p.product.category,
-        purpose: p.purpose,
-        benefits: p.product.benefits,
-        howToUse: p.product.howToUse || '',
-        frequency: p.routineStep || 'as needed',
-        pricing: {
-          amount: p.product.pricing.estimatedPrice,
-          currency: p.product.pricing.currency,
-          size: p.product.pricing.size,
-          costPerUse: 0,
-        },
-        alternatives: p.alternatives?.map(alt => ({
-          name: alt.name,
-          brand: alt.brand,
-          price: alt.pricing.estimatedPrice,
-          quality: alt.quality,
-        })) || [],
-        whereToBuy: p.product.whereToFind?.map(w => w.retailer) || [],
-        aiInsight: `Recommended for ${profile.hairAnalysis.type} hair`,
-      })),
-      optional: productRecommendations.optional.map(p => ({
-        id: p.product.id,
-        name: p.product.name,
-        brand: p.product.brand,
-        category: p.product.category,
-        purpose: p.purpose,
-        benefits: p.product.benefits,
-        howToUse: p.product.howToUse || '',
-        frequency: 'optional',
-        pricing: {
-          amount: p.product.pricing.estimatedPrice,
-          currency: p.product.pricing.currency,
-          size: p.product.pricing.size,
-          costPerUse: 0,
-        },
-        alternatives: p.alternatives?.map(alt => ({
-          name: alt.name,
-          brand: alt.brand,
-          price: alt.pricing.estimatedPrice,
-          quality: alt.quality,
-        })) || [],
-        whereToBuy: p.product.whereToFind?.map(w => w.retailer) || [],
-        aiInsight: `Good addition for extra care`,
-      })),
-      alternatives: [],
-    };
 
     // Log for analytics (in production, save to database)
     console.log('💇 Hair care routine generated:', {
