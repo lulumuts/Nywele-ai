@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, MapPin, Star, Phone, Instagram, DollarSign, Check, ArrowRight, ArrowLeft, Clock, Sparkles, Upload, Loader, X, Image as ImageIcon } from 'lucide-react';
@@ -25,7 +25,7 @@ interface Stylist {
   availabilityHoursPerDay: number; // Max hours they can work per day
 }
 
-export default function BookingFlow() {
+function BookingFlowContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentStep, setCurrentStep] = useState(0); // Start at 0 now
@@ -1110,6 +1110,21 @@ export default function BookingFlow() {
         </AnimatePresence>
       </div>
     </div>
+  );
+}
+
+export default function BookingFlow() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: '100vh', backgroundColor: '#FFFBF5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <Loader className="animate-spin mx-auto mb-4" size={40} style={{ color: '#914600' }} />
+          <p style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Loading booking flow...</p>
+        </div>
+      </div>
+    }>
+      <BookingFlowContent />
+    </Suspense>
   );
 }
 
