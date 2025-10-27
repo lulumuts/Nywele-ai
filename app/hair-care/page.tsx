@@ -854,13 +854,13 @@ export default function HairCarePage() {
                     }
                   >
                     {tab.charAt(0).toUpperCase() + tab.slice(1)} (
-                    {recommendation.personalizedRoutine[tab].length} steps)
+                    {recommendation?.personalizedRoutine?.[tab]?.length || 0} steps)
                   </button>
                 ))}
               </div>
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {recommendation.personalizedRoutine[activeTab].map((step, idx) => (
+                {recommendation?.personalizedRoutine?.[activeTab]?.map((step, idx) => (
                   <motion.div
                     key={idx}
                     initial={{ opacity: 0, y: 20 }}
@@ -942,7 +942,7 @@ export default function HairCarePage() {
                           Next Deep Condition
                         </p>
                         <p className="text-lg font-bold" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                    {recommendation.maintenanceSchedule.nextDeepCondition.toLocaleDateString()}
+                    {recommendation?.maintenanceSchedule?.nextDeepCondition?.toLocaleDateString()}
                   </p>
                 </div>
                       <div className="rounded-lg p-4" style={{ background: 'white', border: '2px solid #914600' }}>
@@ -950,7 +950,7 @@ export default function HairCarePage() {
                           Next Protein Treatment
                         </p>
                         <p className="text-lg font-bold" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                    {recommendation.maintenanceSchedule.nextProteinTreatment.toLocaleDateString()}
+                    {recommendation?.maintenanceSchedule?.nextProteinTreatment?.toLocaleDateString()}
                   </p>
                 </div>
                       <div className="rounded-lg p-4" style={{ background: 'white', border: '2px solid #914600' }}>
@@ -967,7 +967,7 @@ export default function HairCarePage() {
                             Style Refresh
                           </p>
                           <p className="text-lg font-bold" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                      {recommendation.maintenanceSchedule.styleRefresh.toLocaleDateString()}
+                      {recommendation?.maintenanceSchedule?.styleRefresh?.toLocaleDateString()}
                     </p>
                   </div>
                 )}
@@ -976,13 +976,13 @@ export default function HairCarePage() {
               )}
 
                 {/* Products Section */}
-              {activeSection === 'products' && recommendation.productRecommendations && recommendation.productRecommendations.essential.length > 0 && (
+              {activeSection === 'products' && recommendation?.productRecommendations && recommendation?.productRecommendations?.essential?.length > 0 && (
                 <div>
                     <h2 className="text-2xl font-bold mb-6" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
                       Recommended Products
                     </h2>
                     <div className="grid md:grid-cols-3 gap-4">
-                      {recommendation.productRecommendations.essential.slice(0, 3).map((product, idx) => (
+                      {recommendation?.productRecommendations?.essential?.slice(0, 3).map((product, idx) => (
                         <div key={idx} className="rounded-xl p-5 transition-all hover:shadow-lg"
                           style={{ background: 'white', border: '2px solid #914600' }}>
                           <div className="mb-3">
@@ -1058,7 +1058,7 @@ export default function HairCarePage() {
                           </h3>
                 </div>
                 <ul className="space-y-3">
-                  {recommendation.tips.dos.map((tip, idx) => (
+                  {recommendation?.tips?.dos?.map((tip, idx) => (
                             <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                               <CheckCircle size={16} className="mt-0.5 flex-shrink-0" style={{ color: '#643100' }} />
                       <span>{tip}</span>
@@ -1076,7 +1076,7 @@ export default function HairCarePage() {
                           </h3>
                 </div>
                 <ul className="space-y-3">
-                  {recommendation.tips.donts.map((tip, idx) => (
+                  {recommendation?.tips?.donts?.map((tip, idx) => (
                             <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                               <AlertCircle size={16} className="mt-0.5 flex-shrink-0" style={{ color: '#643100' }} />
                       <span>{tip}</span>
@@ -1095,7 +1095,7 @@ export default function HairCarePage() {
                           </h3>
                 </div>
                 <ul className="space-y-3">
-                  {recommendation.tips.proTips.map((tip, idx) => (
+                  {recommendation?.tips?.proTips?.map((tip, idx) => (
                             <li key={idx} className="flex items-start gap-2 text-sm" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                               <Star size={16} className="mt-0.5 flex-shrink-0" />
                       <span>{tip}</span>
