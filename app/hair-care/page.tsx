@@ -780,7 +780,7 @@ export default function HairCarePage() {
                           Timeline
                         </p>
                         <p className="text-xl font-semibold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                          {recommendation.expectedResults.timeline}
+                          {recommendation?.expectedResults?.timeline}
                         </p>
                 </div>
                 <div>
@@ -788,7 +788,7 @@ export default function HairCarePage() {
                           Health Improvement
                         </p>
                         <p className="text-xl font-semibold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                    +{recommendation.expectedResults.metrics.healthImprovement}%
+                    +{recommendation?.expectedResults?.metrics?.healthImprovement}%
                   </p>
                 </div>
               </div>
@@ -797,7 +797,7 @@ export default function HairCarePage() {
                         You can expect:
                       </p>
                 <ul className="space-y-2">
-                  {recommendation.expectedResults.improvements.map((improvement, idx) => (
+                  {recommendation?.expectedResults?.improvements?.map((improvement, idx) => (
                           <li key={idx} className="flex items-start gap-2" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             <CheckCircle size={20} className="mt-0.5 flex-shrink-0" />
                       <span>{improvement}</span>
