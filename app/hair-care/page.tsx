@@ -958,10 +958,10 @@ export default function HairCarePage() {
                           Next Trim
                         </p>
                         <p className="text-lg font-bold" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                    {recommendation.maintenanceSchedule.nextTrim.toLocaleDateString()}
+                    {recommendation?.maintenanceSchedule?.nextTrim?.toLocaleDateString()}
                   </p>
                 </div>
-                {recommendation.maintenanceSchedule.styleRefresh && (
+                {recommendation?.maintenanceSchedule?.styleRefresh && (
                         <div className="rounded-lg p-4" style={{ background: 'white', border: '2px solid #914600' }}>
                           <p className="text-sm font-semibold mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             Style Refresh
