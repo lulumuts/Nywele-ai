@@ -1,19 +1,19 @@
 // Google Cloud Vision API client
-import vision from '@google-cloud/vision';
+import { ImageAnnotatorClient } from '@google-cloud/vision';
 
 // Initialize Vision API client
 // In production, use service account credentials
 // For development, we'll use API key authentication
-let visionClient: vision.ImageAnnotatorClient | null = null;
+let visionClient: ImageAnnotatorClient | null = null;
 
 if (process.env.GOOGLE_CLOUD_VISION_API_KEY) {
   // Using API key (simpler for development)
-  visionClient = new vision.ImageAnnotatorClient({
+  visionClient = new ImageAnnotatorClient({
     apiKey: process.env.GOOGLE_CLOUD_VISION_API_KEY,
   });
 } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
   // Using service account JSON (for production)
-  visionClient = new vision.ImageAnnotatorClient();
+  visionClient = new ImageAnnotatorClient();
 }
 
 export { visionClient };
