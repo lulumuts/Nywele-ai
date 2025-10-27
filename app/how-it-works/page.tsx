@@ -177,68 +177,6 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        {/* Hair Care Workflow Section */}
-        <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-            Hair Care Analysis Flow
-          </h2>
-          <p className="text-center mb-12" style={{ color: '#914600' }}>
-            Get personalised hair care routines powered by Gemini AI
-          </p>
-          <div className="grid md:grid-cols-4 gap-6">
-            {hairCareFlow.map((item, idx) => (
-              <div key={item.step} className="relative">
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 shadow-md p-6 hover:shadow-lg transition-shadow h-full"
-                  style={{ borderColor: '#CE935F' }}>
-                  <div className="text-4xl mb-4 text-center">{item.icon}</div>
-                  <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm text-white"
-                    style={{ backgroundColor: '#914600' }}>
-                    {item.step}
-                  </div>
-                  <h3 className="font-bold text-lg mb-2" style={{ color: '#643100' }}>{item.title}</h3>
-                  <p className="text-sm" style={{ color: '#AF5500' }}>{item.description}</p>
-                </div>
-                {idx < 3 && (
-                  <div className="hidden md:block absolute top-1/2 -right-3 transform translate-x-1/2 -translate-y-1/2 z-10">
-                    <ArrowRight className="w-6 h-6" style={{ color: '#914600' }} />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Booking Workflow Section */}
-        <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-            Style Booking Flow
-          </h2>
-          <p className="text-center mb-12" style={{ color: '#914600' }}>
-            Find the perfect salon to bring your hairstyle vision to life
-          </p>
-          <div className="grid md:grid-cols-4 gap-6">
-            {bookingFlow.map((item, idx) => (
-              <div key={item.step} className="relative">
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 shadow-md p-6 hover:shadow-lg transition-shadow h-full"
-                  style={{ borderColor: '#CE935F' }}>
-                  <div className="text-4xl mb-4 text-center">{item.icon}</div>
-                  <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm text-white"
-                    style={{ backgroundColor: '#AF5500' }}>
-                    {item.step}
-                  </div>
-                  <h3 className="font-bold text-lg mb-2" style={{ color: '#643100' }}>{item.title}</h3>
-                  <p className="text-sm" style={{ color: '#AF5500' }}>{item.description}</p>
-                </div>
-                {idx < 3 && (
-                  <div className="hidden md:block absolute top-1/2 -right-3 transform translate-x-1/2 -translate-y-1/2 z-10">
-                    <ArrowRight className="w-6 h-6" style={{ color: '#AF5500' }} />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Key Features Section */}
         <div className="mb-20 bg-white/60 backdrop-blur-sm rounded-3xl border-2 shadow-lg p-10"
           style={{ borderColor: '#CE935F' }}>
@@ -340,6 +278,68 @@ export default function HowItWorks() {
             >
               Get API Access
             </Link>
+          </div>
+        </div>
+
+        {/* Hair Care Workflow Section */}
+        <div className="mb-20">
+          <h2 className="text-3xl font-bold text-center mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+            Hair Care Analysis Flow
+          </h2>
+          <p className="text-center mb-12" style={{ color: '#914600' }}>
+            Get personalised hair care routines powered by Gemini AI
+          </p>
+          <div className="grid md:grid-cols-4 gap-6">
+            {hairCareFlow.map((item, idx) => (
+              <div key={item.step} className="relative">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 shadow-md p-6 hover:shadow-lg transition-shadow h-full"
+                  style={{ borderColor: '#CE935F' }}>
+                  <div className="text-4xl mb-4 text-center">{item.icon}</div>
+                  <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm text-white"
+                    style={{ backgroundColor: '#914600' }}>
+                    {item.step}
+                  </div>
+                  <h3 className="font-bold text-lg mb-2" style={{ color: '#643100' }}>{item.title}</h3>
+                  <p className="text-sm" style={{ color: '#AF5500' }}>{item.description}</p>
+                </div>
+                {idx < 3 && (
+                  <div className="hidden md:block absolute top-1/2 -right-3 transform translate-x-1/2 -translate-y-1/2 z-10">
+                    <ArrowRight className="w-6 h-6" style={{ color: '#914600' }} />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Booking Workflow Section */}
+        <div className="mb-20">
+          <h2 className="text-3xl font-bold text-center mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+            Style Booking Flow
+          </h2>
+          <p className="text-center mb-12" style={{ color: '#914600' }}>
+            Find the perfect salon to bring your hairstyle vision to life
+          </p>
+          <div className="grid md:grid-cols-4 gap-6">
+            {bookingFlow.map((item, idx) => (
+              <div key={item.step} className="relative">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl border-2 shadow-md p-6 hover:shadow-lg transition-shadow h-full"
+                  style={{ borderColor: '#CE935F' }}>
+                  <div className="text-4xl mb-4 text-center">{item.icon}</div>
+                  <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm text-white"
+                    style={{ backgroundColor: '#AF5500' }}>
+                    {item.step}
+                  </div>
+                  <h3 className="font-bold text-lg mb-2" style={{ color: '#643100' }}>{item.title}</h3>
+                  <p className="text-sm" style={{ color: '#AF5500' }}>{item.description}</p>
+                </div>
+                {idx < 3 && (
+                  <div className="hidden md:block absolute top-1/2 -right-3 transform translate-x-1/2 -translate-y-1/2 z-10">
+                    <ArrowRight className="w-6 h-6" style={{ color: '#AF5500' }} />
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
