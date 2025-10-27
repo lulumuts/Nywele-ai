@@ -918,13 +918,13 @@ function findAlternatives(product: Product): Product[] {
   
   // Find budget alternative
   if (product.alternatives?.budget) {
-    const budgetProduct = MOCK_PRODUCTS.find(p => p.id === product.alternatives.budget);
+    const budgetProduct = MOCK_PRODUCTS.find(p => p.id === product.alternatives?.budget);
     if (budgetProduct) alternatives.push(budgetProduct);
   }
   
   // Find premium alternative
   if (product.alternatives?.premium) {
-    const premiumProduct = MOCK_PRODUCTS.find(p => p.id === product.alternatives.premium);
+    const premiumProduct = MOCK_PRODUCTS.find(p => p.id === product.alternatives?.premium);
     if (premiumProduct) alternatives.push(premiumProduct);
   }
 
