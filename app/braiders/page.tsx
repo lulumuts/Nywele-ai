@@ -24,8 +24,11 @@ interface Job {
 }
 
 interface Quote {
-  products: any[];
-  labor_cost_kes: number;
+  extensionPacks: number;
+  extensionCostPerPack: number;
+  laborHours: number;
+  laborRatePerHour: number;
+  stylingProducts: { item: string; cost: number; include: boolean }[];
   notes: string;
   total_kes: number;
 }
