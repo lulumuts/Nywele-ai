@@ -93,6 +93,12 @@ export default function Home() {
           height: 100vh;
           background: #FDF4E8;
           overflow: hidden;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        
+        .home-container.visible {
+          opacity: 1;
         }
 
         /* Wavy Hair Pattern Background Image */
@@ -428,7 +434,7 @@ export default function Home() {
         </div>
       )}
 
-      <div ref={homeContainerRef} className="home-container">
+      <div ref={homeContainerRef} className={`home-container ${!showIntro ? 'visible' : ''}`}>
         {/* Wavy Hair Patterns - Background Image */}
         <div className="wave-patterns"></div>
 
