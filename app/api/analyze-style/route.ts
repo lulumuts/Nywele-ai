@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 import { requireAuth } from '@/lib/apiAuth';
 
-const genAI = process.env.GEMINI_API_KEY 
-  ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+const openai = process.env.OPENAI_API_KEY 
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   : null;
 
 export async function POST(request: NextRequest) {
@@ -18,14 +18,14 @@ export async function POST(request: NextRequest) {
   console.log('✅ Auth passed');
 
   try {
-    if (!genAI) {
-      console.error('❌ GEMINI_API_KEY not configured');
+    if (!openai) {
+      console.error('❌ OPENAI_API_KEY not configured');
       return NextResponse.json(
-        { error: 'Gemini API not configured. Please add GEMINI_API_KEY to environment variables.' },
+        { error: 'OpenAI API not configured. Please add OPENAI_API_KEY to environment variables.' },
         { status: 500 }
       );
     }
-    console.log('✅ Gemini AI initialized');
+    console.log('✅ OpenAI initialized');
 
     const { image } = await request.json();
     
@@ -37,14 +37,6 @@ export async function POST(request: NextRequest) {
       );
     }
     console.log('✅ Image received, length:', image.length);
-
-    // Use Gemini Vision model
-    console.log('🤖 Initializing Gemini model...');
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-    // Remove data URL prefix if present
-    const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
-    const mimeType = image.match(/^data:(image\/\w+);base64,/)?.[1] || 'image/jpeg';
 
     const prompt = `Analyze this hairstyle image and identify the specific braiding or natural hair style shown. 
     
@@ -66,20 +58,28 @@ Please respond in JSON format with:
   "alternativeStyles": ["list", "of", "similar", "styles"]
 }`;
 
-    console.log('📤 Sending request to Gemini...');
-    const result = await model.generateContent([
-      prompt,
-      {
-        inlineData: {
-          mimeType,
-          data: base64Data
-        }
-      }
-    ]);
+    console.log('📤 Sending request to OpenAI GPT-4 Vision...');
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: prompt },
+            {
+              type: "image_url",
+              image_url: {
+                url: image,
+              },
+            },
+          ],
+        },
+      ],
+      max_tokens: 500,
+    });
 
-    console.log('📥 Received response from Gemini');
-    const response = await result.response;
-    const text = response.text();
+    console.log('📥 Received response from OpenAI');
+    const text = response.choices[0].message.content || '';
     console.log('📝 Response text:', text.substring(0, 200));
     
     // Try to parse JSON from response
@@ -91,7 +91,7 @@ Please respond in JSON format with:
       analysisData = JSON.parse(jsonText);
       console.log('✅ Successfully parsed analysis data');
     } catch (parseError) {
-      console.warn('⚠️ Failed to parse Gemini response as JSON, using fallback');
+      console.warn('⚠️ Failed to parse OpenAI response as JSON, using fallback');
       // Fallback: try to extract style name from text
       const styleMatch = text.match(/(?:detected|identified|shows?|appears?|looks? like)\s+(?:a\s+)?([^.\n]+)/i);
       analysisData = {

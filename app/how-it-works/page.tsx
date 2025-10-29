@@ -2,7 +2,6 @@
 
 import { Brain, Image, Database, CheckCircle2, Sparkles, ArrowRight, Home, Calendar, Heart, Save } from 'lucide-react';
 import Link from 'next/link';
-import Navbar from '../components/Navbar';
 
 export default function HowItWorks() {
   const features = [
@@ -109,9 +108,6 @@ export default function HowItWorks() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#FFFBF5' }}>
-      {/* Navigation */}
-      <Navbar />
-
       {/* Hero Section */}
       <div className="max-w-6xl mx-auto px-4 py-16">
         <div className="text-center mb-16">

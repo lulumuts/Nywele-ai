@@ -8,9 +8,24 @@ import { gsap } from 'gsap';
 export default function Home() {
   const router = useRouter();
   const [showIntro, setShowIntro] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const homeContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Small delay to ensure React is fully hydrated
+    const mountTimer = setTimeout(() => {
+      setMounted(true);
+    }, 10);
+
+    return () => {
+      clearTimeout(mountTimer);
+    };
+  }, []);
+
+  // Separate effect for GSAP animation - only runs after mounted
+  useEffect(() => {
+    if (!mounted) return;
+
     const introTl = gsap.timeline({
       onComplete: () => {
         console.log('Intro complete, redirecting...');
@@ -70,22 +85,27 @@ export default function Home() {
       }
     }, 2.8);
 
-  }, [router]);
+  }, [mounted, router]);
 
   return (
     <>
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
         
-        body {
-          margin: 0;
-          padding: 0;
-          min-height: 100vh;
-          width: 100vw;
-          background: #FDF4E8;
-          font-family: 'Bricolage Grotesque', sans-serif;
-          overflow: hidden;
-        }
+          body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            width: 100vw;
+            background: #FDF4E8;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            overflow: hidden;
+          }
+
+          /* Prevent flash before React hydrates */
+          body > div:first-child {
+            opacity: 1;
+          }
 
         .home-container {
           position: relative;
@@ -94,11 +114,14 @@ export default function Home() {
           background: #FDF4E8;
           overflow: hidden;
           opacity: 0;
-          transition: opacity 0.3s ease;
+          visibility: hidden;
+          transition: opacity 0.3s ease, visibility 0s 0.3s;
         }
         
         .home-container.visible {
           opacity: 1;
+          visibility: visible;
+          transition: opacity 0.3s ease, visibility 0s;
         }
 
         /* Wavy Hair Pattern Background Image */
@@ -114,6 +137,13 @@ export default function Home() {
           background-position: center center;
           background-repeat: no-repeat;
           background-size: 100% 100%;
+          opacity: 0;
+          visibility: hidden;
+        }
+        
+        .home-container.visible .wave-patterns {
+          opacity: 1;
+          visibility: visible;
         }
 
         /* Organic Blob Shapes - Centered */
@@ -124,6 +154,13 @@ export default function Home() {
           transform: translate(-50%, -50%);
           animation: blobPulse 8s ease-in-out infinite;
           z-index: 2;
+          opacity: 0;
+          visibility: hidden;
+        }
+        
+        .home-container.visible .blob-shape-outer {
+          opacity: 1;
+          visibility: visible;
         }
 
         .blob-shape-middle {
@@ -134,6 +171,13 @@ export default function Home() {
           animation: blobPulse 8s ease-in-out infinite;
           animation-delay: -2s;
           z-index: 3;
+          opacity: 0;
+          visibility: hidden;
+        }
+        
+        .home-container.visible .blob-shape-middle {
+          opacity: 1;
+          visibility: visible;
         }
 
         .blob-shape-inner {
@@ -144,6 +188,13 @@ export default function Home() {
           animation: blobPulse 8s ease-in-out infinite;
           animation-delay: -4s;
           z-index: 2;
+          opacity: 0;
+          visibility: hidden;
+        }
+        
+        .home-container.visible .blob-shape-inner {
+          opacity: 1;
+          visibility: visible;
         }
 
         @keyframes blobPulse {
@@ -167,6 +218,13 @@ export default function Home() {
           align-items: center;
           text-align: center;
           max-width: 600px;
+          opacity: 0;
+          visibility: hidden;
+        }
+        
+        .home-container.visible .content-area {
+          opacity: 1;
+          visibility: visible;
         }
 
         .curl-icon {
@@ -213,20 +271,22 @@ export default function Home() {
           box-shadow: 0 6px 20px rgba(100, 49, 0, 0.4);
         }
 
-        /* Intro Screen */
-        .intro-screen {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: #FDF4E8;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 9999;
-          overflow: hidden;
-        }
+          /* Intro Screen */
+          .intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #FDF4E8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            overflow: hidden;
+            opacity: 1;
+            visibility: visible;
+          }
 
         .intro-overlay-content {
           position: relative;
@@ -331,10 +391,6 @@ export default function Home() {
           font-family: 'Bricolage Grotesque', sans-serif;
         }
 
-        .home-container {
-          opacity: 0;
-        }
-
         /* Responsive Design */
         @media (max-width: 1200px) {
           .content-area {
@@ -400,7 +456,7 @@ export default function Home() {
       `}</style>
 
       {/* Intro Animation Screen */}
-      {showIntro && (
+      {showIntro && mounted && (
         <div className="intro-screen">
           <div className="intro-overlay-content">
             {/* Intro Content */}
@@ -434,89 +490,92 @@ export default function Home() {
         </div>
       )}
 
-      <div ref={homeContainerRef} className={`home-container ${!showIntro ? 'visible' : ''}`}>
-        {/* Wavy Hair Patterns - Background Image */}
-        <div className="wave-patterns"></div>
+      {/* Only render home-container after mounting to prevent FOUC */}
+      {mounted && (
+        <div ref={homeContainerRef} className={`home-container ${!showIntro ? 'visible' : ''}`} style={{ display: showIntro ? 'none' : 'block' }}>
+          {/* Wavy Hair Patterns - Background Image */}
+          <div className="wave-patterns"></div>
 
-        {/* Organic Blob Shape - Outer */}
-        <svg 
-          className="blob-shape-outer"
-          width="620" 
-          height="603" 
-          viewBox="0 0 620 603" 
-              fill="none" 
-        >
-          <path 
-            fillRule="evenodd" 
-            clipRule="evenodd" 
-            d="M336.327 1.48572C414.231 9.60864 473.115 66.7872 518.604 130.55C574.65 209.11 638.43 296.033 612.844 389.082C584.309 492.855 495.991 583.359 389.609 599.667C291.749 614.669 219.14 525.124 143.712 460.998C79.7729 406.64 -0.331203 353.001 0.761041 269.085C1.81384 188.2 85.2711 142.397 148.515 91.962C205.675 46.3795 263.612 -6.09616 336.327 1.48572Z" 
-            stroke="#AF5500" 
-            strokeWidth="1.5"
-          />
-        </svg>
-
-        {/* Organic Blob Shape - Middle (Filled) */}
-        <svg 
-          className="blob-shape-middle"
-          width="604" 
-          height="606" 
-          viewBox="0 0 604 606" 
-          fill="none"
-        >
-            <path 
-            fillRule="evenodd" 
-            clipRule="evenodd" 
-            d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
-            fill="#AF5500" 
-            fillOpacity="0.5" 
-            stroke="#AF5500" 
-            strokeWidth="2"
-          />
-        </svg>
-
-        {/* Organic Blob Shape - Inner */}
-        <svg 
-          className="blob-shape-inner"
-          width="597" 
-          height="607" 
-          viewBox="0 0 597 607" 
-          fill="none"
-        >
-            <path 
-            fillRule="evenodd" 
-            clipRule="evenodd" 
-            d="M394.019 9.67684C467.955 35.5323 512.078 104.741 541.651 177.27C578.087 266.63 620.121 365.91 573.783 450.559C522.103 544.965 415.308 612.683 308.03 604.039C209.347 596.087 159.326 492.221 100.704 412.441C51.0106 344.812 -14.5781 274.158 5.82117 192.752C25.4836 114.286 117.249 88.9462 190.413 54.4418C256.538 23.2571 325.007 -14.4565 394.019 9.67684Z" 
-            stroke="#AF5500" 
-            strokeWidth="4"
-          />
-        </svg>
-
-        {/* Content */}
-        <div className="content-area">
-          {/* Curl Icon */}
+          {/* Organic Blob Shape - Outer */}
           <svg 
-            className="curl-icon"
-            width="81" 
-            height="77" 
-            viewBox="0 0 81 77" 
-            fill="none"
+            className="blob-shape-outer"
+            width="620" 
+            height="603" 
+            viewBox="0 0 620 603" 
+                fill="none" 
           >
             <path 
-              d="M26.4168 1.50037C26.3153 1.546 18.9202 4.51235 16.9078 5.85052C14.8953 7.18868 12.4202 8.01234 10.9202 9.51236C9.42023 11.0124 8.92019 11.5124 6.92021 14.0124C4.92022 16.5124 3.29872 21.0124 2.42021 24.0124C1.54169 27.0124 1.41483 30.8501 1.54169 33.0124C1.67903 35.3533 2.35945 38.7601 4.92022 43.5124C6.74414 46.8972 11.2442 49.4796 13.8322 49.996C16.4202 50.5124 18.6592 51.5876 27.3516 51.4065C30.5874 51.3391 33.5272 50.3174 37.6659 48.861C42.8112 47.0503 45.8731 45.2287 46.7952 44.6319C49.4202 42.9329 50.6765 40.1097 51.39 37.8C51.9398 36.0201 51.1792 34.1978 50.0834 32.8321C48.2852 30.5912 43.5142 29.5747 38.9202 33.5124C35.4202 36.5124 35.0981 37.9497 33.2465 42.0648C31.0265 46.9984 30.649 50.9027 30.5387 52.7799C30.3967 55.1959 30.8062 57.0755 31.4161 58.8381C32.5781 62.1963 34.0986 64.9976 35.3568 66.8227C38.8309 71.8617 42.3911 73.0787 44.3932 73.7446C47.1911 74.6752 52.6891 73.4 57.825 71.8084C61.138 70.7816 65.6434 68.5963 68.0727 67.405C70.5019 66.2138 70.6566 65.9003 70.7175 65.5417C70.8435 64.7991 70.4997 63.933 69.9976 63.1524C69.7559 62.7767 69.3057 62.6225 68.9462 62.5451C66.9408 62.1136 64.4581 64.1761 63.6793 65.2848C62.124 67.499 65.2366 70.8731 66.8107 72.2277C69.7286 73.768 71.0565 74.011 72.9323 74.0274C74.2194 74.016 76.1871 73.9648 78.5749 73.4734" 
-              stroke="#7d3d00" 
-              strokeWidth="3" 
-              strokeLinecap="round"
+              fillRule="evenodd" 
+              clipRule="evenodd" 
+              d="M336.327 1.48572C414.231 9.60864 473.115 66.7872 518.604 130.55C574.65 209.11 638.43 296.033 612.844 389.082C584.309 492.855 495.991 583.359 389.609 599.667C291.749 614.669 219.14 525.124 143.712 460.998C79.7729 406.64 -0.331203 353.001 0.761041 269.085C1.81384 188.2 85.2711 142.397 148.515 91.962C205.675 46.3795 263.612 -6.09616 336.327 1.48572Z" 
+              stroke="#AF5500" 
+              strokeWidth="1.5"
             />
           </svg>
 
-          <h1 className="logo-text">Nywele.ai</h1>
-          <p className="tagline">AI-Powered African Hair care</p>
-          
-          <Link href="/hair-care" className="cta-button">
-            Get Started
-          </Link>
+          {/* Organic Blob Shape - Middle (Filled) */}
+          <svg 
+            className="blob-shape-middle"
+            width="604" 
+            height="606" 
+            viewBox="0 0 604 606" 
+            fill="none"
+          >
+              <path 
+              fillRule="evenodd" 
+              clipRule="evenodd" 
+              d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
+              fill="#AF5500" 
+              fillOpacity="0.5" 
+              stroke="#AF5500" 
+              strokeWidth="2"
+            />
+          </svg>
+
+          {/* Organic Blob Shape - Inner */}
+          <svg 
+            className="blob-shape-inner"
+            width="597" 
+            height="607" 
+            viewBox="0 0 597 607" 
+            fill="none"
+          >
+              <path 
+              fillRule="evenodd" 
+              clipRule="evenodd" 
+              d="M394.019 9.67684C467.955 35.5323 512.078 104.741 541.651 177.27C578.087 266.63 620.121 365.91 573.783 450.559C522.103 544.965 415.308 612.683 308.03 604.039C209.347 596.087 159.326 492.221 100.704 412.441C51.0106 344.812 -14.5781 274.158 5.82117 192.752C25.4836 114.286 117.249 88.9462 190.413 54.4418C256.538 23.2571 325.007 -14.4565 394.019 9.67684Z" 
+              stroke="#AF5500" 
+              strokeWidth="4"
+            />
+          </svg>
+
+          {/* Content */}
+          <div className="content-area">
+            {/* Curl Icon */}
+            <svg 
+              className="curl-icon"
+              width="81" 
+              height="77" 
+              viewBox="0 0 81 77" 
+              fill="none"
+            >
+              <path 
+                d="M26.4168 1.50037C26.3153 1.546 18.9202 4.51235 16.9078 5.85052C14.8953 7.18868 12.4202 8.01234 10.9202 9.51236C9.42023 11.0124 8.92019 11.5124 6.92021 14.0124C4.92022 16.5124 3.29872 21.0124 2.42021 24.0124C1.54169 27.0124 1.41483 30.8501 1.54169 33.0124C1.67903 35.3533 2.35945 38.7601 4.92022 43.5124C6.74414 46.8972 11.2442 49.4796 13.8322 49.996C16.4202 50.5124 18.6592 51.5876 27.3516 51.4065C30.5874 51.3391 33.5272 50.3174 37.6659 48.861C42.8112 47.0503 45.8731 45.2287 46.7952 44.6319C49.4202 42.9329 50.6765 40.1097 51.39 37.8C51.9398 36.0201 51.1792 34.1978 50.0834 32.8321C48.2852 30.5912 43.5142 29.5747 38.9202 33.5124C35.4202 36.5124 35.0981 37.9497 33.2465 42.0648C31.0265 46.9984 30.649 50.9027 30.5387 52.7799C30.3967 55.1959 30.8062 57.0755 31.4161 58.8381C32.5781 62.1963 34.0986 64.9976 35.3568 66.8227C38.8309 71.8617 42.3911 73.0787 44.3932 73.7446C47.1911 74.6752 52.6891 73.4 57.825 71.8084C61.138 70.7816 65.6434 68.5963 68.0727 67.405C70.5019 66.2138 70.6566 65.9003 70.7175 65.5417C70.8435 64.7991 70.4997 63.933 69.9976 63.1524C69.7559 62.7767 69.3057 62.6225 68.9462 62.5451C66.9408 62.1136 64.4581 64.1761 63.6793 65.2848C62.124 67.499 65.2366 70.8731 66.8107 72.2277C69.7286 73.768 71.0565 74.011 72.9323 74.0274C74.2194 74.016 76.1871 73.9648 78.5749 73.4734" 
+                stroke="#7d3d00" 
+                strokeWidth="3" 
+                strokeLinecap="round"
+              />
+            </svg>
+
+            <h1 className="logo-text">Nywele.ai</h1>
+            <p className="tagline">AI-Powered African Hair care</p>
+            
+            <Link href="/hair-care" className="cta-button">
+              Get Started
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
