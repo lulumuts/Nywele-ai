@@ -350,8 +350,8 @@ export default function HairCarePage() {
             >
               <div className="text-center">
                   <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                    style={{ background: '#CE935F' }}>
-                    <User size={32} style={{ color: '#FDF4E8' }} />
+                    style={{ background: '#643100' }}>
+                    <User size={32} style={{ color: '#FFFFFF' }} />
                 </div>
                   <h3 className="text-3xl font-bold mb-2" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
                     Create Your Profile
