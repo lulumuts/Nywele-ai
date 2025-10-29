@@ -361,7 +361,7 @@ export default function HairCarePage() {
                 </p>
                 <div className="flex flex-col gap-3">
                   <button
-                      onClick={() => setCurrentStep(1)}
+                      onClick={() => window.location.href = '/register'}
                       className="w-full py-4 text-white rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
                       style={{ background: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
