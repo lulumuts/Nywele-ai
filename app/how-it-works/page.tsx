@@ -107,9 +107,14 @@ export default function HowItWorks() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FFFBF5' }}>
-      {/* Hero Section */}
-      <div className="max-w-6xl mx-auto px-4 py-16">
+    <>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
+      `}</style>
+      
+      <div className="min-h-screen" style={{ backgroundColor: '#FFFBF5' }}>
+        {/* Hero Section */}
+        <div className="max-w-6xl mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4" 
             style={{ backgroundColor: 'rgba(206, 147, 95, 0.2)', color: '#914600' }}>
@@ -362,6 +367,7 @@ export default function HowItWorks() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
