@@ -1,6 +1,9 @@
 // Product Information & Recommendation System
 // Education-first approach: We inform, not sell
 
+// Import Supabase functions
+import { fetchAllProducts as fetchSupabaseProducts, fetchProductsByCategory as fetchSupabaseCategoryProducts, fetchProductsForHairType as fetchSupabaseHairTypeProducts } from './supabase-data';
+
 // ==================== INTERFACES ====================
 
 export interface RetailerOption {
@@ -698,6 +701,71 @@ export function getProductsForStyle(styleName: string): Product[] {
   );
 }
 
+// ==================== SUPABASE-INTEGRATED FUNCTIONS ====================
+
+/**
+ * Fetch all products from Supabase, with fallback to mock data
+ */
+export async function getAllProducts(): Promise<Product[]> {
+  try {
+    console.log('📦 Fetching products from Supabase...');
+    const supabaseProducts = await fetchSupabaseProducts();
+    
+    if (supabaseProducts && supabaseProducts.length > 0) {
+      console.log(`✅ Fetched ${supabaseProducts.length} products from Supabase`);
+      return supabaseProducts;
+    }
+    
+    console.log('⚠️ No Supabase products found, using mock data');
+    return MOCK_PRODUCTS;
+  } catch (error) {
+    console.error('❌ Error fetching Supabase products, falling back to mock data:', error);
+    return MOCK_PRODUCTS;
+  }
+}
+
+/**
+ * Fetch products by category from Supabase, with fallback to mock data
+ */
+export async function getProductsByCategoryAsync(category: Product['category']): Promise<Product[]> {
+  try {
+    console.log(`📦 Fetching ${category} products from Supabase...`);
+    const supabaseProducts = await fetchSupabaseCategoryProducts(category);
+    
+    if (supabaseProducts && supabaseProducts.length > 0) {
+      console.log(`✅ Fetched ${supabaseProducts.length} ${category} products from Supabase`);
+      return supabaseProducts;
+    }
+    
+    console.log(`⚠️ No Supabase ${category} products found, using mock data`);
+    return getProductsByCategory(category);
+  } catch (error) {
+    console.error(`❌ Error fetching Supabase ${category} products, falling back to mock data:`, error);
+    return getProductsByCategory(category);
+  }
+}
+
+/**
+ * Fetch products for specific hair type from Supabase, with fallback to mock data
+ */
+export async function getProductsForHairTypeAsync(hairType: string): Promise<Product[]> {
+  try {
+    console.log(`📦 Fetching products for hair type ${hairType} from Supabase...`);
+    const supabaseProducts = await fetchSupabaseHairTypeProducts(hairType);
+    
+    if (supabaseProducts && supabaseProducts.length > 0) {
+      console.log(`✅ Fetched ${supabaseProducts.length} products for ${hairType} from Supabase`);
+      return supabaseProducts;
+    }
+    
+    console.log(`⚠️ No Supabase products for ${hairType}, using mock data`);
+    return MOCK_PRODUCTS.filter(p => p.suitableFor.hairTypes.includes(hairType));
+  } catch (error) {
+    console.error(`❌ Error fetching Supabase products for ${hairType}, falling back to mock data:`, error);
+    return MOCK_PRODUCTS.filter(p => p.suitableFor.hairTypes.includes(hairType));
+  }
+}
+
 // Affiliate link tracking
 export function trackAffiliateClick(productId: string, retailer: string): void {
   // Log affiliate click for analytics
@@ -767,12 +835,17 @@ export interface ProductRecommendationResult {
   budgetFit: 'under' | 'within' | 'over';
 }
 
-export function recommendProductsForRoutine(
+export async function recommendProductsForRoutine(
   profile: HairCareProfile,
   routine: HairCareRecommendation,
   budget: { min: number; max: number }
-): ProductRecommendationResult {
+): Promise<ProductRecommendationResult> {
   const recommendations: ProductRecommendationForRoutine[] = [];
+  
+  // Fetch all products from Supabase (with fallback to mock data)
+  console.log('🔍 Fetching products for routine recommendations...');
+  const allProducts = await getAllProducts();
+  console.log(`📊 Using ${allProducts.length} products for matching`);
   
   // Map routine steps to products
   const allRoutineSteps = [
@@ -783,7 +856,7 @@ export function recommendProductsForRoutine(
 
   // Recommend products based on routine and hair needs
   allRoutineSteps.forEach(step => {
-    const stepProducts = findProductsForStep(step, profile);
+    const stepProducts = findProductsForStep(step, profile, allProducts);
     recommendations.push(...stepProducts);
   });
 
@@ -800,6 +873,8 @@ export function recommendProductsForRoutine(
   const totalCost = [...essential, ...optional].reduce((sum, p) => sum + p.estimatedCost, 0);
   const budgetFit = totalCost < budget.min ? 'under' : totalCost > budget.max ? 'over' : 'within';
 
+  console.log(`✅ Recommended ${essential.length} essential + ${optional.length} optional products (Total: KES ${totalCost})`);
+
   return {
     essential,
     optional,
@@ -808,13 +883,13 @@ export function recommendProductsForRoutine(
   };
 }
 
-function findProductsForStep(step: any, profile: HairCareProfile): ProductRecommendationForRoutine[] {
+function findProductsForStep(step: any, profile: HairCareProfile, allProducts: Product[]): ProductRecommendationForRoutine[] {
   const products: ProductRecommendationForRoutine[] = [];
   const stepName = step.action?.toLowerCase() || '';
 
   // Match products to step type
   if (stepName.includes('moisturize') || stepName.includes('oil')) {
-    const oils = MOCK_PRODUCTS.filter(p => p.subCategory === 'oil');
+    const oils = allProducts.filter(p => p.subCategory === 'oil');
     oils.forEach(product => {
       products.push({
         product,
@@ -823,13 +898,13 @@ function findProductsForStep(step: any, profile: HairCareProfile): ProductRecomm
         routineStep: step.frequency || 'daily',
         priority: 'essential',
         estimatedCost: product.pricing.estimatedPrice,
-        alternatives: findAlternatives(product)
+        alternatives: findAlternatives(product, allProducts)
       });
     });
   }
 
   if (stepName.includes('shampoo') || stepName.includes('cleanse')) {
-    const shampoos = MOCK_PRODUCTS.filter(p => p.subCategory === 'shampoo');
+    const shampoos = allProducts.filter(p => p.subCategory === 'shampoo');
     shampoos.forEach(product => {
       products.push({
         product,
@@ -838,13 +913,13 @@ function findProductsForStep(step: any, profile: HairCareProfile): ProductRecomm
         routineStep: 'weekly',
         priority: 'essential',
         estimatedCost: product.pricing.estimatedPrice,
-        alternatives: findAlternatives(product)
+        alternatives: findAlternatives(product, allProducts)
       });
     });
   }
 
   if (stepName.includes('condition') || stepName.includes('deep')) {
-    const conditioners = MOCK_PRODUCTS.filter(p => p.subCategory === 'deep-conditioner');
+    const conditioners = allProducts.filter(p => p.subCategory === 'deep-conditioner');
     conditioners.forEach(product => {
       products.push({
         product,
@@ -853,13 +928,13 @@ function findProductsForStep(step: any, profile: HairCareProfile): ProductRecomm
         routineStep: 'weekly',
         priority: 'essential',
         estimatedCost: product.pricing.estimatedPrice,
-        alternatives: findAlternatives(product)
+        alternatives: findAlternatives(product, allProducts)
       });
     });
   }
 
   if (stepName.includes('protect') || stepName.includes('bonnet')) {
-    const tools = MOCK_PRODUCTS.filter(p => p.category === 'tool');
+    const tools = allProducts.filter(p => p.category === 'tool');
     tools.forEach(product => {
       products.push({
         product,
@@ -913,18 +988,18 @@ function scoreProductForProfile(product: Product, profile: HairCareProfile, budg
   return score;
 }
 
-function findAlternatives(product: Product): Product[] {
+function findAlternatives(product: Product, allProducts: Product[]): Product[] {
   const alternatives: Product[] = [];
   
   // Find budget alternative
   if (product.alternatives?.budget) {
-    const budgetProduct = MOCK_PRODUCTS.find(p => p.id === product.alternatives?.budget);
+    const budgetProduct = allProducts.find(p => p.id === product.alternatives?.budget);
     if (budgetProduct) alternatives.push(budgetProduct);
   }
   
   // Find premium alternative
   if (product.alternatives?.premium) {
-    const premiumProduct = MOCK_PRODUCTS.find(p => p.id === product.alternatives?.premium);
+    const premiumProduct = allProducts.find(p => p.id === product.alternatives?.premium);
     if (premiumProduct) alternatives.push(premiumProduct);
   }
 

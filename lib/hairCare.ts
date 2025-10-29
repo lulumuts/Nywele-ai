@@ -1,6 +1,8 @@
 // Hair Care Recommendation System
 // Generates personalized daily, weekly, and monthly routines
 
+import { recommendProductsForRoutine } from './products';
+
 // ==================== INTERFACES ====================
 
 export interface HairCareProfile {
@@ -590,9 +592,9 @@ export function calculateConfidence(profile: HairCareProfile): number {
 
 // ==================== MAIN GENERATOR ====================
 
-export function generateHairCareRoutine(
+export async function generateHairCareRoutine(
   profile: HairCareProfile
-): HairCareRecommendation {
+): Promise<HairCareRecommendation> {
   // Step 1: Assess needs
   const primaryNeeds = identifyPrimaryNeeds(profile);
 
@@ -616,9 +618,8 @@ export function generateHairCareRoutine(
   // Generate unique ID
   const routineId = `routine_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-  // Note: Product recommendations will be added in the API layer
-  // For now, return empty arrays
-  return {
+  // Create temporary routine structure for product recommendation
+  const tempRoutine = {
     routineId,
     confidence,
     personalizedRoutine: {
@@ -630,6 +631,102 @@ export function generateHairCareRoutine(
       essential: [],
       optional: [],
       alternatives: [],
+    },
+    maintenanceSchedule: schedule,
+    tips,
+    expectedResults,
+  };
+
+  // Step 7: Get product recommendations from Supabase (with fallback to mock data)
+  console.log('🛍️ Fetching product recommendations from Supabase...');
+  
+  // Map profile to products.ts HairCareProfile format
+  const productsProfile = {
+    hairType: profile.hairAnalysis.type,
+    porosity: profile.hairAnalysis.porosity,
+    currentCondition: {
+      health: profile.hairAnalysis.health,
+      moisture: profile.hairAnalysis.health, // Use health as proxy
+      strength: profile.hairAnalysis.health // Use health as proxy
+    },
+    concerns: profile.concerns,
+    goals: profile.goals,
+    lifestyle: {
+      budget: profile.lifestyle.budget
+    }
+  };
+
+  const productRecs = await recommendProductsForRoutine(
+    productsProfile,
+    tempRoutine as any, // Type compatibility
+    profile.lifestyle.budget
+  );
+
+  // Transform product recommendations to match interface
+  const essential = productRecs.essential.map(rec => ({
+    id: rec.product.id,
+    name: rec.product.name,
+    brand: rec.product.brand,
+    category: rec.product.category as any,
+    purpose: rec.purpose,
+    benefits: rec.product.benefits,
+    howToUse: rec.product.howToUse,
+    frequency: rec.routineStep,
+    pricing: {
+      amount: rec.product.pricing.estimatedPrice,
+      currency: rec.product.pricing.currency,
+      size: rec.product.pricing.size,
+      costPerUse: Math.round(rec.product.pricing.estimatedPrice / 30) // Estimate
+    },
+    alternatives: rec.alternatives?.map(alt => ({
+      name: alt.name,
+      brand: alt.brand,
+      price: alt.pricing.estimatedPrice,
+      quality: alt.quality
+    })) || [],
+    whereToBuy: rec.product.whereToFind?.map(r => r.retailer) || [],
+    aiInsight: `Recommended for your ${profile.hairAnalysis.type} hair with ${profile.hairAnalysis.porosity} porosity.`
+  }));
+
+  const optional = productRecs.optional.map(rec => ({
+    id: rec.product.id,
+    name: rec.product.name,
+    brand: rec.product.brand,
+    category: rec.product.category as any,
+    purpose: rec.purpose,
+    benefits: rec.product.benefits,
+    howToUse: rec.product.howToUse,
+    frequency: rec.routineStep,
+    pricing: {
+      amount: rec.product.pricing.estimatedPrice,
+      currency: rec.product.pricing.currency,
+      size: rec.product.pricing.size,
+      costPerUse: Math.round(rec.product.pricing.estimatedPrice / 30)
+    },
+    alternatives: rec.alternatives?.map(alt => ({
+      name: alt.name,
+      brand: alt.brand,
+      price: alt.pricing.estimatedPrice,
+      quality: alt.quality
+    })) || [],
+    whereToBuy: rec.product.whereToFind?.map(r => r.retailer) || [],
+    aiInsight: `Optional product that may enhance your routine.`
+  }));
+
+  console.log(`✅ Product recommendations ready: ${essential.length} essential, ${optional.length} optional`);
+
+  return {
+    routineId,
+    confidence,
+    personalizedRoutine: {
+      daily: dailyRoutine,
+      weekly: weeklyRoutine,
+      monthly: monthlyRoutine,
+    },
+    productRecommendations: {
+      essential,
+      optional,
+      alternatives: [], // Can be populated later
     },
     maintenanceSchedule: schedule,
     tips,

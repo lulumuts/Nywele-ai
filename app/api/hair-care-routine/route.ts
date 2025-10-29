@@ -39,8 +39,8 @@ export async function POST(request: NextRequest) {
       allergies: body.allergies || [],
     };
 
-    // Generate routine (includes product recommendations already)
-    const recommendation = generateHairCareRoutine(profile);
+    // Generate routine (this will now fetch products from Supabase!)
+    const recommendation = await generateHairCareRoutine(profile);
 
     // Log for analytics (in production, save to database)
     console.log('💇 Hair care routine generated:', {
@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
       goals: profile.goals,
       productCount: (recommendation.productRecommendations?.essential?.length || 0) + 
                     (recommendation.productRecommendations?.optional?.length || 0),
+      productsSource: 'Supabase (with fallback to mock)',
     });
 
     return NextResponse.json(recommendation);
