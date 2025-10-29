@@ -161,8 +161,8 @@ export default function Register() {
             style={{ backgroundColor: 'rgba(184, 125, 72, 0.3)', borderColor: '#9E6240' }}
           >
             <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'rgba(158, 98, 64, 0.2)' }}>
-                <User size={32} style={{ color: '#9E6240' }} />
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#9E6240' }}>
+                <User size={32} style={{ color: '#FFFFFF' }} />
               </div>
               <h2 className="text-3xl font-bold mb-2" style={{ color: '#9E6240' }}>Welcome to Nywele.ai!</h2>
               <p style={{ color: '#914600' }}>Let's create your profile</p>
@@ -219,8 +219,8 @@ export default function Register() {
             style={{ backgroundColor: 'rgba(184, 125, 72, 0.3)', borderColor: '#9E6240' }}
           >
             <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'rgba(158, 98, 64, 0.2)' }}>
-                <Sparkles size={32} style={{ color: '#9E6240' }} />
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#9E6240' }}>
+                <Sparkles size={32} style={{ color: '#FFFFFF' }} />
               </div>
               <h2 className="text-3xl font-bold mb-2" style={{ color: '#9E6240' }}>What's Your Hair Type?</h2>
               <p style={{ color: '#914600' }}>This helps us personalize your recommendations</p>
@@ -284,8 +284,8 @@ export default function Register() {
             style={{ backgroundColor: 'rgba(184, 125, 72, 0.3)', borderColor: '#9E6240' }}
           >
             <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'rgba(158, 98, 64, 0.2)' }}>
-                <Sparkles size={32} style={{ color: '#9E6240' }} />
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#9E6240' }}>
+                <Sparkles size={32} style={{ color: '#FFFFFF' }} />
               </div>
               <h2 className="text-3xl font-bold mb-2" style={{ color: '#9E6240' }}>What Are Your Hair Goals?</h2>
               <p style={{ color: '#914600' }}>Select all that apply</p>
@@ -356,8 +356,8 @@ export default function Register() {
             style={{ backgroundColor: 'rgba(184, 125, 72, 0.3)', borderColor: '#9E6240' }}
           >
             <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'rgba(158, 98, 64, 0.2)' }}>
-                <Sparkles size={32} style={{ color: '#9E6240' }} />
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#9E6240' }}>
+                <Sparkles size={32} style={{ color: '#FFFFFF' }} />
               </div>
               <h2 className="text-3xl font-bold mb-2" style={{ color: '#9E6240' }}>Tell Us More About Your Hair</h2>
               <p style={{ color: '#914600' }}>This helps us create better recommendations</p>
@@ -475,8 +475,8 @@ export default function Register() {
             style={{ backgroundColor: 'rgba(184, 125, 72, 0.3)', borderColor: '#9E6240' }}
           >
             <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'rgba(158, 98, 64, 0.2)' }}>
-                <Sparkles size={32} style={{ color: '#9E6240' }} />
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#9E6240' }}>
+                <Sparkles size={32} style={{ color: '#FFFFFF' }} />
               </div>
               <h2 className="text-3xl font-bold mb-2" style={{ color: '#9E6240' }}>Almost Done!</h2>
               <p style={{ color: '#914600' }}>Help us personalize product recommendations</p>
