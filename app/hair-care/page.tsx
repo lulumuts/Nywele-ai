@@ -223,6 +223,7 @@ export default function HairCarePage() {
       return;
     }
 
+    console.log('🔄 Starting routine generation...');
     setLoading(true);
     try {
       const profile: HairCareProfile = {
@@ -250,15 +251,22 @@ export default function HairCarePage() {
         allergies: [],
       };
 
+      console.log('📤 Sending profile to API:', profile);
       const response = await fetch('/api/hair-care-routine', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(profile),
       });
 
-      if (!response.ok) throw new Error('Failed to generate routine');
+      console.log('📥 API response status:', response.status);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ API error response:', errorText);
+        throw new Error(`Failed to generate routine: ${response.status}`);
+      }
 
       const data = await response.json();
+      console.log('✅ Routine data received:', data);
       
       data.maintenanceSchedule = {
         nextTrim: new Date(data.maintenanceSchedule.nextTrim),
@@ -271,11 +279,13 @@ export default function HairCarePage() {
       
       setRecommendation(data);
       setCurrentStep(4); // Move to results step
+      console.log('✅ Routine generation complete!');
     } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to generate routine. Please try again.');
+      console.error('❌ Error generating routine:', error);
+      alert(`Failed to generate routine: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`);
     } finally {
       setLoading(false);
+      console.log('🔄 Loading state reset');
     }
   };
 
