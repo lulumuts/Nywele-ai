@@ -1078,12 +1078,12 @@ function BookingFlowContent() {
 
               <div className="flex flex-col gap-3 max-w-md mx-auto">
                 <button
-                  onClick={() => router.push('/recommendations')}
+                  onClick={() => router.push('/dashboard')}
                   className="py-3 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
                   style={{ background: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   <Sparkles size={20} />
-                  Get Hair Care Tips
+                  View My Dashboard
                 </button>
                 {selectedStylist?.phone && (
                   <a
