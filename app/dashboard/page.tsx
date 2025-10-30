@@ -230,9 +230,9 @@ export default function Dashboard() {
             className="mb-12"
           >
               <div className="rounded-2xl shadow-xl p-8"
-                style={{ background: '#D49961' }}>
+                style={{ background: 'rgba(212, 153, 97, 0.6)', border: '2px solid #AF5500' }}>
                 <h2 className="text-3xl font-bold mb-6" 
-                  style={{ color: '#AF5500', fontFamily: 'Caprasimo, serif' }}>
+                  style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
                   Recommended Products for you
                   </h2>
                 
