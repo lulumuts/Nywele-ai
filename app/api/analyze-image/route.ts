@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { analyzeHairImage, detectHairType, detectHairstyle, analyzeHairHealth } from '@/lib/vision';
+import { analyzeHairImage, detectHairType, detectHairstyle, analyzeHairHealth, visionClient } from '@/lib/vision';
 import { requireAuth } from '@/lib/apiAuth';
 
 export async function POST(request: NextRequest) {
@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if Vision API is configured
-    if (!process.env.GOOGLE_CLOUD_VISION_API_KEY && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    // Check if Vision API client is initialized
+    if (!visionClient) {
       console.log('⚠️ Vision API not configured, returning default analysis');
       
       // Return basic default analysis when Vision API is not configured
