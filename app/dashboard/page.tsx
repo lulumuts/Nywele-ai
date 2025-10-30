@@ -132,7 +132,7 @@ export default function Dashboard() {
           width: '150vmax',
           height: '150vmax',
           left: '27%',
-          top: '103%',
+          top: '50%',
           transform: 'translate(-50%, -50%) rotate(10deg)',
           zIndex: 1,
           pointerEvents: 'none',
