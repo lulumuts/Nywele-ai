@@ -6,14 +6,23 @@ import { ImageAnnotatorClient } from '@google-cloud/vision';
 // For development, we'll use API key authentication
 let visionClient: ImageAnnotatorClient | null = null;
 
-if (process.env.GOOGLE_CLOUD_VISION_API_KEY) {
-  // Using API key (simpler for development)
-  visionClient = new ImageAnnotatorClient({
-    apiKey: process.env.GOOGLE_CLOUD_VISION_API_KEY,
-  });
-} else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-  // Using service account JSON (for production)
-  visionClient = new ImageAnnotatorClient();
+try {
+  if (process.env.GOOGLE_CLOUD_VISION_API_KEY) {
+    // Using API key (simpler for development)
+    visionClient = new ImageAnnotatorClient({
+      apiKey: process.env.GOOGLE_CLOUD_VISION_API_KEY,
+    });
+  } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    // Check if credentials file exists before initializing
+    const fs = require('fs');
+    if (fs.existsSync(process.env.GOOGLE_APPLICATION_CREDENTIALS)) {
+      visionClient = new ImageAnnotatorClient();
+    } else {
+      console.log('⚠️ GOOGLE_APPLICATION_CREDENTIALS file not found:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+    }
+  }
+} catch (error) {
+  console.log('⚠️ Failed to initialize Vision API client:', error);
 }
 
 export { visionClient };
