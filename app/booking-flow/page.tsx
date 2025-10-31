@@ -7,6 +7,7 @@ import { Calendar, MapPin, Star, Phone, Instagram, DollarSign, Check, ArrowRight
 import { generateJobSpec, mapStyleToTemplateSlug, JobSpec } from '@/lib/specs';
 import SpecSummary from '@/app/components/SpecSummary';
 import Navbar from '@/app/components/Navbar';
+import { getAllStyles, getProductsForStyle } from '@/lib/supabase-styles';
 
 interface Stylist {
   id: string;
@@ -39,6 +40,10 @@ function BookingFlowContent() {
   const [uploadedStyleImage, setUploadedStyleImage] = useState<string | null>(null);
   const [analyzingImage, setAnalyzingImage] = useState(false);
   const [styleDetectionResult, setStyleDetectionResult] = useState<any>(null);
+  
+  // Styles from Supabase
+  const [availableStyles, setAvailableStyles] = useState<any[]>([]);
+  const [selectedStyleProducts, setSelectedStyleProducts] = useState<any>(null);
   
   const desiredStyle = desiredStyleInput;
   const budget = budgetInput;
@@ -73,7 +78,28 @@ function BookingFlowContent() {
     
     // Always start at step 0 so user can control the flow
     setCurrentStep(0);
+    
+    // Fetch available styles from Supabase
+    async function loadStyles() {
+      const styles = await getAllStyles();
+      setAvailableStyles(styles);
+    }
+    loadStyles();
   }, []);
+  
+  // Load products when style is selected
+  useEffect(() => {
+    if (desiredStyleInput) {
+      async function loadProducts() {
+        const products = await getProductsForStyle(desiredStyleInput);
+        setSelectedStyleProducts(products);
+        console.log('✅ Loaded products for', desiredStyleInput, ':', products);
+      }
+      loadProducts();
+    } else {
+      setSelectedStyleProducts(null);
+    }
+  }, [desiredStyleInput]);
 
   // Generate job spec and load stylists when moving to step 1
   useEffect(() => {
@@ -443,15 +469,30 @@ function BookingFlowContent() {
                           }}
                         >
                           <option value="">Select a style...</option>
-                          <option value="Box Braids">Box Braids</option>
-                          <option value="Knotless Braids">Knotless Braids</option>
-                          <option value="Senegalese Twists">Senegalese Twists</option>
-                          <option value="Faux Locs">Faux Locs</option>
-                          <option value="Cornrows">Cornrows</option>
-                          <option value="Two-Strand Twists">Two-Strand Twists</option>
-                          <option value="Passion Twists">Passion Twists</option>
-                          <option value="Goddess Locs">Goddess Locs</option>
+                          {availableStyles.map((style) => (
+                            <option key={style.id} value={style.name}>
+                              {style.name}
+                            </option>
+                          ))}
                         </select>
+                        
+                        {/* Show recommended products when style is selected */}
+                        {selectedStyleProducts && (
+                          <div className="mt-4 p-4 rounded-xl" style={{ background: 'rgba(206, 147, 95, 0.2)', border: '2px solid #914600' }}>
+                            <p className="text-sm font-bold mb-2" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                              Recommended Products for {desiredStyleInput}
+                            </p>
+                            {selectedStyleProducts.essential && selectedStyleProducts.essential.length > 0 && (
+                              <div className="space-y-2">
+                                {selectedStyleProducts.essential.map((product: any, idx: number) => (
+                                  <div key={idx} className="text-xs" style={{ color: '#914600' }}>
+                                    ✅ {product.brand} {product.name} ({product.quantity} packs) - KES {product.total_cost}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
 
                         {/* OR Divider */}
                         <div className="flex items-center gap-3 my-4">
