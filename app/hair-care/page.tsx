@@ -676,31 +676,88 @@ export default function HairCarePage() {
                             <CheckCircle style={{ color: '#FDF4E8' }} />
                         Analysis Complete
                       </h3>
-                          <div className="space-y-4">
-                            <div className="rounded-lg p-4" style={{ background: 'white', border: '2px solid #914600' }}>
-                              <p className="text-sm mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          <div className="grid grid-cols-2 gap-3 mb-4">
+                            <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                              <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                 Hair Type
                               </p>
-                              <p className="text-3xl font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                              <p className="text-2xl font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
                             {hairAnalysis.hairType?.hairType || hairAnalysis.hairType || '4c'}
                           </p>
                         </div>
-                            <div className="rounded-lg p-4" style={{ background: 'white', border: '2px solid #914600' }}>
-                              <p className="text-sm mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                            <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                              <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                 Health Score
                               </p>
-                              <p className="text-3xl font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                              <p className="text-2xl font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
                             {hairAnalysis.health?.healthScore || hairAnalysis.health?.score || 65}/100
                           </p>
                         </div>
-                            <div className="rounded-lg p-4" style={{ background: 'white', border: '2px solid #914600' }}>
-                              <p className="text-sm mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                Texture
+                            {(hairAnalysis.hairType?.density || hairAnalysis.density || hairAnalysis.characteristics?.density) && (
+                              <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                                <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  Density
+                                </p>
+                                <p className="text-xl font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                  {hairAnalysis.hairType?.density || hairAnalysis.density || hairAnalysis.characteristics?.density || 'medium'}
+                                </p>
+                              </div>
+                            )}
+                            {(hairAnalysis.hairType?.porosity || hairAnalysis.porosity || hairAnalysis.characteristics?.porosity) && (
+                              <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                                <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  Porosity
+                                </p>
+                                <p className="text-xl font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                  {hairAnalysis.hairType?.porosity || hairAnalysis.porosity || hairAnalysis.characteristics?.porosity || 'medium'}
+                                </p>
+                              </div>
+                            )}
+                            {hairAnalysis.health?.moisture && (
+                              <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                                <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  Moisture
+                                </p>
+                                <p className="text-xl font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                  {hairAnalysis.health.moisture}
+                                </p>
+                              </div>
+                            )}
+                            {hairAnalysis.health?.damage && hairAnalysis.health.damage !== 'none' && (
+                              <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                                <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  Damage
+                                </p>
+                                <p className="text-xl font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                  {hairAnalysis.health.damage}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Current Style */}
+                          {(hairAnalysis.detectedStyle?.style || hairAnalysis.characteristics?.currentStyle) && (
+                            <div className="rounded-lg p-4 mb-4" style={{ background: 'white', border: '2px solid #914600' }}>
+                              <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                Current Style
                               </p>
-                              <p className="text-3xl font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-                            {hairAnalysis.hairType?.texture || hairAnalysis.texture || 'coily'}
-                          </p>
-                        </div>
+                              <p className="text-lg font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                {hairAnalysis.detectedStyle?.style || hairAnalysis.characteristics?.currentStyle}
+                              </p>
+                            </div>
+                          )}
+                          
+                          {/* Description */}
+                          {hairAnalysis.description && (
+                            <div className="rounded-lg p-4" style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+                              <p className="text-xs mb-2" style={{ color: 'rgba(255, 255, 255, 0.8)', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                Analysis Notes
+                              </p>
+                              <p className="text-sm" style={{ color: '#FDF4E8', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                {hairAnalysis.description}
+                              </p>
+                            </div>
+                          )}
                       </div>
                         </div>
                       )}
