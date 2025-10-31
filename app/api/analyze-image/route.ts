@@ -105,7 +105,8 @@ Respond in JSON format with:
 
     console.log('📥 Received response from OpenAI');
     const text = response.choices[0].message.content || '';
-    console.log('📝 Response preview:', text.substring(0, 150));
+    console.log('📝 Full response:', text);
+    console.log('📝 Response preview:', text.substring(0, 300));
     
     // Parse JSON from response
     let analysisData;
@@ -113,10 +114,13 @@ Respond in JSON format with:
       // Extract JSON from markdown code blocks if present
       const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/) || text.match(/\{[\s\S]*\}/);
       const jsonText = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : text;
+      console.log('📋 Extracted JSON text:', jsonText.substring(0, 300));
       analysisData = JSON.parse(jsonText);
-      console.log('✅ Successfully parsed hair analysis');
+      console.log('✅ Successfully parsed hair analysis:', JSON.stringify(analysisData));
     } catch (parseError) {
       console.warn('⚠️ Failed to parse OpenAI response, using fallback');
+      console.error('❌ Parse error:', parseError);
+      console.error('❌ Full response text:', text);
       // Fallback: extract what we can from text
       const hairTypeMatch = text.match(/hair type[:\s]*(4[abc])/i);
       analysisData = {
