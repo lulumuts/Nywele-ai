@@ -759,7 +759,6 @@ export default function HairCarePage() {
                             </div>
                           )}
                       </div>
-                        </div>
                       )}
 
                       {/* Action Buttons - Only show when analysis is complete and not loading routine */}
