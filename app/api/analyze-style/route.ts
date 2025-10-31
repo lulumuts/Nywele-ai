@@ -37,6 +37,28 @@ export async function POST(request: NextRequest) {
       );
     }
     console.log('✅ Image received, length:', image.length);
+    console.log('✅ Image format:', image.substring(0, 50));
+    
+    // Validate image format
+    if (!image.startsWith('data:image/')) {
+      console.error('❌ Invalid image format, must be data URL');
+      return NextResponse.json(
+        { error: 'Invalid image format' },
+        { status: 400 }
+      );
+    }
+    
+    // Check image size (OpenAI has limits)
+    const imageSizeKB = (image.length * 3) / 4 / 1024; // Approximate size
+    console.log('✅ Image size (approx):', imageSizeKB.toFixed(2), 'KB');
+    
+    if (imageSizeKB > 20000) { // ~20MB limit
+      console.error('❌ Image too large:', imageSizeKB.toFixed(2), 'KB');
+      return NextResponse.json(
+        { error: 'Image is too large. Please use a smaller image.' },
+        { status: 400 }
+      );
+    }
 
     const prompt = `Analyze this hairstyle image and identify the specific braiding or natural hair style shown. 
     
@@ -114,13 +136,25 @@ Please respond in JSON format with:
     console.error('❌ Error message:', error.message);
     console.error('❌ Error stack:', error.stack);
     
+    // Check for OpenAI API errors
+    if (error.status === 400) {
+      console.error('❌ OpenAI 400 Bad Request - likely image format issue');
+      return NextResponse.json(
+        { 
+          error: 'Unable to analyze image. Please try a different image.',
+          details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        },
+        { status: 400 }
+      );
+    }
+    
     // Provide more detailed error information
     const errorMessage = error.message || 'Failed to analyze image';
     const errorDetails = {
       message: error.message,
       name: error.name,
-      stack: error.stack?.substring(0, 500),
-      response: error.response?.data
+      status: error.status,
+      stack: error.stack?.substring(0, 500)
     };
     
     console.error('❌ Full error details:', JSON.stringify(errorDetails, null, 2));
@@ -130,7 +164,7 @@ Please respond in JSON format with:
         error: errorMessage,
         details: process.env.NODE_ENV === 'development' ? errorDetails : 'An error occurred while analyzing the image.'
       },
-      { status: 500 }
+      { status: error.status || 500 }
     );
   }
 }
