@@ -3,29 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { User, Mail, Sparkles, ArrowRight, Check } from 'lucide-react';
-
-interface SavedRoutine {
-  id: string;
-  createdAt: string;
-  hairAnalysis: any;
-  routine: any;
-  notes?: string;
-}
-
-interface UserProfile {
-  name: string;
-  email: string;
-  hairType: '4a' | '4b' | '4c' | '';
-  hairGoals: string[];
-  porosity?: 'low' | 'normal' | 'high' | '';
-  length?: 'short' | 'medium' | 'long' | '';
-  currentConcerns?: string[];
-  budget?: 'low' | 'medium' | 'high' | '';
-  climate?: 'dry' | 'humid' | 'temperate' | '';
-  createdAt: string;
-  savedRoutines?: SavedRoutine[];
-}
+import { User, Mail, Sparkles, ArrowRight, Check, ChevronDown } from 'lucide-react';
+import { PROFILE_VERSION, type UserProfile, type HairDensity, type StrandThickness, type Elasticity, type ScalpCondition, type ProtectiveStyleFrequency, type ActivityLevel, type WaterExposure } from '@/types/userProfile';
 
 export default function Register() {
   const router = useRouter();
@@ -41,6 +20,21 @@ export default function Register() {
   const [selectedConcerns, setSelectedConcerns] = useState<string[]>([]);
   const [budget, setBudget] = useState<'low' | 'medium' | 'high' | ''>('');
   const [climate, setClimate] = useState<'dry' | 'humid' | 'temperate' | ''>('');
+  const [hairDensity, setHairDensity] = useState<HairDensity | ''>('');
+  const [strandThickness, setStrandThickness] = useState<StrandThickness | ''>('');
+  const [elasticity, setElasticity] = useState<Elasticity | ''>('');
+  const [scalpCondition, setScalpCondition] = useState<ScalpCondition | ''>('');
+  const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
+  const [selectedSensitivities, setSelectedSensitivities] = useState<string[]>([]);
+  const [selectedPreferences, setSelectedPreferences] = useState<string[]>([]);
+  const [washFrequency, setWashFrequency] = useState<string>('');
+  const [protectiveStyleFrequency, setProtectiveStyleFrequency] = useState<ProtectiveStyleFrequency | ''>('');
+  const [activityLevel, setActivityLevel] = useState<ActivityLevel | ''>('');
+  const [waterExposure, setWaterExposure] = useState<WaterExposure | ''>('');
+  const [regimenNotes, setRegimenNotes] = useState('');
+
+  // New state for optional section
+  const [showOptional, setShowOptional] = useState(false);
 
   const hairGoalOptions = [
     { id: 'growth', label: 'Hair Growth', emoji: '🌱' },
@@ -60,6 +54,64 @@ export default function Register() {
     { id: 'tangles', label: 'Tangles', emoji: '🪢' }
   ];
 
+  const densityOptions: { id: HairDensity; label: string }[] = [
+    { id: 'low', label: 'Low' },
+    { id: 'medium', label: 'Medium' },
+    { id: 'high', label: 'High' }
+  ];
+
+  const strandOptions: { id: StrandThickness; label: string }[] = [
+    { id: 'fine', label: 'Fine' },
+    { id: 'medium', label: 'Medium' },
+    { id: 'coarse', label: 'Coarse' }
+  ];
+
+  const elasticityOptions: { id: Elasticity; label: string; description: string }[] = [
+    { id: 'low', label: 'Low', description: 'Stretches a little, breaks easily' },
+    { id: 'balanced', label: 'Balanced', description: 'Stretches and returns without breaking' },
+    { id: 'high', label: 'High', description: 'Stretches a lot, may need strengthening' }
+  ];
+
+  const scalpOptions: { id: ScalpCondition; label: string }[] = [
+    { id: 'balanced', label: 'Balanced' },
+    { id: 'dry', label: 'Dry' },
+    { id: 'oily', label: 'Oily' },
+    { id: 'flaky', label: 'Flaky' },
+    { id: 'sensitive', label: 'Sensitive' }
+  ];
+
+  const allergyOptions = ['Coconut', 'Nut Oils', 'Aloe', 'Fragrance', 'Shea Butter'];
+  const sensitivityOptions = ['Protein', 'Sulfates', 'Silicones', 'Drying Alcohols', 'Heavy Oils'];
+  const preferenceOptions = ['Vegan', 'Cruelty Free', 'Sulfate Free', 'Silicone Free', 'Paraben Free'];
+
+  const protectiveStyleOptions: { id: ProtectiveStyleFrequency; label: string }[] = [
+    { id: 'rare', label: 'Rarely' },
+    { id: 'occasional', label: 'Occasionally' },
+    { id: 'regular', label: 'Regularly' },
+    { id: 'continuous', label: 'Back-to-back' }
+  ];
+
+  const activityOptions: { id: ActivityLevel; label: string }[] = [
+    { id: 'low', label: 'Low' },
+    { id: 'moderate', label: 'Moderate' },
+    { id: 'high', label: 'High / Very Active' }
+  ];
+
+  const waterOptions: { id: WaterExposure; label: string }[] = [
+    { id: 'minimal', label: 'Minimal' },
+    { id: 'hard-water', label: 'Hard Water' },
+    { id: 'swimmer', label: 'Swimmer' },
+    { id: 'frequent-chlorine', label: 'Frequent Chlorine' }
+  ];
+
+  const toggleSelectable = (value: string, list: string[], setter: (next: string[]) => void) => {
+    setter(
+      list.includes(value)
+        ? list.filter((item) => item !== value)
+        : [...list, value]
+    );
+  };
+
   const toggleGoal = (goalId: string) => {
     setSelectedGoals(prev =>
       prev.includes(goalId)
@@ -77,23 +129,42 @@ export default function Register() {
   };
 
   const handleSubmit = () => {
-    // Validate
-    if (!name || !email || !hairType || selectedGoals.length === 0) {
-      alert('Please complete all fields');
-      return;
-    }
+     // Validate only required fields
+     if (!name || !email || !hairType || selectedGoals.length === 0) {
+       alert('Please complete all required fields');
+       return;
+     }
+ 
+    const trimmedWashFrequency = washFrequency.trim();
+    const parsedWashFrequency = trimmedWashFrequency === '' ? null : Number(trimmedWashFrequency);
+    const normalizedWashFrequency = parsedWashFrequency !== null && !Number.isNaN(parsedWashFrequency)
+      ? parsedWashFrequency
+      : null;
 
     // Create user profile
     const profile: UserProfile = {
+      profileVersion: PROFILE_VERSION,
       name,
       email,
       hairType,
       hairGoals: selectedGoals,
-      porosity: porosity || undefined,
-      length: length || undefined,
-      currentConcerns: selectedConcerns.length > 0 ? selectedConcerns : undefined,
-      budget: budget || undefined,
-      climate: climate || undefined,
+      hairPorosity: porosity || '',
+      hairLength: length || '',
+      currentConcerns: selectedConcerns,
+      hairDensity: hairDensity || '',
+      strandThickness: strandThickness || '',
+      elasticity: elasticity || '',
+      scalpCondition: scalpCondition || '',
+      ingredientAllergies: selectedAllergies,
+      ingredientSensitivities: selectedSensitivities,
+      preferredProductAttributes: selectedPreferences,
+      washFrequencyPerWeek: normalizedWashFrequency,
+      protectiveStyleFrequency: protectiveStyleFrequency || '',
+      activityLevel: activityLevel || '',
+      waterExposure: waterExposure || '',
+      budget: budget || '',
+      climate: climate || '',
+      currentRegimenNotes: regimenNotes.trim(),
       createdAt: new Date().toISOString(),
       savedRoutines: []
     };
@@ -123,10 +194,10 @@ export default function Register() {
       `}</style>
 
       <div className="max-w-2xl mx-auto px-4 py-12">
-        {/* Progress Indicator */}
+        {/* Progress Indicator - Now shows 3 steps */}
         <div className="mb-8">
           <div className="flex items-center justify-center gap-2">
-            {[1, 2, 3, 4, 5].map((s) => (
+            {[1, 2, 3].map((s) => (
               <div key={s} className="flex items-center">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
                   s === step 
@@ -138,7 +209,7 @@ export default function Register() {
                 style={s <= step ? { backgroundColor: '#9E6240' } : {}}>
                   {s < step ? <Check size={20} /> : s}
                 </div>
-                {s < 5 && (
+                {s < 3 && (
                   <div className={`w-12 h-1 ${s < step ? '' : 'bg-gray-200'}`} 
                     style={s < step ? { backgroundColor: '#9E6240' } : {}} />
                 )}
@@ -147,7 +218,7 @@ export default function Register() {
           </div>
           <div className="text-center mt-4">
             <p className="text-sm text-gray-600">
-              Step {step} of 5
+              Step {step} of 3 • {step === 3 && 'Optional info available'}
             </p>
           </div>
         </div>
@@ -275,7 +346,7 @@ export default function Register() {
           </motion.div>
         )}
 
-        {/* Step 3: Hair Goals */}
+        {/* Step 3: Hair Goals + Optional Info Combined */}
         {step === 3 && (
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -291,6 +362,7 @@ export default function Register() {
               <p style={{ color: '#914600' }}>Select all that apply</p>
             </div>
 
+            {/* Hair Goals Selection */}
             <div className="grid grid-cols-2 gap-4 mb-8">
               {hairGoalOptions.map((goal) => (
                 <button
@@ -326,47 +398,38 @@ export default function Register() {
               </p>
             </div>
 
-            <div className="flex gap-3">
+            {/* Optional Section Toggle */}
+            <div className="mb-6">
               <button
-                onClick={() => setStep(2)}
-                className="px-6 py-4 border-2 rounded-xl font-semibold transition-all"
-                style={{ borderColor: '#9E6240', color: '#914600', backgroundColor: 'white' }}
+                onClick={() => setShowOptional(!showOptional)}
+                className="w-full py-3 rounded-xl border-2 font-medium transition-all flex items-center justify-center gap-2"
+                style={{ 
+                  borderColor: '#9E6240', 
+                  color: '#914600', 
+                  backgroundColor: showOptional ? 'rgba(254, 244, 230, 0.8)' : 'white'
+                }}
               >
-                Back
-              </button>
-              <button
-                onClick={() => setStep(4)}
-                disabled={selectedGoals.length === 0}
-                className="flex-1 py-4 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                style={{ backgroundColor: '#9E6240' }}
-              >
-                Continue
-                <ArrowRight size={20} />
+                {showOptional ? 'Hide' : 'Show'} Additional Info (Optional)
+                <ChevronDown 
+                  size={20} 
+                  className={`transition-transform ${showOptional ? 'rotate-180' : ''}`}
+                />
               </button>
             </div>
-          </motion.div>
-        )}
 
-        {/* Step 4: Hair Details */}
-        {step === 4 && (
+            {/* Optional Info - Collapsible */}
+            {showOptional && (
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="rounded-2xl shadow-xl p-8 border-2"
-            style={{ backgroundColor: 'rgba(184, 125, 72, 0.3)', borderColor: '#9E6240' }}
-          >
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#9E6240' }}>
-                <Sparkles size={32} style={{ color: '#FFFFFF' }} />
-              </div>
-              <h2 className="text-3xl font-bold mb-2" style={{ color: '#9E6240' }}>Tell Us More About Your Hair</h2>
-              <p style={{ color: '#914600' }}>This helps us create better recommendations</p>
-            </div>
-
-            <div className="space-y-6">
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="space-y-6 mb-6 pt-6 border-t-2"
+                style={{ borderColor: 'rgba(158, 98, 64, 0.3)' }}
+              >
               {/* Hair Porosity */}
               <div>
-                <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>Hair Porosity (Optional)</label>
+                  <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                    Hair Porosity (Optional)
+                  </label>
                 <div className="grid grid-cols-3 gap-3">
                   {[
                     { value: 'low' as const, label: 'Low', desc: 'Resists moisture' },
@@ -392,7 +455,9 @@ export default function Register() {
 
               {/* Hair Length */}
               <div>
-                <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>Current Hair Length (Optional)</label>
+                  <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                    Current Hair Length (Optional)
+                  </label>
                 <div className="grid grid-cols-3 gap-3">
                   {[
                     { value: 'short' as const, label: 'Short', emoji: '✂️' },
@@ -443,46 +508,8 @@ export default function Register() {
                     </button>
                   ))}
                 </div>
-              </div>
             </div>
 
-            <div className="flex gap-3 mt-8">
-              <button
-                onClick={() => setStep(3)}
-                className="px-6 py-4 border-2 rounded-xl font-semibold transition-all"
-                style={{ borderColor: '#9E6240', color: '#914600', backgroundColor: 'white' }}
-              >
-                Back
-              </button>
-              <button
-                onClick={() => setStep(5)}
-                className="flex-1 py-4 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
-                style={{ backgroundColor: '#9E6240' }}
-              >
-                Continue
-                <ArrowRight size={20} />
-              </button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Step 5: Budget & Environment */}
-        {step === 5 && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="rounded-2xl shadow-xl p-8 border-2"
-            style={{ backgroundColor: 'rgba(184, 125, 72, 0.3)', borderColor: '#9E6240' }}
-          >
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#9E6240' }}>
-                <Sparkles size={32} style={{ color: '#FFFFFF' }} />
-              </div>
-              <h2 className="text-3xl font-bold mb-2" style={{ color: '#9E6240' }}>Almost Done!</h2>
-              <p style={{ color: '#914600' }}>Help us personalize product recommendations</p>
-            </div>
-
-            <div className="space-y-6">
               {/* Budget */}
               <div>
                 <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
@@ -534,21 +561,279 @@ export default function Register() {
                     >
                       <p className="text-2xl mb-1">{option.emoji}</p>
                       <p className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                      Hair Density
+                    </label>
+                    <div className="flex flex-wrap gap-3">
+                      {densityOptions.map((option) => (
+                        <button
+                          key={option.id}
+                          onClick={() => setHairDensity(option.id)}
+                          className="px-4 py-3 rounded-xl border-2 transition-all"
+                          style={
+                            hairDensity === option.id
+                              ? { borderColor: '#9E6240', backgroundColor: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
+                          }
+                        >
+                          <span className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                      Strand Thickness
+                    </label>
+                    <div className="flex flex-wrap gap-3">
+                      {strandOptions.map((option) => (
+                        <button
+                          key={option.id}
+                          onClick={() => setStrandThickness(option.id)}
+                          className="px-4 py-3 rounded-xl border-2 transition-all"
+                          style={
+                            strandThickness === option.id
+                              ? { borderColor: '#9E6240', backgroundColor: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
+                          }
+                        >
+                          <span className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                      Elasticity
+                    </label>
+                    <div className="space-y-2">
+                      {elasticityOptions.map((option) => (
+                        <button
+                          key={option.id}
+                          onClick={() => setElasticity(option.id)}
+                          className="w-full text-left px-4 py-3 rounded-xl border-2 transition-all"
+                          style={
+                            elasticity === option.id
+                              ? { borderColor: '#9E6240', backgroundColor: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
+                          }
+                        >
+                          <span className="font-semibold block" style={{ color: '#9E6240' }}>{option.label}</span>
+                          <span className="text-xs" style={{ color: '#914600' }}>{option.description}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                      Scalp Condition
+                    </label>
+                    <div className="flex flex-wrap gap-3">
+                      {scalpOptions.map((option) => (
+                        <button
+                          key={option.id}
+                          onClick={() => setScalpCondition(option.id)}
+                          className="px-4 py-3 rounded-xl border-2 transition-all"
+                          style={
+                            scalpCondition === option.id
+                              ? { borderColor: '#9E6240', backgroundColor: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
+                          }
+                        >
+                          <span className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</span>
                     </button>
                   ))}
                 </div>
               </div>
             </div>
 
-            <div className="rounded-xl p-4 mt-6 mb-6" style={{ backgroundColor: 'rgba(158, 98, 64, 0.2)' }}>
-              <p className="text-sm text-center" style={{ color: '#914600' }}>
-                🎉 You're all set! Click below to complete your registration
+                <div className="grid md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                      How often do you wash per week?
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      max={10}
+                      step="0.5"
+                      value={washFrequency}
+                      onChange={(event) => setWashFrequency(event.target.value)}
+                      placeholder="e.g. 1.5"
+                      className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent"
+                      style={{ borderColor: '#9E6240', backgroundColor: 'white', color: '#643100' }}
+                    />
+                    <p className="text-xs mt-2" style={{ color: '#914600' }}>
+                      Include co-washes in your count. Use decimals for alternating weeks.
               </p>
             </div>
 
+                  <div>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                      Protective Style Frequency
+                    </label>
+                    <div className="flex flex-wrap gap-3">
+                      {protectiveStyleOptions.map((option) => (
+                        <button
+                          key={option.id}
+                          onClick={() => setProtectiveStyleFrequency(option.id)}
+                          className="px-4 py-3 rounded-xl border-2 transition-all"
+                          style={
+                            protectiveStyleFrequency === option.id
+                              ? { borderColor: '#9E6240', backgroundColor: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
+                          }
+                        >
+                          <span className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                      Activity Level
+                    </label>
+                    <div className="flex flex-wrap gap-3">
+                      {activityOptions.map((option) => (
+                        <button
+                          key={option.id}
+                          onClick={() => setActivityLevel(option.id)}
+                          className="px-4 py-3 rounded-xl border-2 transition-all"
+                          style={
+                            activityLevel === option.id
+                              ? { borderColor: '#9E6240', backgroundColor: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
+                          }
+                        >
+                          <span className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                      Water Exposure
+                    </label>
+                    <div className="flex flex-wrap gap-3">
+                      {waterOptions.map((option) => (
+                        <button
+                          key={option.id}
+                          onClick={() => setWaterExposure(option.id)}
+                          className="px-4 py-3 rounded-xl border-2 transition-all"
+                          style={
+                            waterExposure === option.id
+                              ? { borderColor: '#9E6240', backgroundColor: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
+                          }
+                        >
+                          <span className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                    Ingredient Allergies
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {allergyOptions.map((option) => (
+                      <button
+                        key={option}
+                        onClick={() => toggleSelectable(option, selectedAllergies, setSelectedAllergies)}
+                        className="px-3 py-2 rounded-lg border-2 text-sm transition-all"
+                        style={
+                          selectedAllergies.includes(option)
+                            ? { borderColor: '#9E6240', backgroundColor: 'rgba(158, 98, 64, 0.2)', color: '#643100' }
+                            : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white', color: '#914600' }
+                        }
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                    Sensitivities / Things to Limit
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {sensitivityOptions.map((option) => (
+                      <button
+                        key={option}
+                        onClick={() => toggleSelectable(option, selectedSensitivities, setSelectedSensitivities)}
+                        className="px-3 py-2 rounded-lg border-2 text-sm transition-all"
+                        style={
+                          selectedSensitivities.includes(option)
+                            ? { borderColor: '#9E6240', backgroundColor: 'rgba(158, 98, 64, 0.2)', color: '#643100' }
+                            : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white', color: '#914600' }
+                        }
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                    Product Preferences
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {preferenceOptions.map((option) => (
+                      <button
+                        key={option}
+                        onClick={() => toggleSelectable(option, selectedPreferences, setSelectedPreferences)}
+                        className="px-3 py-2 rounded-lg border-2 text-sm transition-all"
+                        style={
+                          selectedPreferences.includes(option)
+                            ? { borderColor: '#9E6240', backgroundColor: 'rgba(158, 98, 64, 0.2)', color: '#643100' }
+                            : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white', color: '#914600' }
+                        }
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: '#914600' }}>
+                    Current Routine Notes
+                  </label>
+                  <textarea
+                    value={regimenNotes}
+                    onChange={(event) => setRegimenNotes(event.target.value)}
+                    placeholder="Products you rotate, areas of focus, reactions to note..."
+                    rows={3}
+                    className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent"
+                    style={{ borderColor: '#9E6240', backgroundColor: 'white', color: '#643100', resize: 'vertical' }}
+                  />
+                </div>
+              </motion.div>
+            )}
+
             <div className="flex gap-3">
               <button
-                onClick={() => setStep(4)}
+                onClick={() => setStep(2)}
                 className="px-6 py-4 border-2 rounded-xl font-semibold transition-all"
                 style={{ borderColor: '#9E6240', color: '#914600', backgroundColor: 'white' }}
               >
@@ -556,7 +841,8 @@ export default function Register() {
               </button>
               <button
                 onClick={handleSubmit}
-                className="flex-1 py-4 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                disabled={selectedGoals.length === 0}
+                className="flex-1 py-4 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 style={{ backgroundColor: '#9E6240' }}
               >
                 Complete Registration
@@ -565,6 +851,7 @@ export default function Register() {
             </div>
           </motion.div>
         )}
+
       </div>
     </div>
   );

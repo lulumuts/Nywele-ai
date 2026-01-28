@@ -47,22 +47,28 @@ export default function Navbar() {
       description: 'Learn about Nywele.ai'
     },
     {
-      name: 'Book Style',
-      href: '/booking-flow',
-      icon: Sparkles,
-      description: 'Book your hairstyle'
-    },
-    {
-      name: 'Hair Care',
+      name: 'Hair Analysis',
       href: '/hair-care',
       icon: Heart,
-      description: 'Get recommendations'
+      description: 'Understand your hair'
+    },
+    {
+      name: 'Product Check',
+      href: '/products',
+      icon: Search,
+      description: 'Check product compatibility'
+    },
+    {
+      name: 'Style Advisor',
+      href: '/style-advisor',
+      icon: Sparkles,
+      description: 'Get style advice'
     }
   ];
 
   const isActive = (href: string) => {
     if (href === '/how-it-works') return pathname === '/how-it-works' || pathname === '/';
-    if (href === '/booking-flow') return pathname.startsWith('/booking');
+    if (href === '/style-advisor') return pathname.startsWith('/style-advisor') || pathname.startsWith('/booking-flow');
     return pathname.startsWith(href);
   };
 

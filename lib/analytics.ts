@@ -132,11 +132,10 @@ export async function trackProductClick(data: {
   }
 }
 
-// Track salon views (for future use)
-export async function trackSalonView(data: {
-  salonName: string;
-  location?: string;
-  services?: string[];
+// Track external booking link clicks (Fresha, Braiding Nairobi, etc.)
+export async function trackExternalBookingLinkClick(data: {
+  platform: string; // 'fresha' | 'braiding-nairobi' | 'other'
+  style?: string;
   hairType?: string;
 }) {
   if (!supabase) {
@@ -148,23 +147,171 @@ export async function trackSalonView(data: {
     const { error } = await supabase
       .from('analytics_events')
       .insert({
-        event_type: 'salon_view',
-        salon_name: data.salonName,
+        event_type: 'external_booking_link_clicked',
         hair_type: data.hairType,
+        style: data.style,
         metadata: {
-          location: data.location,
-          services: data.services,
+          platform: data.platform,
         }
       });
 
     if (error) {
-      console.error('[Analytics] Failed to track salon view:', error);
+      console.error('[Analytics] Failed to track external booking link click:', error);
     } else {
-      console.log('[Analytics] ✅ Tracked salon view:', data.salonName);
+      console.log('[Analytics] ✅ Tracked external booking link click:', data.platform);
     }
   } catch (error) {
-    console.error('[Analytics] Failed to track salon view:', error);
+    console.error('[Analytics] Failed to track external booking link click:', error);
   }
+}
+
+// Track hair passport exports
+export async function trackPassportExport(data: {
+  format: 'text' | 'json' | 'pdf';
+  hairType?: string;
+}) {
+  if (!supabase) {
+    console.log('[Analytics] Supabase not configured - skipping tracking');
+    return;
+  }
+
+  try {
+    const { error } = await supabase
+      .from('analytics_events')
+      .insert({
+        event_type: 'passport_exported',
+        hair_type: data.hairType,
+        metadata: {
+          format: data.format,
+        }
+      });
+
+    if (error) {
+      console.error('[Analytics] Failed to track passport export:', error);
+    } else {
+      console.log('[Analytics] ✅ Tracked passport export:', data.format);
+    }
+  } catch (error) {
+    console.error('[Analytics] Failed to track passport export:', error);
+  }
+}
+
+// Track style assessment completion (renamed from booking_completed)
+export async function trackStyleAssessmentCompleted(data: {
+  style: string;
+  compatibility: 'compatible' | 'risky' | 'unknown';
+  hairType?: string;
+}) {
+  if (!supabase) {
+    console.log('[Analytics] Supabase not configured - skipping tracking');
+    return;
+  }
+
+  try {
+    const { error } = await supabase
+      .from('analytics_events')
+      .insert({
+        event_type: 'style_assessment_completed',
+        hair_type: data.hairType,
+        style: data.style,
+        metadata: {
+          compatibility: data.compatibility,
+        }
+      });
+
+    if (error) {
+      console.error('[Analytics] Failed to track style assessment:', error);
+    } else {
+      console.log('[Analytics] ✅ Tracked style assessment:', data.style);
+    }
+  } catch (error) {
+    console.error('[Analytics] Failed to track style assessment:', error);
+  }
+}
+
+// Track product scans (for future product intelligence feature)
+export async function trackProductScan(data: {
+  productName?: string;
+  brand?: string;
+  barcode?: string;
+  compatibility?: 'compatible' | 'incompatible' | 'unknown';
+}) {
+  if (!supabase) {
+    console.log('[Analytics] Supabase not configured - skipping tracking');
+    return;
+  }
+
+  try {
+    const { error } = await supabase
+      .from('analytics_events')
+      .insert({
+        event_type: 'product_scanned',
+        product_name: data.productName,
+        metadata: {
+          brand: data.brand,
+          barcode: data.barcode,
+          compatibility: data.compatibility,
+        }
+      });
+
+    if (error) {
+      console.error('[Analytics] Failed to track product scan:', error);
+    } else {
+      console.log('[Analytics] ✅ Tracked product scan:', data.productName || data.barcode);
+    }
+  } catch (error) {
+    console.error('[Analytics] Failed to track product scan:', error);
+  }
+}
+
+// Track routine adaptations (when users adapt routines based on location/climate)
+export async function trackRoutineAdapted(data: {
+  originalClimate?: string;
+  newClimate?: string;
+  location?: string;
+  hairType?: string;
+}) {
+  if (!supabase) {
+    console.log('[Analytics] Supabase not configured - skipping tracking');
+    return;
+  }
+
+  try {
+    const { error } = await supabase
+      .from('analytics_events')
+      .insert({
+        event_type: 'routine_adapted',
+        hair_type: data.hairType,
+        metadata: {
+          originalClimate: data.originalClimate,
+          newClimate: data.newClimate,
+          location: data.location,
+        }
+      });
+
+    if (error) {
+      console.error('[Analytics] Failed to track routine adaptation:', error);
+    } else {
+      console.log('[Analytics] ✅ Tracked routine adaptation');
+    }
+  } catch (error) {
+    console.error('[Analytics] Failed to track routine adaptation:', error);
+  }
+}
+
+// Legacy: Keep trackSalonView for backward compatibility but mark as deprecated
+/** @deprecated Use trackExternalBookingLinkClick instead */
+export async function trackSalonView(data: {
+  salonName: string;
+  location?: string;
+  services?: string[];
+  hairType?: string;
+}) {
+  // Redirect to new function
+  return trackExternalBookingLinkClick({
+    platform: 'other',
+    hairType: data.hairType,
+  });
 }
 
 // Get analytics stats

@@ -9,9 +9,35 @@ export default function Home() {
   const router = useRouter();
   const [showIntro, setShowIntro] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [skipRequested, setSkipRequested] = useState(false);
   const homeContainerRef = useRef<HTMLDivElement>(null);
+  const targetRouteRef = useRef('/dashboard'); // Education-first platform - redirect to dashboard
+  const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const hasNavigatedRef = useRef(false);
+
+  const navigateToTarget = () => {
+    if (hasNavigatedRef.current) return;
+    hasNavigatedRef.current = true;
+
+    gsap.to('.intro-overlay-content', {
+      opacity: 0,
+      duration: 0.45,
+      ease: 'power2.inOut',
+      onComplete: () => {
+        router.push(targetRouteRef.current);
+      }
+    });
+  };
 
   useEffect(() => {
+    // Check if user has previously skipped intro
+    const hasSkippedBefore = localStorage.getItem('nywele-skip-intro') === 'true';
+    if (hasSkippedBefore) {
+      setShowIntro(false);
+      router.push(targetRouteRef.current);
+      return;
+    }
+    
     // Small delay to ensure React is fully hydrated
     const mountTimer = setTimeout(() => {
       setMounted(true);
@@ -20,24 +46,27 @@ export default function Home() {
     return () => {
       clearTimeout(mountTimer);
     };
-  }, []);
+  }, [router]);
 
   // Separate effect for GSAP animation - only runs after mounted
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || skipRequested) return;
 
-    const introTl = gsap.timeline({
-      onComplete: () => {
-        console.log('Intro complete, redirecting...');
-        // Redirect to how it works page
-        router.push('/how-it-works');
-      }
-    });
+    const introTl = gsap.timeline();
+    introTimelineRef.current = introTl;
 
+    introTl.to('.intro-blob', {
+      opacity: 1,
+      duration: 0.8,
+      ease: 'power2.out',
+      stagger: 0.12
+    }, 0);
+
+    // Reduced timing: 1.5s total instead of 4s+
     // 1. Fade in coil icon
     introTl.to('.intro-coil', {
       opacity: 1,
-      duration: 0.8,
+      duration: 0.4,
       ease: 'power2.out'
     }, 0);
 
@@ -45,47 +74,51 @@ export default function Home() {
     introTl.to('.intro-title', {
       opacity: 1,
       y: 0,
-      duration: 1,
+      duration: 0.5,
       ease: 'power3.out'
-    }, 0.5);
+    }, 0.2);
 
     // 3. Show subtitle
     introTl.to('.intro-subtitle', {
       opacity: 1,
-      duration: 0.8,
+      duration: 0.4,
       ease: 'power2.out'
-    }, 1.3);
+    }, 0.7);
 
     // 4. Show loading bar (after text is loaded)
     introTl.to('.loading-bar-container', {
       opacity: 1,
-      duration: 0.5
-    }, 2.3);
+      duration: 0.3
+    }, 1.1);
 
     introTl.to('.loading-text', {
       opacity: 1,
-      duration: 0.5
-    }, 2.3);
+      duration: 0.3
+    }, 1.1);
 
-    // 5. Fill loading bar and redirect when done
+    // 5. Faster loading bar: 0.8s instead of 1.5s
     introTl.to('.loading-bar', {
       width: '100%',
-      duration: 1.5,
-      ease: 'power1.inOut',
+      duration: 2,
+      ease: 'power2.inOut',
       onComplete: () => {
-        // Fade out and redirect immediately after loading bar fills
-        gsap.to('.intro-overlay-content', {
-          opacity: 0,
-          duration: 0.5,
-          ease: 'power2.inOut',
-          onComplete: () => {
-            setShowIntro(false);
-          }
-        });
+        navigateToTarget();
       }
-    }, 2.8);
+    }, 1.4);
 
-  }, [mounted, router]);
+    return () => {
+      introTimelineRef.current?.kill();
+      introTimelineRef.current = null;
+    };
+
+  }, [mounted, router, skipRequested]);
+
+  const handleSkip = () => {
+    localStorage.setItem('nywele-skip-intro', 'true');
+    setSkipRequested(true);
+    introTimelineRef.current?.kill();
+    navigateToTarget();
+  };
 
   return (
     <>
@@ -312,11 +345,29 @@ export default function Home() {
 
         .intro-blob {
           position: absolute;
-          width: 280px;
-          height: 280px;
+          width: 540px;
+          height: 540px;
+          max-width: 85vw;
+          max-height: 85vh;
           opacity: 0;
-          visibility: hidden;
-          display: none;
+          transform-origin: center;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        .intro-blob-outer {
+          animation: introBlobPulse 8s ease-in-out infinite;
+        }
+
+        .intro-blob-middle {
+          animation: introBlobPulse 8s ease-in-out infinite reverse;
+          animation-delay: -1.2s;
+        }
+
+        .intro-blob-inner {
+          animation: introBlobPulse 6s ease-in-out infinite;
+          animation-delay: -2s;
         }
         
         .intro-blob.visible {
@@ -384,11 +435,22 @@ export default function Home() {
           bottom: 120px;
           left: 50%;
           transform: translateX(-50%);
-          font-size: 0.9em;
-          letter-spacing: 2px;
+          font-size: 1em;
+          letter-spacing: 3px;
           opacity: 0;
           color: #AF5500;
           font-family: 'Bricolage Grotesque', sans-serif;
+        }
+
+        @keyframes introBlobPulse {
+          0%, 100% {
+            transform: translate(-50%, -50%) scale(1);
+            filter: blur(0px);
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(1.08);
+            filter: blur(6px);
+          }
         }
 
         /* Responsive Design */
@@ -456,9 +518,85 @@ export default function Home() {
       `}</style>
 
       {/* Intro Animation Screen */}
-      {showIntro && mounted && (
+      {showIntro && mounted && !skipRequested && (
         <div className="intro-screen">
           <div className="intro-overlay-content">
+            {/* Skip Button - Top Right */}
+            <button
+              onClick={handleSkip}
+              className="absolute top-6 right-6 px-4 py-2 rounded-lg font-medium transition-all hover:opacity-80 z-20"
+              style={{ 
+                background: 'rgba(255, 255, 255, 0.2)', 
+                color: '#AF5500',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(175, 85, 0, 0.3)',
+                fontFamily: 'Bricolage Grotesque, sans-serif'
+              }}
+            >
+              Skip
+            </button>
+ 
+            <div className="blob-container">
+              <svg
+                className="intro-blob intro-blob-outer"
+                viewBox="0 0 620 603"
+                fill="none"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M336.327 1.48572C414.231 9.60864 473.115 66.7872 518.604 130.55C574.65 209.11 638.43 296.033 612.844 389.082C584.309 492.855 495.991 583.359 389.609 599.667C291.749 614.669 219.14 525.124 143.712 460.998C79.7729 406.64 -0.331203 353.001 0.761041 269.085C1.81384 188.2 85.2711 142.397 148.515 91.962C205.675 46.3795 263.612 -6.09616 336.327 1.48572Z"
+                  fill="none"
+                  stroke="url(#introOuterGradient)"
+                  strokeWidth="3"
+                  opacity="0.65"
+                />
+                <defs>
+                  <linearGradient id="introOuterGradient" x1="80" y1="32" x2="540" y2="603" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#FEE4D6" />
+                    <stop offset="1" stopColor="#AF5500" stopOpacity="0.65" />
+                  </linearGradient>
+                </defs>
+              </svg>
+
+              <svg
+                className="intro-blob intro-blob-middle"
+                viewBox="0 0 604 606"
+                fill="none"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z"
+                  fill="none"
+                  stroke="url(#introMiddleGradient)"
+                  strokeWidth="2.5"
+                  opacity="0.6"
+                />
+                <defs>
+                  <linearGradient id="introMiddleGradient" x1="140" y1="20" x2="520" y2="560" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#FDF4E8" stopOpacity="0.95" />
+                    <stop offset="1" stopColor="#AF5500" stopOpacity="0.7" />
+                  </linearGradient>
+                </defs>
+              </svg>
+
+              <svg
+                className="intro-blob intro-blob-inner"
+                viewBox="0 0 597 607"
+                fill="none"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M394.019 9.67684C467.955 35.5323 512.078 104.741 541.651 177.27C578.087 266.63 620.121 365.91 573.783 450.559C522.103 544.965 415.308 612.683 308.03 604.039C209.347 596.087 159.326 492.221 100.704 412.441C51.0106 344.812 -14.5781 274.158 5.82117 192.752C25.4836 114.286 117.249 88.9462 190.413 54.4418C256.538 23.2571 325.007 -14.4565 394.019 9.67684Z"
+                  stroke="rgba(175, 85, 0, 0.7)"
+                  strokeWidth="2"
+                  fill="none"
+                />
+              </svg>
+            </div>
+
             {/* Intro Content */}
             <div className="intro-content">
               {/* Coil SVG */}
@@ -470,7 +608,7 @@ export default function Home() {
                 fill="none"
               >
                 <path 
-                  d="M26.4168 1.50037C26.3153 1.546 18.9202 4.51235 16.9078 5.85052C14.8953 7.18868 12.4202 8.01234 10.9202 9.51236C9.42023 11.0124 8.92019 11.5124 6.92021 14.0124C4.92022 16.5124 3.29872 21.0124 2.42021 24.0124C1.54169 27.0124 1.41483 30.8501 1.54169 33.0124C1.67903 35.3533 2.35945 38.7601 4.92022 43.5124C6.74414 46.8972 11.2442 49.4796 13.8322 49.996C16.4202 50.5124 18.6592 51.5876 27.3516 51.4065C30.5874 51.3391 33.5272 50.3174 37.6659 48.861C42.8112 47.0503 45.8731 45.2287 46.7952 44.6319C49.4202 42.9329 50.6765 40.1097 51.39 37.8C51.9398 36.0201 51.1792 34.1978 50.0834 32.8321C48.2852 30.5912 43.5142 29.5747 38.9202 33.5124C35.4202 36.5124 35.0981 37.9497 33.2465 42.0648C31.0265 46.9984 30.649 50.9027 30.5387 52.7799C30.3967 55.1959 30.886 57.0755 31.4161 58.8381C32.5781 62.1963 34.0986 64.9976 35.3568 66.8227C38.8309 71.8617 42.3911 73.0787 44.3932 73.7446C47.1911 74.6752 52.6891 73.4 57.825 71.8084C61.138 70.7816 65.6434 68.5963 68.0727 67.405C70.5019 66.2138 70.6566 65.9003 70.7175 65.5417C70.8435 64.7991 70.4997 63.933 69.9976 63.1524C69.7559 62.7767 69.3057 62.6225 68.9462 62.5451C66.9408 62.1136 64.4581 64.1761 63.6793 65.2848C62.124 67.499 65.2366 70.8731 66.8107 72.2277C69.7286 73.768 71.0565 74.011 72.9323 74.0274C74.2194 74.016 76.1871 73.9648 78.5749 73.4734" 
+                  d="M26.4168 1.50037C26.3153 1.546 18.9202 4.51235 16.9078 5.85052C14.8953 7.18868 12.4202 8.01234 10.9202 9.51236C9.42023 11.0124 8.92019 11.5124 6.92021 14.0124C4.92022 16.5124 3.29872 21.0124 2.42021 24.0124C1.54169 27.0124 1.41483 30.8501 1.54169 33.0124C1.67903 35.3533 2.35945 38.7601 4.92022 43.5124C6.74414 46.8972 11.2442 49.4796 13.8322 49.996C16.4202 50.5124 18.6592 51.5876 27.3516 51.4065C30.5874 51.3391 33.5272 50.3174 37.6659 48.861C42.8112 47.0503 45.8731 45.2287 46.7952 44.6319C49.4202 42.9329 50.6765 40.1097 51.39 37.8C51.9398 36.0201 51.1792 34.1978 50.0834 32.8321C48.2852 30.5912 43.5142 29.5747 38.9202 33.5124C35.4202 36.5124 35.0981 37.9497 33.2465 42.0648C31.0265 46.9984 30.649 50.9027 30.5387 52.7799C30.3967 55.1959 30.8062 57.0755 31.4161 58.8381C32.5781 62.1963 34.0986 64.9976 35.3568 66.8227C38.8309 71.8617 42.3911 73.0787 44.3932 73.7446C47.1911 74.6752 52.6891 73.4 57.825 71.8084C61.138 70.7816 65.6434 68.5963 68.0727 67.405C70.5019 66.2138 70.6566 65.9003 70.7175 65.5417C70.8435 64.7991 70.4997 63.933 69.9976 63.1524C69.7559 62.7767 69.3057 62.6225 68.9462 62.5451C66.9408 62.1136 64.4581 64.1761 63.6793 65.2848C62.124 67.499 65.2366 70.8731 66.8107 72.2277C69.7286 73.768 71.0565 74.011 72.9323 74.0274C74.2194 74.016 76.1871 73.9648 78.5749 73.4734" 
                   stroke="#AF5500" 
                   strokeWidth="3" 
                   strokeLinecap="round"
@@ -492,7 +630,7 @@ export default function Home() {
 
       {/* Only render home-container after mounting to prevent FOUC */}
       {mounted && (
-        <div ref={homeContainerRef} className={`home-container ${!showIntro ? 'visible' : ''}`} style={{ display: showIntro ? 'none' : 'block' }}>
+        <div ref={homeContainerRef} className={`home-container ${!showIntro ? 'visible' : ''}`} style={{ display: 'none' }}>
           {/* Wavy Hair Patterns - Background Image */}
           <div className="wave-patterns"></div>
 

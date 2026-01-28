@@ -9,25 +9,13 @@ import {
   ArrowRight,
   Lightbulb,
   ShoppingBag,
-  Package
+  Package,
+  Sparkles,
+  Search,
+  BookOpen
 } from 'lucide-react';
 import Navbar from '@/app/components/Navbar';
-
-interface SavedRoutine {
-  id: string;
-  createdAt: string;
-  hairAnalysis: any;
-  routine: any;
-  notes?: string;
-}
-
-interface UserProfile {
-  name: string;
-  email: string;
-  hairType: '4a' | '4b' | '4c';
-  hairGoals: string[];
-  savedRoutines?: SavedRoutine[];
-}
+import { normalizeUserProfile, type UserProfile } from '@/types/userProfile';
 
 interface DailyTip {
   id: string;
@@ -46,7 +34,7 @@ export default function Dashboard() {
   useEffect(() => {
     const profile = localStorage.getItem('nywele-user-profile');
     if (profile) {
-      const parsedProfile = JSON.parse(profile);
+      const parsedProfile = normalizeUserProfile(JSON.parse(profile));
       setUserName(parsedProfile.name);
       setUserProfile(parsedProfile);
       
@@ -55,44 +43,64 @@ export default function Dashboard() {
     }
   }, []);
 
+  const dedupeProducts = (products: any[]) => {
+    const seen = new Set<string>();
+
+    return products.filter((product) => {
+      if (!product) return false;
+
+      const key = `${(product.brand || '').toLowerCase()}-${(product.name || '').toLowerCase()}`;
+
+      if (seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+      return true;
+    });
+  };
+
   const getProductRecommendations = (profile: UserProfile) => {
     if (profile.savedRoutines && profile.savedRoutines.length > 0) {
       const latestRoutine = profile.savedRoutines[0];
       if (latestRoutine.routine?.productRecommendations?.essential) {
-        setRecommendedProducts(latestRoutine.routine.productRecommendations.essential.slice(0, 3));
-        return;
+        const uniqueRecommended = dedupeProducts(latestRoutine.routine.productRecommendations.essential).slice(0, 3);
+
+        if (uniqueRecommended.length > 0) {
+          setRecommendedProducts(uniqueRecommended);
+          return;
+        }
       }
     }
 
-    const hairType = profile.hairType;
-    const defaultProducts = [
+    const defaultProducts = dedupeProducts([
       {
         brand: 'Shea Moisture',
         name: 'Strengthen & Restore Leave-In Conditioner',
-        purpose: 'Deep Condition & repair',
+        purpose: 'Moisturises & repairs brittle hair',
         pricing: { currency: 'KES', amount: 2200, size: '312ml' },
-        benefits: ['Deep hydration', 'Repairs damage'],
+        benefits: ['Deep hydration', 'Strengthens weak strands'],
         whereToBuy: ['Carrefour', 'Naivas', 'Online stores']
       },
       {
-        brand: 'Shea Moisture',
-        name: 'Deep Treatment Masque',
-        purpose: 'Deep Condition & repair',
-        pricing: { currency: 'KES', amount: 2200, size: '355ml' },
-        benefits: ['Deep hydration', 'Repairs damage'],
-        whereToBuy: ['Zucchini', 'Healthy U', 'Chandarana']
+        brand: 'Mielle Organics',
+        name: 'Rosemary Mint Scalp & Hair Strengthening Oil',
+        purpose: 'Stimulates the scalp & reduces breakage',
+        pricing: { currency: 'KES', amount: 1850, size: '59ml' },
+        benefits: ['Encourages growth', 'Reduces shedding'],
+        whereToBuy: ['Super Cosmetics', 'Healthy U', 'Online stores']
       },
       {
-        brand: 'Shea Moisture',
-        name: 'Strengthen & Restore Leave-In Conditioner',
-        purpose: 'Deep Condition & repair',
-        pricing: { currency: 'KES', amount: 2200, size: '355ml' },
-        benefits: ['Deep hydration', 'Repairs damage'],
-        whereToBuy: ['Naivas', 'Carrefour', 'Tuskys']
+        brand: "Aunt Jackie's",
+        name: 'Quench Moisture Intensive Leave-In Conditioner',
+        purpose: 'Leave-in hydration for coils & curls',
+        pricing: { currency: 'KES', amount: 1600, size: '355ml' },
+        benefits: ['Softens coils', 'Reduces tangles'],
+        whereToBuy: ['Best Lady', 'Super Cosmetics', 'Jumia']
       }
-    ];
+    ]);
 
-    setRecommendedProducts(defaultProducts);
+    setRecommendedProducts(defaultProducts.slice(0, 3));
   };
 
   const generateDailyTips = (profile: UserProfile) => {
@@ -179,10 +187,10 @@ export default function Dashboard() {
               transition={{ delay: 0.1 }}
               className="mb-12"
             >
-              <div className="rounded-2xl shadow-xl p-8" 
-                style={{ background: '#FDF4E8', border: '2px solid #914600' }}>
-                <h2 className="text-3xl font-bold mb-6" 
-                  style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+              <div className="rounded-2xl shadow-xl p-8"
+                style={{ background: 'rgba(175, 85, 0, 0.7)', border: '2px solid #FDF4E8', backdropFilter: 'blur(6px)' }}>
+                <h2 className="text-3xl font-bold mb-6"
+                  style={{ color: '#FDF4E8', fontFamily: 'Caprasimo, serif' }}>
                   Your Daily Hair Tips
                 </h2>
                 
@@ -193,12 +201,12 @@ export default function Dashboard() {
                       initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 + index * 0.1 }}
-                      className="rounded-xl p-6" 
-                      style={{ background: 'white', border: '2px solid #914600' }}
+                      className="rounded-xl p-6"
+                      style={{ background: 'rgba(253, 244, 232, 0.12)', border: '2px solid #FDF4E8', backdropFilter: 'blur(4px)' }}
                     >
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-bold" 
-                          style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                        <h3 className="text-lg font-bold"
+                          style={{ color: '#FDF4E8', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                           {tip.title}
                   </h3>
                         <span className="px-3 py-1 rounded-full text-xs font-semibold"
@@ -210,8 +218,8 @@ export default function Dashboard() {
                           {tip.category.charAt(0).toUpperCase() + tip.category.slice(1)}
                         </span>
                       </div>
-                      <p className="text-sm" 
-                        style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                      <p className="text-sm"
+                        style={{ color: 'rgba(255, 255, 255, 0.85)', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                         {tip.description}
                       </p>
                     </motion.div>
@@ -321,12 +329,116 @@ export default function Dashboard() {
           </motion.div>
         )}
 
-          {/* Call to Action */}
+          {/* Education-First CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="mb-12"
+          >
+            <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Primary CTA: Understand Your Hair */}
+              <motion.button
+                onClick={() => router.push('/hair-care')}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="lg:col-span-2 rounded-2xl shadow-xl p-8 text-left transition-all hover:shadow-2xl"
+                style={{ 
+                  background: 'linear-gradient(135deg, #643100 0%, #AF5500 100%)',
+                  border: '2px solid #914600'
+                }}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(253, 244, 232, 0.2)' }}>
+                    <Lightbulb size={32} style={{ color: '#FDF4E8' }} />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-3xl font-bold mb-2" 
+                      style={{ color: '#FDF4E8', fontFamily: 'Caprasimo, serif' }}>
+                      Understand Your Hair
+                    </h3>
+                    <p className="mb-4 text-lg" 
+                      style={{ color: 'rgba(253, 244, 232, 0.9)', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                      Get AI-powered hair analysis and personalized care routines
+                    </p>
+                    <div className="flex items-center gap-2 text-white font-semibold">
+                      <span style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Get Started</span>
+                      <ArrowRight size={20} />
+                    </div>
+                  </div>
+                </div>
+              </motion.button>
+
+              {/* Secondary CTA: Check a Product */}
+              <motion.button
+                onClick={() => router.push('/products')}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="rounded-2xl shadow-xl p-6 text-left transition-all hover:shadow-2xl"
+                style={{ 
+                  background: '#FDF4E8',
+                  border: '2px solid #914600'
+                }}
+              >
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
+                  style={{ background: 'rgba(206, 147, 95, 0.2)' }}>
+                  <Search size={24} style={{ color: '#643100' }} />
+                </div>
+                <h4 className="text-xl font-bold mb-2" 
+                  style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                  Check a Product
+                </h4>
+                <p className="text-sm mb-3" 
+                  style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  See if products work with your hair profile
+                </p>
+                <div className="flex items-center gap-2" style={{ color: '#914600' }}>
+                  <span className="text-sm font-semibold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>Explore</span>
+                  <ArrowRight size={16} />
+                </div>
+              </motion.button>
+            </div>
+
+            {/* Tertiary CTA: Style Advisor */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="mt-6"
+            >
+              <button
+                onClick={() => router.push('/style-advisor')}
+                className="w-full rounded-xl shadow-lg p-4 text-left transition-all hover:shadow-xl flex items-center justify-between"
+                style={{ 
+                  background: 'rgba(212, 153, 97, 0.3)',
+                  border: '1px solid #CE935F'
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <Sparkles size={20} style={{ color: '#914600' }} />
+                  <div>
+                    <p className="font-semibold" 
+                      style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                      Get Style Advice
+                    </p>
+                    <p className="text-xs" 
+                      style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                      Check style compatibility and get recommendations
+                    </p>
+                  </div>
+                </div>
+                <ArrowRight size={16} style={{ color: '#914600' }} />
+              </button>
+            </motion.div>
+          </motion.div>
+
+          {/* Call to Action for New Users */}
           {!userProfile && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.6 }}
               className="rounded-2xl shadow-xl p-8 text-center"
               style={{ background: '#FDF4E8', border: '2px solid #914600' }}
             >

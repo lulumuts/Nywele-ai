@@ -42,3 +42,4 @@ next-env.d.ts
 gen-lang-client-0862951522-fde1ac7d48d5.json
 *.json
 .env.local
+.env.local.bak

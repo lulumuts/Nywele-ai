@@ -197,10 +197,36 @@ export async function getProductsForStyle(styleName: string): Promise<{
       };
     }
 
+    // Type for the joined query result
+    type StyleProductQueryResult = {
+      recommendation_type: 'essential' | 'recommended' | 'alternative';
+      quantity: number;
+      notes?: string;
+      priority: number;
+      products: {
+        id: number;
+        brand: string;
+        name: string;
+        category: string;
+        description?: string;
+        estimated_price: number;
+        currency: string;
+        image_url?: string;
+        hair_types?: string[];
+        tags?: string[];
+        length?: string;
+        texture?: string;
+        color_code?: string;
+        color_name?: string;
+        community_rating?: number;
+        expert_rating?: number;
+      };
+    };
+
     // Group products by recommendation type
-    const essential = data
-      .filter(item => item.recommendation_type === 'essential')
-      .map(item => ({
+    const essential = (data as StyleProductQueryResult[])
+      .filter((item: StyleProductQueryResult) => item.recommendation_type === 'essential')
+      .map((item: StyleProductQueryResult) => ({
         ...item.products,
         quantity: item.quantity,
         notes: item.notes,
@@ -208,9 +234,9 @@ export async function getProductsForStyle(styleName: string): Promise<{
         total_cost: item.products.estimated_price * item.quantity
       }));
 
-    const recommended = data
-      .filter(item => item.recommendation_type === 'recommended')
-      .map(item => ({
+    const recommended = (data as StyleProductQueryResult[])
+      .filter((item: StyleProductQueryResult) => item.recommendation_type === 'recommended')
+      .map((item: StyleProductQueryResult) => ({
         ...item.products,
         quantity: item.quantity,
         notes: item.notes,
@@ -218,9 +244,9 @@ export async function getProductsForStyle(styleName: string): Promise<{
         total_cost: item.products.estimated_price * item.quantity
       }));
 
-    const alternative = data
-      .filter(item => item.recommendation_type === 'alternative')
-      .map(item => ({
+    const alternative = (data as StyleProductQueryResult[])
+      .filter((item: StyleProductQueryResult) => item.recommendation_type === 'alternative')
+      .map((item: StyleProductQueryResult) => ({
         ...item.products,
         quantity: item.quantity,
         notes: item.notes,
@@ -229,7 +255,7 @@ export async function getProductsForStyle(styleName: string): Promise<{
       }));
 
     // Calculate total cost for essential products
-    const totalCost = essential.reduce((sum, product) => sum + product.total_cost, 0);
+    const totalCost = essential.reduce((sum: number, product: { total_cost: number }) => sum + product.total_cost, 0);
 
     console.log(`✅ Found products for ${styleName}:`);
     console.log(`   Essential: ${essential.length}`);
@@ -438,4 +464,5 @@ export function formatDuration(days: number): string {
   const weeks = Math.floor(days / 7);
   return `${weeks} ${weeks === 1 ? 'week' : 'weeks'}`;
 }
+
 

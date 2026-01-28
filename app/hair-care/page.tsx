@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import type { HairCareProfile, HairCareRecommendation } from '@/lib/hairCare';
 import Navbar from '@/app/components/Navbar';
+import { normalizeUserProfile, PROFILE_VERSION, type UserProfile } from '@/types/userProfile';
 
 export default function HairCarePage() {
   const hasLoadedRoutine = useRef(false);
@@ -34,17 +35,46 @@ export default function HairCarePage() {
   const [hairImage, setHairImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [hairAnalysis, setHairAnalysis] = useState<any>(null);
+  const [geminiHealth, setGeminiHealth] = useState<any>(null);
   
   // New multi-step state
   const [currentStep, setCurrentStep] = useState(0); // 0=profile check, 1=name/email, 2=upload, 3=analysis, 4=results
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   
   // Active section state
   const [activeSection, setActiveSection] = useState<'routine' | 'maintenance' | 'products' | 'tips'>('routine');
   const [isExpectedResultsOpen, setIsExpectedResultsOpen] = useState(false);
   const [showProfilePrompt, setShowProfilePrompt] = useState(false);
   const [hasProfile, setHasProfile] = useState(true);
+
+  // Helpers: derive richer insights from Vision API output
+  const deriveTexture = (analysis: any): string | null => {
+    if (!analysis) return null;
+    const type = analysis.hairType?.hairType || analysis.hairType || '';
+    if (typeof type === 'string') {
+      if (type.startsWith('4')) return 'coily';
+      if (type.startsWith('3')) return 'curly';
+      if (type.startsWith('2')) return 'wavy';
+      if (type.startsWith('1')) return 'straight';
+    }
+    const labels: any[] = analysis.labels || [];
+    const text = labels.map(l => (l.name || l.description || '').toLowerCase()).join(' ');
+    if (/kinky|coily|afro|tight curl/.test(text)) return 'coily';
+    if (/curl|curly|ringlet|perm/.test(text)) return 'curly';
+    if (/wavy|wave/.test(text)) return 'wavy';
+    if (/straight/.test(text)) return 'straight';
+    return null;
+  };
+
+  const healthStatus = (score?: number): string => {
+    if (typeof score !== 'number') return 'unknown';
+    if (score >= 80) return 'excellent';
+    if (score >= 70) return 'healthy';
+    if (score >= 55) return 'needs care';
+    return 'damaged';
+  };
 
   // Check for profile on mount and load viewing routine if exists
   useEffect(() => {
@@ -96,9 +126,10 @@ export default function HairCarePage() {
       setCurrentStep(0);
     } else {
       // If profile exists, skip to upload step
-      const parsedProfile = JSON.parse(profile);
+      const parsedProfile = normalizeUserProfile(JSON.parse(profile));
       setUserName(parsedProfile.name);
       setUserEmail(parsedProfile.email);
+      setUserProfile(parsedProfile);
       setCurrentStep(2);
     }
   }, []);
@@ -110,11 +141,30 @@ export default function HairCarePage() {
     }
     
     // Create basic profile
-    const basicProfile = {
-      name: userName,
-      email: userEmail,
-      hairType: '4c', // Default, will be detected
+    const basicProfile: UserProfile = {
+      profileVersion: PROFILE_VERSION,
+      name: userName.trim(),
+      email: userEmail.trim(),
+      hairType: '4c', // Default, will be detected later
       hairGoals: ['moisture', 'growth'],
+      hairPorosity: '',
+      hairLength: '',
+      currentConcerns: [],
+      hairDensity: '',
+      strandThickness: '',
+      elasticity: '',
+      scalpCondition: '',
+      ingredientAllergies: [],
+      ingredientSensitivities: [],
+      preferredProductAttributes: [],
+      washFrequencyPerWeek: null,
+      protectiveStyleFrequency: '',
+      activityLevel: '',
+      waterExposure: '',
+      budget: '',
+      climate: '',
+      currentRegimenNotes: '',
+      createdAt: new Date().toISOString(),
       savedRoutines: []
     };
     
@@ -142,24 +192,25 @@ export default function HairCarePage() {
     }
 
     try {
-    const profile = JSON.parse(storedProfile);
+      const profile = normalizeUserProfile(JSON.parse(storedProfile));
       console.log('Parsed profile:', profile);
 
-    const newRoutine = {
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      hairAnalysis: hairAnalysis,
-      routine: recommendation,
-      notes: ''
-    };
+      const newRoutine = {
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString(),
+        hairAnalysis: hairAnalysis,
+        routine: recommendation,
+        notes: ''
+      };
 
-    if (!profile.savedRoutines) {
-      profile.savedRoutines = [];
-    }
-      profile.savedRoutines.unshift(newRoutine);
+      const updatedProfile: UserProfile = {
+        ...profile,
+        profileVersion: PROFILE_VERSION,
+        savedRoutines: [newRoutine, ...(profile.savedRoutines || [])]
+      };
 
-    localStorage.setItem('nywele-user-profile', JSON.stringify(profile));
-      console.log('Routine saved successfully. Total routines:', profile.savedRoutines.length);
+      localStorage.setItem('nywele-user-profile', JSON.stringify(updatedProfile));
+      console.log('Routine saved successfully. Total routines:', updatedProfile.savedRoutines?.length ?? 0);
 
       alert('✅ Routine saved successfully! View it in your profile.');
     } catch (error) {
@@ -192,23 +243,77 @@ export default function HairCarePage() {
           const result = await response.json();
           
           if (result.success) {
-            setHairAnalysis(result.data);
-            console.log('✅ Hair analysis complete:', result.data);
+            const analysisData = result.data;
+            
+            // Enhance the analysis with extracted characteristics
+            const enhancedAnalysis = {
+              ...analysisData,
+              // Use extracted characteristics, but prioritize hair type detection for texture
+              texture: (() => {
+                // If hair type is 4a/4b/4c, texture should be coily
+                const hairType = analysisData.hairType?.hairType || analysisData.hairType;
+                if (hairType && typeof hairType === 'string' && hairType.toLowerCase().startsWith('4')) {
+                  return 'coily';
+                }
+                // Otherwise use extracted characteristics
+                return analysisData.extractedCharacteristics?.texture || 
+                       deriveTexture(analysisData) || 
+                       null;
+              })(),
+              // Enhance length if not detected
+              length: analysisData.length || 
+                      (analysisData.extractedCharacteristics?.length ? {
+                        length: analysisData.extractedCharacteristics.length,
+                        confidence: 0.7
+                      } : null),
+              // Enhance density if not detected
+              density: analysisData.density || 
+                       (analysisData.extractedCharacteristics?.density ? {
+                         density: analysisData.extractedCharacteristics.density,
+                         confidence: 0.7
+                       } : null),
+            };
+            
+            setHairAnalysis(enhancedAnalysis);
+            console.log('✅ Hair analysis complete:', enhancedAnalysis);
+            console.log('📊 Extracted characteristics:', analysisData.extractedCharacteristics);
+            console.log('🎨 UI Display Values:');
+            console.log('  - Hair Type:', enhancedAnalysis.hairType?.hairType || enhancedAnalysis.hairType);
+            console.log('  - Texture:', enhancedAnalysis.texture);
+            console.log('  - Health:', enhancedAnalysis.health?.healthScore || enhancedAnalysis.health?.score);
+            console.log('  - Length:', enhancedAnalysis.length?.length || enhancedAnalysis.extractedCharacteristics?.length);
+            console.log('  - Density:', enhancedAnalysis.density?.density || enhancedAnalysis.extractedCharacteristics?.density);
+            console.log('  - Overall Quality:', enhancedAnalysis.overallQuality);
+
+            // Enrich with Gemini health analysis
+            try {
+              console.log('🔍 Calling Gemini hair-health API...');
+              const hh = await fetch('/api/hair-health', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64Image }),
+              });
+              console.log('📥 Gemini API response status:', hh.status);
+              const hhJson = await hh.json();
+              console.log('📥 Gemini API response:', hhJson);
+              if (hhJson.success && hhJson.data) {
+                setGeminiHealth(hhJson.data);
+                console.log('✅ Gemini hair-health set:', hhJson.data);
+              } else {
+                console.warn('⚠️ Gemini API returned unsuccessful:', hhJson);
+                setGeminiHealth(null);
+              }
+            } catch (e) {
+              console.error('❌ Gemini hair-health failed:', e);
+              setGeminiHealth(null);
+            }
           } else {
-            console.warn('⚠️ Analysis failed, using defaults');
-            setHairAnalysis({
-              hairType: { hairType: '4c', texture: 'coily', confidence: 0.8 },
-              health: { healthScore: 65, indicators: [] },
-              detectedStyle: { style: 'natural', confidence: 0.5 }
-            });
+            console.warn('⚠️ Analysis failed; Vision API not configured or returned error');
+            setHairAnalysis({});
           }
         } catch (error) {
           console.error('❌ Analysis error:', error);
-          setHairAnalysis({
-            hairType: { hairType: '4c', texture: 'coily', confidence: 0.8 },
-            health: { healthScore: 65, indicators: [] },
-            detectedStyle: { style: 'natural', confidence: 0.5 }
-          });
+          setHairAnalysis({});
         } finally {
           setIsAnalyzing(false);
         }
@@ -228,9 +333,9 @@ export default function HairCarePage() {
     try {
       const profile: HairCareProfile = {
         hairAnalysis: {
-          type: hairAnalysis.hairType?.hairType || hairAnalysis.hairType || '4c',
-          health: hairAnalysis.health?.healthScore || hairAnalysis.health?.score || 65,
-          texture: hairAnalysis.hairType?.texture || hairAnalysis.texture || 'coily',
+          type: hairAnalysis.hairType?.hairType || hairAnalysis.hairType || 'unknown',
+          health: hairAnalysis.health?.healthScore || hairAnalysis.health?.score || 60,
+          texture: hairAnalysis.hairType?.texture || deriveTexture(hairAnalysis) || 'unknown',
           density: hairAnalysis.hairType?.density || hairAnalysis.density || 'thick',
           porosity: hairAnalysis.hairType?.porosity || hairAnalysis.porosity || 'low',
           elasticity: 'medium',
@@ -241,12 +346,15 @@ export default function HairCarePage() {
           installedDate: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
           maintenanceDue: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000),
         },
-        goals: ['growth', 'moisture', 'strength'],
-        concerns: hairAnalysis.concerns || ['dryness'],
+        goals: (userProfile?.hairGoals || ['growth', 'moisture', 'strength']) as Array<"growth" | "moisture" | "strength" | "shine" | "protective">,
+        concerns: userProfile?.currentConcerns || hairAnalysis.concerns || ['dryness'],
         lifestyle: {
-          activity: 'moderate',
-          climate: 'dry',
-          budget: { min: 2000, max: 5000 },
+          activity: (userProfile?.activityLevel || 'moderate') as 'low' | 'moderate' | 'high',
+          climate: (userProfile?.climate || 'temperate') as 'humid' | 'dry' | 'temperate',
+          budget: { 
+            min: userProfile?.budget === 'low' ? 1000 : userProfile?.budget === 'high' ? 5000 : 2500,
+            max: userProfile?.budget === 'low' ? 3000 : userProfile?.budget === 'high' ? 10000 : 8000
+          },
         },
         allergies: [],
       };
@@ -308,6 +416,35 @@ export default function HairCarePage() {
   return (
     <>
       <Navbar />
+      
+      {/* Progress Indicator */}
+      {currentStep > 0 && currentStep < 4 && (
+        <div className="sticky top-16 z-40 backdrop-blur-sm border-b" style={{ borderColor: 'rgba(145, 70, 0, 0.2)', backgroundColor: 'rgba(253, 244, 232, 0.95)' }}>
+          <div className="max-w-4xl mx-auto px-4 py-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                {currentStep === 1 && 'Step 1: Enter Your Details'}
+                {currentStep === 2 && 'Step 2: Upload Photo'}
+                {currentStep === 3 && 'Step 3: Analyzing Your Hair'}
+                {currentStep === 4 && 'Complete!'}
+              </span>
+              <span className="text-xs" style={{ color: '#914600' }}>
+                {currentStep} of 4
+              </span>
+            </div>
+            <div className="w-full h-2 rounded-full" style={{ backgroundColor: 'rgba(206, 147, 95, 0.3)' }}>
+              <div 
+                className="h-2 rounded-full transition-all duration-300"
+                style={{ 
+                  width: `${(currentStep / 4) * 100}%`,
+                  backgroundColor: '#643100'
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="min-h-screen relative" style={{ background: '#FDF4E8' }}>
         {/* Wavy Background Pattern */}
         <div style={{
@@ -549,103 +686,37 @@ export default function HairCarePage() {
                   </div>
                 </div>
                 
-                {/* Centered Loader Overlay */}
+                {/* Improved Loading State with Time Estimate */}
                 {(isAnalyzing || loading) && (
-                  <div className="absolute inset-0 flex items-center justify-center z-20">
-                    <div style={{ position: 'relative', width: '300px', height: '300px' }}>
-                      {/* Outer Blob - Stroke Only */}
-                      <svg 
-                        style={{ 
-                          position: 'absolute',
-                          left: '50%',
-                          top: '50%',
-                          transform: 'translate(-50%, -50%)',
-                          animation: 'blob-pulse 2s ease-in-out infinite',
-                          width: '240px',
-                          height: '240px',
-                          overflow: 'visible',
-                          opacity: 0.3
-                        }}
-                        viewBox="0 0 620 603" 
-                        fill="none"
-                        preserveAspectRatio="xMidYMid meet"
-                      >
-                        <path 
-                          fillRule="evenodd" 
-                          clipRule="evenodd" 
-                          d="M336.327 1.48572C414.231 9.60864 473.115 66.7872 518.604 130.55C574.65 209.11 638.43 296.033 612.844 389.082C584.309 492.855 495.991 583.359 389.609 599.667C291.749 614.669 219.14 525.124 143.712 460.998C79.7729 406.64 -0.331203 353.001 0.761041 269.085C1.81384 188.2 85.2711 142.397 148.515 91.962C205.675 46.3795 263.612 -6.09616 336.327 1.48572Z" 
-                          stroke="#643100" 
-                          strokeWidth="2"
-                          fill="none"
-                        />
-                      </svg>
-
-                      {/* Middle Blob - Stroke Only */}
-                      <svg 
+                  <div className="absolute inset-0 flex items-center justify-center z-20 bg-white/80 backdrop-blur-sm">
+                    <div className="text-center max-w-md px-4">
+                      <div className="mb-6">
+                        <Loader className="animate-spin mx-auto mb-4" size={48} style={{ color: '#643100' }} />
+                        <h3 className="text-2xl font-bold mb-2" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                          {isAnalyzing ? 'Analyzing Your Hair' : 'Generating Your Routine'}
+                        </h3>
+                        <p className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          {isAnalyzing ? 'This usually takes 30-45 seconds' : 'This usually takes 20-30 seconds'}
+                        </p>
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="w-full h-2 rounded-full mb-4" style={{ backgroundColor: 'rgba(206, 147, 95, 0.3)' }}>
+                        <div 
+                          className="h-2 rounded-full transition-all duration-300"
                         style={{
-                          position: 'absolute',
-                          left: '50%',
-                          top: '50%',
-                          transform: 'translate(-50%, -50%)',
-                          animation: 'blob-pulse 2s ease-in-out infinite 0.3s',
-                          width: '240px',
-                          height: '240px',
-                          overflow: 'visible',
-                          opacity: 0.5
-                        }}
-                        viewBox="0 0 604 606" 
-                        fill="none"
-                        preserveAspectRatio="xMidYMid meet"
-                      >
-                        <path 
-                          fillRule="evenodd" 
-                          clipRule="evenodd" 
-                          d="M377.17 5.77053C452.755 26.3143 501.678 92.217 536.323 162.465C579.008 249.014 627.981 345.062 587.766 432.786C542.917 530.62 441.195 605.745 333.575 604.736C234.577 603.807 177.311 503.753 113.175 428.333C58.8083 364.4 -11.6287 298.579 2.94255 215.931C16.9875 136.267 106.724 104.48 177.255 64.8706C241 29.0722 306.62 -13.4049 377.17 5.77053Z" 
-                          stroke="#643100" 
-                          strokeWidth="2"
-                          fill="none"
+                            width: isAnalyzing ? '60%' : '80%',
+                            backgroundColor: '#643100',
+                            animation: 'pulse 2s ease-in-out infinite'
+                          }}
                         />
-                      </svg>
-
-                      {/* Inner Blob - Stroke Only */}
-                      <svg 
-                        style={{
-                          position: 'absolute',
-                          left: '50%',
-                          top: '50%',
-                          transform: 'translate(-50%, -50%)',
-                          animation: 'blob-pulse 2s ease-in-out infinite 0.6s',
-                          width: '240px',
-                          height: '240px',
-                          overflow: 'visible',
-                          opacity: 0.7
-                        }}
-                        viewBox="0 0 624 605" 
-                        fill="none"
-                        preserveAspectRatio="xMidYMid meet"
-                      >
-                        <path 
-                          fillRule="evenodd" 
-                          clipRule="evenodd" 
-                          d="M390.524 3.70487C463.396 17.8137 515.846 77.3794 554.759 140.765C602.232 218.935 657.832 306.799 638.118 397.175C615.532 500.107 533.028 589.582 428.839 602.686C333.506 614.635 256.959 528.525 178.009 468.089C109.669 416.261 23.8254 368.185 7.61277 286.486C-7.94113 207.589 65.6438 152.13 128.074 97.3488C184.523 47.5069 322.675 -9.48221 390.524 3.70487Z" 
-                          stroke="#643100" 
-                          strokeWidth="2"
-                          fill="none"
-                        />
-                      </svg>
-
-                      {/* Loading Text */}
-                      <div style={{
-                        position: 'absolute',
-                        left: '50%',
-                        top: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        textAlign: 'center'
-                      }}>
-                        <span className="text-2xl font-bold" 
-                          style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-                          Loading...
-                        </span>
+                      </div>
+                      
+                      {/* Skeleton Cards */}
+                      <div className="space-y-3">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="h-20 rounded-lg animate-pulse" style={{ backgroundColor: 'rgba(206, 147, 95, 0.2)' }} />
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -666,7 +737,7 @@ export default function HairCarePage() {
                     </div>
 
                     {/* Right Section - Analysis Panel without Image */}
-                    <div className="flex flex-col justify-center space-y-6">
+                    <div className="flex flex-col justify-center space-y-6 max-h-[80vh] overflow-y-auto pr-2">
                       {hairAnalysis && (
                         /* Analysis Complete */
                         <div className="rounded-xl p-6"
@@ -674,91 +745,381 @@ export default function HairCarePage() {
                           <h3 className="text-lg font-bold mb-4 flex items-center gap-2" 
                             style={{ color: '#FDF4E8', fontFamily: 'Caprasimo, serif' }}>
                             <CheckCircle style={{ color: '#FDF4E8' }} />
-                        Analysis Complete
-                      </h3>
-                          <div className="grid grid-cols-2 gap-3 mb-4">
-                            <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
-                              <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                            Comprehensive Analysis Complete
+                            {geminiHealth && <span className="text-xs ml-auto" style={{ color: '#FDF4E8' }}>✨ Enhanced</span>}
+                          </h3>
+                          
+                          <div className="space-y-4">
+                            {/* Debug indicator - remove in production */}
+                            {process.env.NODE_ENV === 'development' && (
+                              <div className="rounded-lg p-2 text-xs" style={{ background: '#fee2e2', border: '1px solid #dc2626' }}>
+                                <p>Debug: geminiHealth = {geminiHealth ? '✅ Set' : '❌ Not set'}</p>
+                                <p>hairAnalysis keys: {Object.keys(hairAnalysis || {}).join(', ')}</p>
+                              </div>
+                            )}
+                            
+                            {/* Overall Quality Score - Highlighted */}
+                            {typeof hairAnalysis.overallQuality === 'number' && (
+                              <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, #FDF4E8 0%, #E7B58D 100%)', border: '2px solid #914600' }}>
+                                <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  Overall Quality Score
+                                </p>
+                                <p className="text-4xl font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                  {hairAnalysis.overallQuality}/100
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Primary Metrics Grid */}
+                            <div className="grid grid-cols-2 gap-3">
+                              {/* Hair Type */}
+                              <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                                <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                 Hair Type
                               </p>
-                              <p className="text-2xl font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-                            {hairAnalysis.hairType?.hairType || hairAnalysis.hairType || '4c'}
+                                <div className="flex items-baseline gap-2">
+                                  <p className="text-2xl font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                    {(hairAnalysis.hairType?.hairType || hairAnalysis.hairType || 'Unknown').toString().toUpperCase()}
                           </p>
+                                  {typeof hairAnalysis.hairType?.confidence === 'number' && (
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: '#FDF4E8', color: '#643100' }}>
+                                      {Math.round(hairAnalysis.hairType.confidence * 100)}%
+                                    </span>
+                                  )}
                         </div>
-                            <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
-                              <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                Health Score
+                              </div>
+
+                              {/* Health Score */}
+                              <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                                <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  Health
+                                </p>
+                                <div className="flex items-baseline gap-2">
+                                  <p className="text-2xl font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                    {(hairAnalysis.health?.healthScore || hairAnalysis.health?.score || 60)}/100
+                                  </p>
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full capitalize" style={{ background: '#FDF4E8', color: '#643100' }}>
+                                    {healthStatus(hairAnalysis.health?.healthScore ?? hairAnalysis.health?.score)}
+                                  </span>
+                        </div>
+                              </div>
+
+                              {/* Length */}
+                              {(hairAnalysis.length || hairAnalysis.extractedCharacteristics?.length) && (
+                                <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                                  <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                    Length
+                                  </p>
+                                  <p className="text-xl font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                    {hairAnalysis.length?.length || hairAnalysis.extractedCharacteristics?.length || 'Unknown'}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Density */}
+                              {(hairAnalysis.density || hairAnalysis.extractedCharacteristics?.density) && (
+                                <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                                  <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                    Density
+                                  </p>
+                                  <p className="text-xl font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                    {hairAnalysis.density?.density || hairAnalysis.extractedCharacteristics?.density || 'Unknown'}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Texture */}
+                              <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                                <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  Texture
+                                </p>
+                                <p className="text-xl font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                  {hairAnalysis.texture || 
+                                   hairAnalysis.extractedCharacteristics?.texture || 
+                                   deriveTexture(hairAnalysis) || 
+                                   'Unknown'}
+                                </p>
+                              </div>
+
+                              {/* Volume */}
+                              {hairAnalysis.volume && (
+                                <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                                  <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                    Volume
+                                  </p>
+                                  <p className="text-xl font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                    {hairAnalysis.volume.volume}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Condition Metrics */}
+                            <div className="grid grid-cols-2 gap-3">
+                              {/* Shine */}
+                              {hairAnalysis.shine && (
+                                <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                                  <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                    Shine
+                                  </p>
+                                  <p className="text-lg font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                    {hairAnalysis.shine.level}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Frizz */}
+                              {hairAnalysis.frizz && (
+                                <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                                  <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                    Frizz
+                                  </p>
+                                  <p className="text-lg font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                    {hairAnalysis.frizz.level}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Gemini Health Score (progress bar) */}
+                            {geminiHealth?.healthScore !== undefined && (
+                              <div className="rounded-lg p-4" style={{ background: 'white', border: '2px solid #914600' }}>
+                                <p className="text-sm mb-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Health Score</p>
+                                <div className="w-full h-3 rounded-full" style={{ background: '#FDF4E8', border: '1px solid #E7B58D' }}>
+                                  <div
+                                    className="h-3 rounded-full"
+                                    style={{
+                                      width: `${Math.max(0, Math.min(100, geminiHealth.healthScore))}%`,
+                                      background: geminiHealth.healthScore >= 70 ? '#16a34a' : geminiHealth.healthScore >= 50 ? '#f59e0b' : '#dc2626',
+                                    }}
+                                  />
+                                </div>
+                                <p className="text-xs mt-1" style={{ color: '#643100' }}>{geminiHealth.healthScore}/100</p>
+                              </div>
+                            )}
+
+                            {/* Hair Characteristics (Gemini) */}
+                            {geminiHealth && (
+                              <div className="rounded-lg p-4 space-y-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                                <p className="text-sm font-semibold" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Hair Characteristics</p>
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div>
+                                    <p className="text-xs" style={{ color: '#914600' }}>Curl Pattern</p>
+                                    <p className="text-sm font-semibold capitalize" style={{ color: '#643100' }}>{geminiHealth.curlPattern?.type || 'Unknown'}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs" style={{ color: '#914600' }}>Porosity</p>
+                                    <p className="text-sm font-semibold capitalize" style={{ color: '#643100' }}>{geminiHealth.porosity || 'Unknown'}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs" style={{ color: '#914600' }}>Strand Thickness</p>
+                                    <p className="text-sm font-semibold capitalize" style={{ color: '#643100' }}>{geminiHealth.strandThickness || 'Unknown'}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs" style={{ color: '#914600' }}>Density</p>
+                                    <p className="text-sm font-semibold capitalize" style={{ color: '#643100' }}>{geminiHealth.density || 'Unknown'}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs" style={{ color: '#914600' }}>Length</p>
+                                    <p className="text-sm font-semibold capitalize" style={{ color: '#643100' }}>{geminiHealth.length || 'Unknown'}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Health Indicators (severity color-coded) */}
+                            {geminiHealth && (
+                              <div className="rounded-lg p-4 space-y-3" style={{ background: 'white', border: '2px solid #914600' }}>
+                                <p className="text-sm font-semibold" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Health Indicators</p>
+                                <div className="grid grid-cols-2 gap-3">
+                                  {[
+                                    { label: 'Moisture', key: 'moistureLevel' },
+                                    { label: 'Protein Balance', key: 'proteinBalance' },
+                                    { label: 'Scalp Health', key: 'scalpHealth' },
+                                    { label: 'SSKs', key: 'ssks' },
+                                    { label: 'Split Ends', key: 'splitEnds' },
+                                    { label: 'Heat Damage', key: 'heatDamage' },
+                                    { label: 'Chemical Processing', key: 'chemicalProcessing' },
+                                  ].map((item, i) => {
+                                    const val = geminiHealth[item.key];
+                                    const severity = typeof val === 'string' ? val.toLowerCase() : '';
+                                    const bg = severity.includes('none') || severity.includes('balanced') || severity.includes('well') ? '#dcfce7' : severity.includes('moderate') || severity.includes('dry') || severity.includes('oily') ? '#fef9c3' : '#fee2e2';
+                                    return (
+                                      <div key={i} className="rounded-md p-2" style={{ background: bg, border: '1px solid #E7B58D' }}>
+                                        <p className="text-xs" style={{ color: '#914600' }}>{item.label}</p>
+                                        <p className="text-sm font-semibold capitalize" style={{ color: '#643100' }}>{val || 'Unknown'}</p>
+                                      </div>
+                                    );
+                                  })}
+                                  {Array.isArray(geminiHealth.breakagePoints) && (
+                                    <div className="rounded-md p-2" style={{ background: '#fef9c3', border: '1px solid #E7B58D' }}>
+                                      <p className="text-xs" style={{ color: '#914600' }}>Breakage Points</p>
+                                      <div className="flex flex-wrap gap-2 mt-1">
+                                        {geminiHealth.breakagePoints.map((bp: string, idx: number) => (
+                                          <span key={idx} className="text-xs px-2 py-0.5 rounded-full capitalize" style={{ background: 'white', color: '#643100', border: '1px solid #E7B58D' }}>{bp}</span>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Recommendations (expandable) */}
+                            {geminiHealth?.recommendations && (
+                              <details className="rounded-lg p-4" style={{ background: 'white', border: '2px solid #914600' }}>
+                                <summary className="cursor-pointer text-sm font-semibold" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Recommendations</summary>
+                                <div className="mt-3 space-y-3">
+                                  {Array.isArray(geminiHealth.recommendations.immediate) && (
+                                    <div>
+                                      <p className="text-xs mb-1" style={{ color: '#914600' }}>Immediate Actions</p>
+                                      <ul className="list-disc list-inside text-sm" style={{ color: '#643100' }}>
+                                        {geminiHealth.recommendations.immediate.map((r: string, i: number) => <li key={i}>{r}</li>)}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  {Array.isArray(geminiHealth.recommendations.products) && (
+                                    <div>
+                                      <p className="text-xs mb-1" style={{ color: '#914600' }}>Product Suggestions</p>
+                                      <ul className="list-disc list-inside text-sm" style={{ color: '#643100' }}>
+                                        {geminiHealth.recommendations.products.map((r: string, i: number) => <li key={i}>{r}</li>)}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  {Array.isArray(geminiHealth.recommendations.techniques) && (
+                                    <div>
+                                      <p className="text-xs mb-1" style={{ color: '#914600' }}>Techniques</p>
+                                      <ul className="list-disc list-inside text-sm" style={{ color: '#643100' }}>
+                                        {geminiHealth.recommendations.techniques.map((r: string, i: number) => <li key={i}>{r}</li>)}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  {geminiHealth.recommendations.schedule && (
+                                    <div>
+                                      <p className="text-xs mb-1" style={{ color: '#914600' }}>Maintenance Schedule</p>
+                                      <p className="text-sm" style={{ color: '#643100' }}>{geminiHealth.recommendations.schedule}</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </details>
+                            )}
+
+                            {/* Damage Assessment */}
+                            {hairAnalysis.damage && hairAnalysis.damage.severity !== 'none' && (
+                              <div className="rounded-lg p-4" style={{ background: hairAnalysis.damage.severity === 'severe' ? '#fee2e2' : hairAnalysis.damage.severity === 'moderate' ? '#fef3c7' : '#f0fdf4', border: '2px solid #914600' }}>
+                                <p className="text-sm font-bold mb-2 capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                  Damage: {hairAnalysis.damage.severity}
+                                </p>
+                                {hairAnalysis.damage.damageTypes.length > 0 && (
+                                  <div className="flex flex-wrap gap-2">
+                                    {hairAnalysis.damage.damageTypes.map((type: string, i: number) => (
+                                      <span key={i} className="text-xs px-2 py-1 rounded-full capitalize" style={{ background: 'white', color: '#643100', border: '1px solid #E7B58D' }}>
+                                        {type}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Detected Style */}
+                            {hairAnalysis.detectedStyle?.style && (
+                            <div className="rounded-lg p-4" style={{ background: 'white', border: '2px solid #914600' }}>
+                              <p className="text-sm mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  Detected Style
                               </p>
-                              <p className="text-2xl font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-                            {hairAnalysis.health?.healthScore || hairAnalysis.health?.score || 65}/100
+                                <div className="flex items-baseline gap-2">
+                                  <p className="text-xl font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                    {hairAnalysis.detectedStyle.style.replace(/-/g, ' ')}
                           </p>
+                                  {typeof hairAnalysis.detectedStyle.confidence === 'number' && (
+                                    <span className="text-xs px-2 py-1 rounded-full" style={{ background: '#FDF4E8', color: '#643100', border: '1px solid #E7B58D' }}>
+                                      {Math.round(hairAnalysis.detectedStyle.confidence * 100)}%
+                                    </span>
+                                  )}
                         </div>
-                            {(hairAnalysis.hairType?.density || hairAnalysis.density || hairAnalysis.characteristics?.density) && (
+                              </div>
+                            )}
+
+                            {/* Color Treatment */}
+                            {hairAnalysis.colorTreatment && hairAnalysis.colorTreatment.hasColorTreatment && (
                               <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
                                 <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                  Density
+                                  Color Treatment
                                 </p>
-                                <p className="text-xl font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-                                  {hairAnalysis.hairType?.density || hairAnalysis.density || hairAnalysis.characteristics?.density || 'medium'}
+                                <p className="text-lg font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                  {hairAnalysis.colorTreatment.treatmentType}
                                 </p>
                               </div>
                             )}
-                            {(hairAnalysis.hairType?.porosity || hairAnalysis.porosity || hairAnalysis.characteristics?.porosity) && (
+
+                            {/* Product Residues */}
+                            {hairAnalysis.productResidues && hairAnalysis.productResidues.visible && (
                               <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
                                 <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                  Porosity
+                                  Products Detected
                                 </p>
-                                <p className="text-xl font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-                                  {hairAnalysis.hairType?.porosity || hairAnalysis.porosity || hairAnalysis.characteristics?.porosity || 'medium'}
-                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  {hairAnalysis.productResidues.products.map((product: string, i: number) => (
+                                    <span key={i} className="text-xs px-2 py-1 rounded-full capitalize" style={{ background: '#FDF4E8', color: '#643100', border: '1px solid #E7B58D' }}>
+                                      {product}
+                                    </span>
+                                  ))}
+                                </div>
                               </div>
                             )}
-                            {hairAnalysis.health?.moisture && (
+
+                            {/* Scalp Health */}
+                            {hairAnalysis.scalp && hairAnalysis.scalp.visible && (
                               <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
                                 <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                  Moisture
+                                  Scalp Visibility
                                 </p>
-                                <p className="text-xl font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-                                  {hairAnalysis.health.moisture}
-                                </p>
+                                {hairAnalysis.scalp.health && (
+                                  <p className="text-sm font-semibold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                                    {hairAnalysis.scalp.health}
+                                  </p>
+                                )}
+                                {hairAnalysis.scalp.concerns.length > 0 && (
+                                  <div className="flex flex-wrap gap-2 mt-2">
+                                    {hairAnalysis.scalp.concerns.map((concern: string, i: number) => (
+                                      <span key={i} className="text-xs px-2 py-1 rounded-full capitalize" style={{ background: '#fee2e2', color: '#643100' }}>
+                                        {concern}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             )}
-                            {hairAnalysis.health?.damage && hairAnalysis.health.damage !== 'none' && (
-                              <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid #914600' }}>
-                                <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                  Damage
-                                </p>
-                                <p className="text-xl font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-                                  {hairAnalysis.health.damage}
-                                </p>
+
+                            {/* Top Features Labels */}
+                            {(Array.isArray(hairAnalysis.labels) && hairAnalysis.labels.length > 0) && (
+                              <div className="rounded-lg p-4 space-y-2" style={{ background: 'white', border: '2px solid #914600' }}>
+                                <p className="text-sm font-semibold" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Detected Features</p>
+                                <div className="flex flex-wrap gap-2">
+                                  {hairAnalysis.labels.slice(0, 10).map((l: any, i: number) => (
+                                    <span key={i} className="text-xs px-2 py-1 rounded-full" style={{ background: '#FDF4E8', color: '#643100', border: '1px solid #E7B58D' }}>
+                                      {(l.name || l.description || '').toString()}
+                                    </span>
+                                  ))}
+                                </div>
                               </div>
                             )}
-                          </div>
-                          
-                          {/* Current Style */}
-                          {(hairAnalysis.detectedStyle?.style || hairAnalysis.characteristics?.currentStyle) && (
-                            <div className="rounded-lg p-4 mb-4" style={{ background: 'white', border: '2px solid #914600' }}>
-                              <p className="text-xs mb-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                Current Style
-                              </p>
-                              <p className="text-lg font-bold capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-                                {hairAnalysis.detectedStyle?.style || hairAnalysis.characteristics?.currentStyle}
-                              </p>
-                            </div>
-                          )}
-                          
-                          {/* Description */}
-                          {hairAnalysis.description && (
-                            <div className="rounded-lg p-4" style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
-                              <p className="text-xs mb-2" style={{ color: 'rgba(255, 255, 255, 0.8)', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                Analysis Notes
-                              </p>
-                              <p className="text-sm" style={{ color: '#FDF4E8', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                {hairAnalysis.description}
-                              </p>
-                            </div>
-                          )}
+
+                            {/* Dominant Colors */}
+                            {(Array.isArray(hairAnalysis.colors) && hairAnalysis.colors.length > 0) && (
+                              <div className="rounded-lg p-4 space-y-2" style={{ background: 'white', border: '2px solid #914600' }}>
+                                <p className="text-sm font-semibold" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Dominant Colors</p>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  {hairAnalysis.colors.slice(0, 6).map((c: any, i: number) => (
+                                    <div key={i} className="w-8 h-8 rounded-full border-2 shadow-sm" title={`${Math.round((c.score || 0) * 100)}%`}
+                                      style={{ background: `rgb(${c.color?.red || 0}, ${c.color?.green || 0}, ${c.color?.blue || 0})`, borderColor: '#E7B58D' }} />
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                       </div>
+                        </div>
                       )}
 
                       {/* Action Buttons - Only show when analysis is complete and not loading routine */}

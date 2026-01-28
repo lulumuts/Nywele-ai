@@ -11,6 +11,17 @@ const bricolage = Bricolage_Grotesque({
 export const metadata: Metadata = {
   title: "Nywele.ai - AI-Powered African Hair Care",
   description: "Personalized hair care routines, styling recommendations, and product suggestions for African hair",
+  icons: {
+    icon: [
+      { url: "/coil.svg", type: "image/svg+xml" }
+    ],
+    shortcut: [
+      { url: "/coil.svg", type: "image/svg+xml" }
+    ],
+    apple: [
+      { url: "/coil.svg" }
+    ]
+  }
 };
 
 export default function RootLayout({

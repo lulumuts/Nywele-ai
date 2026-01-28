@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Donut with Flattened Braided Sections</title>
+<style>
+body { margin: 0; background: black; overflow: hidden; }
+canvas { display: block; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.168.0/build/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+
+const scene = new THREE.Scene();
+
+// --- Camera ---
+const aspect = innerWidth / innerHeight;
+const zoom = 3;
+const camera = new THREE.OrthographicCamera(
+  -aspect*zoom, aspect*zoom,
+  zoom, -zoom,
+  0.1, 100
+);
+camera.position.set(5, 5, 5);
+camera.lookAt(0, 0, 0);
+
+// --- Renderer ---
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setClearColor(0x000000);
+document.body.appendChild(renderer.domElement);
+
+// --- Donut parameters ---
+const R = 1.5;
+const r = 0.3;
+const numPoints = 600;
+const numStrands = 3;
+const braidMeshes = [];
+const donutGroup = new THREE.Group();
+scene.add(donutGroup);
+
+// --- Braid parameters ---
+const braidWidth = Math.PI / 24;
+const baseBraidAmplitude = 0.02; // flattened braid height
+const phaseOffsets = [0, 2/3*Math.PI, 4/3*Math.PI];
+const amplitudeOffsets = [1.0, 0.95, 1.05];
+const strandColor = 0xff6600; // neon orange
+
+// --- Multiple tight braid centers ---
+const numBraids = 12;
+const braidCenters = [];
+const braidSpacing = Math.PI / 24;
+for (let i = 0; i < numBraids; i++) {
+  braidCenters.push(Math.PI/2 + i * braidSpacing);
+}
+
+// --- Function to create points ---
+function createStrandPoints(strandIndex, time) {
+  const points = [];
+  const waveAmplitude = 0.15; // traveling ripple amplitude
+  const waveWidth = Math.PI / 12;
+  const speed = 1.0;
+  const rippleCenter = (time * speed) % (Math.PI * 2);
+  const strandPhase = (strandIndex / numStrands) * Math.PI * 2;
+
+  const minorOffset = (strandIndex - 1) * 0.015; // closer strands
+
+  for (let i = 0; i <= numPoints; i++) {
+    const t = (i / numPoints) * Math.PI * 2;
+    const dx = Math.cos(t) * r;
+    const dy = Math.sin(t) * r + minorOffset;
+    const x = (R + dx) * Math.cos(t);
+    const y = (R + dx) * Math.sin(t);
+
+    // --- Check if t is within any braid section ---
+    let inBraid = false;
+    for (let bc of braidCenters) {
+      let diffBraid = t - bc;
+      diffBraid = ((diffBraid + Math.PI*2) % (Math.PI*2));
+      if (diffBraid > Math.PI) diffBraid -= Math.PI*2;
+      if (Math.abs(diffBraid) < braidWidth) {
+        inBraid = true;
+        break;
+      }
+    }
+
+    // traveling ripple (skip ripple in braid section)
+    let zWave = 0;
+    if (!inBraid) {
+      let diffWave = t - rippleCenter;
+      diffWave = ((diffWave + Math.PI*2) % (Math.PI*2));
+      if (diffWave > Math.PI) diffWave -= Math.PI*2;
+      const gaussWave = Math.exp(-Math.pow(diffWave / waveWidth, 2));
+      zWave = gaussWave * Math.sin(time*3 + strandPhase) * waveAmplitude;
+    }
+
+    // flattened braid segments
+    let zBraid = 0;
+    for (let bc of braidCenters) {
+      let diffBraid = t - bc;
+      diffBraid = ((diffBraid + Math.PI*2) % (Math.PI*2));
+      if (diffBraid > Math.PI) diffBraid -= Math.PI*2;
+
+      if (Math.abs(diffBraid) < braidWidth) {
+        const taper = Math.exp(-Math.pow(diffBraid / (braidWidth/2), 2));
+        const localPhase = (diffBraid / braidWidth) * Math.PI;
+        zBraid += Math.sin(localPhase + phaseOffsets[strandIndex])
+                  * baseBraidAmplitude * amplitudeOffsets[strandIndex] * taper;
+      }
+    }
+
+    const z = dy + zWave + zBraid;
+    points.push(new THREE.Vector3(x, y, z));
+  }
+
+  return points;
+}
+
+// --- Create TubeGeometry strands ---
+for (let j = 0; j < numStrands; j++) {
+  const points = createStrandPoints(j, 0);
+  const curve = new THREE.CatmullRomCurve3(points);
+  const geometry = new THREE.TubeGeometry(curve, numPoints, 0.01, 8, false);
+  const material = new THREE.MeshStandardMaterial({ color: strandColor, emissive: strandColor, metalness: 0.5, roughness: 0.3 });
+  const mesh = new THREE.Mesh(geometry, material);
+  donutGroup.add(mesh);
+  braidMeshes.push(mesh);
+}
+
+// --- Lighting ---
+const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+scene.add(ambient);
+const directional = new THREE.DirectionalLight(0xffffff, 1.0);
+directional.position.set(5,5,5);
+scene.add(directional);
+
+// --- Animate ---
+let time = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  time += 0.01;
+
+  braidMeshes.forEach((mesh, j) => {
+    const points = createStrandPoints(j, time);
+    const curve = new THREE.CatmullRomCurve3(points);
+    mesh.geometry.dispose();
+    mesh.geometry = new THREE.TubeGeometry(curve, numPoints, 0.01, 8, false);
+  });
+
+  donutGroup.rotation.x = time * 0.2;
+  donutGroup.rotation.y = 0;
+  donutGroup.rotation.z = 0;
+
+  renderer.render(scene, camera);
+}
+
+animate();
+
+// --- Resize ---
+window.addEventListener('resize', () => {
+  const aspect = innerWidth / innerHeight;
+  camera.left = -aspect*zoom;
+  camera.right = aspect*zoom;
+  camera.top = zoom;
+  camera.bottom = -zoom;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
+

@@ -5,35 +5,14 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { User, Mail, Edit2, Save, ArrowRight, Calendar, Heart, Sparkles, Trash2, FileText, Plus } from 'lucide-react';
 import Navbar from '@/app/components/Navbar';
-
-interface SavedRoutine {
-  id: string;
-  createdAt: string;
-  hairAnalysis: any;
-  routine: any;
-  notes?: string;
-}
-
-interface UserProfile {
-  name: string;
-  email: string;
-  hairType: '4a' | '4b' | '4c';
-  hairGoals: string[];
-  createdAt: string;
-  savedRoutines?: SavedRoutine[];
-  lastBooking?: {
-    style: string;
-    date: string;
-    stylist: string;
-  };
-}
+import { normalizeUserProfile, PROFILE_VERSION, type UserProfile, type SavedRoutine } from '@/types/userProfile';
 
 export default function Profile() {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [minLoadingComplete, setMinLoadingComplete] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editedGoals, setEditedGoals] = useState<string[]>([]);
+  const [editedProfile, setEditedProfile] = useState<UserProfile | null>(null);
   const [expandedRoutine, setExpandedRoutine] = useState<string | null>(null);
 
   const hairGoalOptions = [
@@ -44,6 +23,111 @@ export default function Profile() {
     { id: 'styles', label: 'Try New Styles', emoji: '💇🏾‍♀️' },
     { id: 'maintenance', label: 'Low Maintenance', emoji: '⏱️' }
   ];
+
+  const concernOptions = [
+    { id: 'dryness', label: 'Dryness', emoji: '🏜️' },
+    { id: 'breakage', label: 'Breakage', emoji: '💔' },
+    { id: 'thinning', label: 'Thinning', emoji: '📉' },
+    { id: 'dandruff', label: 'Dandruff', emoji: '❄️' },
+    { id: 'frizz', label: 'Frizz', emoji: '🌪️' },
+    { id: 'tangles', label: 'Tangles', emoji: '🪢' }
+  ];
+
+  const densityOptions = [
+    { id: 'low', label: 'Low' },
+    { id: 'medium', label: 'Medium' },
+    { id: 'high', label: 'High' }
+  ] as const;
+
+  const strandOptions = [
+    { id: 'fine', label: 'Fine' },
+    { id: 'medium', label: 'Medium' },
+    { id: 'coarse', label: 'Coarse' }
+  ] as const;
+
+  const elasticityOptions = [
+    { id: 'low', label: 'Low', description: 'Stretches a little, breaks easily' },
+    { id: 'balanced', label: 'Balanced', description: 'Stretches and returns without breaking' },
+    { id: 'high', label: 'High', description: 'Stretches a lot, may need strengthening' }
+  ] as const;
+
+  const scalpOptions = [
+    { id: 'balanced', label: 'Balanced' },
+    { id: 'dry', label: 'Dry' },
+    { id: 'oily', label: 'Oily' },
+    { id: 'flaky', label: 'Flaky' },
+    { id: 'sensitive', label: 'Sensitive' }
+  ] as const;
+
+  const protectiveStyleOptions = [
+    { id: 'rare', label: 'Rarely' },
+    { id: 'occasional', label: 'Occasionally' },
+    { id: 'regular', label: 'Regularly' },
+    { id: 'continuous', label: 'Back-to-back' }
+  ] as const;
+
+  const activityOptions = [
+    { id: 'low', label: 'Low' },
+    { id: 'moderate', label: 'Moderate' },
+    { id: 'high', label: 'High / Very Active' }
+  ] as const;
+
+  const waterOptions = [
+    { id: 'minimal', label: 'Minimal' },
+    { id: 'hard-water', label: 'Hard Water' },
+    { id: 'swimmer', label: 'Swimmer' },
+    { id: 'frequent-chlorine', label: 'Frequent Chlorine' }
+  ] as const;
+
+  const allergyOptions = ['Coconut', 'Nut Oils', 'Aloe', 'Fragrance', 'Shea Butter'];
+  const sensitivityOptions = ['Protein', 'Sulfates', 'Silicones', 'Drying Alcohols', 'Heavy Oils'];
+  const preferenceOptions = ['Vegan', 'Cruelty Free', 'Sulfate Free', 'Silicone Free', 'Paraben Free'];
+
+  const porosityOptions = [
+    { id: 'low', label: 'Low', description: 'Resists moisture' },
+    { id: 'normal', label: 'Normal', description: 'Balanced absorption' },
+    { id: 'high', label: 'High', description: 'Absorbs quickly, loses moisture fast' }
+  ] as const;
+
+  const lengthOptions = [
+    { id: 'short', label: 'Short', emoji: '✂️' },
+    { id: 'medium', label: 'Medium', emoji: '💇🏾‍♀️' },
+    { id: 'long', label: 'Long', emoji: '👩🏾‍🦱' }
+  ] as const;
+
+  const budgetOptions = [
+    { id: 'low', label: 'Budget', description: 'Under KES 2,000' },
+    { id: 'medium', label: 'Moderate', description: 'KES 2,000 - 5,000' },
+    { id: 'high', label: 'Premium', description: 'Over KES 5,000' }
+  ] as const;
+
+  const climateOptions = [
+    { id: 'dry', label: 'Dry', emoji: '☀️' },
+    { id: 'humid', label: 'Humid', emoji: '💧' },
+    { id: 'temperate', label: 'Temperate', emoji: '🌤️' }
+  ] as const;
+
+  const toggleSelectable = (value: string, list: string[], updater: (next: string[]) => void) => {
+    updater(
+      list.includes(value)
+        ? list.filter((item: string) => item !== value)
+        : [...list, value]
+    );
+  };
+
+  const toggleEditedListValue = (
+    field: 'currentConcerns' | 'ingredientAllergies' | 'ingredientSensitivities' | 'preferredProductAttributes',
+    value: string
+  ) => {
+    setEditedProfile((prev: UserProfile | null) => {
+      if (!prev) return prev;
+      const existing = prev[field] || [];
+      const next = existing.includes(value)
+        ? existing.filter((item: string) => item !== value)
+        : [...existing, value];
+      return { ...prev, [field]: next } as UserProfile;
+    });
+  };
 
   useEffect(() => {
     // Set minimum loading time of 3 seconds (one full blob rotation)
@@ -61,55 +145,82 @@ export default function Profile() {
     const bookingData = localStorage.getItem('nywele-latest-booking');
     
     if (storedProfile) {
-      const parsedProfile = JSON.parse(storedProfile);
+      let normalizedProfile = normalizeUserProfile(JSON.parse(storedProfile));
       
       // Merge with booking data if available
       if (bookingData) {
+        try {
         const booking = JSON.parse(bookingData);
-        parsedProfile.lastBooking = {
+          normalizedProfile = {
+            ...normalizedProfile,
+            lastBooking: {
           style: booking.desiredStyle,
           date: booking.date,
           stylist: booking.stylistInfo?.name || 'Stylist'
-        };
+            }
+          };
+        } catch (error) {
+          console.warn('Unable to parse latest booking information', error);
+        }
       }
-      
-      setProfile(parsedProfile);
-      setEditedGoals(parsedProfile.hairGoals);
+
+      const versionedProfile: UserProfile = {
+        ...normalizedProfile,
+        profileVersion: PROFILE_VERSION,
+        savedRoutines: normalizedProfile.savedRoutines || []
+      };
+
+      localStorage.setItem('nywele-user-profile', JSON.stringify(versionedProfile));
+      setProfile(versionedProfile);
     } else {
       // No profile - redirect to registration
       router.push('/register');
     }
   };
 
+  const updateEditedProfile = (updates: Partial<UserProfile>) => {
+    setEditedProfile((prev: UserProfile | null) => (prev ? { ...prev, ...updates } : prev));
+  };
+
   const toggleGoal = (goalId: string) => {
-    setEditedGoals(prev =>
-      prev.includes(goalId)
-        ? prev.filter(g => g !== goalId)
-        : [...prev, goalId]
-    );
+    setEditedProfile((prev: UserProfile | null) => {
+      if (!prev) return prev;
+      const hasGoal = prev.hairGoals.includes(goalId);
+      const updatedGoals = hasGoal
+        ? prev.hairGoals.filter((goal: string) => goal !== goalId)
+        : [...prev.hairGoals, goalId];
+      return { ...prev, hairGoals: updatedGoals };
+    });
   };
 
   const saveProfile = () => {
-    if (!profile) return;
+    if (!profile || !editedProfile) return;
 
-    const updatedProfile = {
+    const mergedProfile = {
       ...profile,
-      hairGoals: editedGoals
+      ...editedProfile,
+      profileVersion: PROFILE_VERSION,
+      savedRoutines: profile.savedRoutines || [],
+      lastBooking: profile.lastBooking,
+      createdAt: profile.createdAt
     };
 
-    localStorage.setItem('nywele-user-profile', JSON.stringify(updatedProfile));
-    setProfile(updatedProfile);
+    const normalized = normalizeUserProfile(mergedProfile);
+    localStorage.setItem('nywele-user-profile', JSON.stringify(normalized));
+    setProfile(normalized);
     setIsEditing(false);
+    setEditedProfile(null);
   };
 
   const deleteRoutine = (routineId: string) => {
     if (!profile || !confirm('Are you sure you want to delete this routine?')) return;
 
-    const updatedRoutines = profile.savedRoutines?.filter(r => r.id !== routineId) || [];
-    const updatedProfile = {
+    const updatedRoutines = profile.savedRoutines?.filter((routine: SavedRoutine) => routine.id !== routineId) || [];
+    const updatedProfile = normalizeUserProfile({
       ...profile,
+      profileVersion: PROFILE_VERSION,
       savedRoutines: updatedRoutines
-    };
+    });
 
     localStorage.setItem('nywele-user-profile', JSON.stringify(updatedProfile));
     setProfile(updatedProfile);
@@ -118,14 +229,15 @@ export default function Profile() {
   const updateRoutineNotes = (routineId: string, notes: string) => {
     if (!profile) return;
 
-    const updatedRoutines = profile.savedRoutines?.map(r => 
+    const updatedRoutines = profile.savedRoutines?.map((r: SavedRoutine) => 
       r.id === routineId ? { ...r, notes } : r
     ) || [];
 
-    const updatedProfile = {
+    const updatedProfile = normalizeUserProfile({
       ...profile,
+      profileVersion: PROFILE_VERSION,
       savedRoutines: updatedRoutines
-    };
+    });
 
     localStorage.setItem('nywele-user-profile', JSON.stringify(updatedProfile));
     setProfile(updatedProfile);
@@ -375,27 +487,55 @@ export default function Profile() {
                 <Heart style={{ color: '#AF5500' }} size={24} />
                 Hair Goals
               </h3>
-              <button
-                onClick={() => isEditing ? saveProfile() : setIsEditing(true)}
-                className="px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2"
-                style={{ 
-                  background: '#AF5500', 
-                  color: '#FDF4E8',
-                  fontFamily: 'Bricolage Grotesque, sans-serif'
-                }}
-              >
-                {isEditing ? (
-                  <>
-                    <Save size={16} />
-                    Save
-                  </>
-                ) : (
-                  <>
-                    <Edit2 size={16} />
-                    Edit
-                  </>
+              <div className="flex items-center gap-2">
+                {isEditing && (
+                  <button
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditedProfile(null);
+                    }}
+                    className="px-4 py-2 rounded-lg font-medium transition-all"
+                    style={{ 
+                      background: 'rgba(175, 85, 0, 0.1)', 
+                      color: '#AF5500',
+                      border: '1px solid #AF5500',
+                      fontFamily: 'Bricolage Grotesque, sans-serif'
+                    }}
+                  >
+                    Cancel
+                  </button>
                 )}
-              </button>
+                <button
+                  onClick={() => {
+                    if (isEditing) {
+                      saveProfile();
+                    } else {
+                      if (profile) {
+                        setEditedProfile({ ...profile });
+                        setIsEditing(true);
+                      }
+                    }
+                  }}
+                  className="px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2"
+                  style={{ 
+                    background: '#AF5500', 
+                    color: '#FDF4E8',
+                    fontFamily: 'Bricolage Grotesque, sans-serif'
+                  }}
+                >
+                  {isEditing ? (
+                    <>
+                      <Save size={16} />
+                      Save
+                    </>
+                  ) : (
+                    <>
+                      <Edit2 size={16} />
+                      Edit
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
             {isEditing ? (
@@ -405,7 +545,7 @@ export default function Profile() {
                     key={goal.id}
                     onClick={() => toggleGoal(goal.id)}
                     className="p-3 rounded-xl border-2 transition-all text-left"
-                    style={editedGoals.includes(goal.id) ? {
+                    style={editedProfile?.hairGoals.includes(goal.id) ? {
                       borderColor: '#AF5500',
                       background: 'rgba(175, 85, 0, 0.1)'
                     } : {
@@ -425,7 +565,7 @@ export default function Profile() {
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {profile.hairGoals.map((goalId) => {
+                {profile.hairGoals.map((goalId: string) => {
                   const goal = hairGoalOptions.find(g => g.id === goalId);
                   return goal ? (
                     <div
@@ -441,6 +581,457 @@ export default function Profile() {
                     </div>
                   ) : null;
                 })}
+              </div>
+            )}
+          </motion.div>
+
+          {/* Hair Health Profile */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="rounded-2xl shadow-xl p-6"
+            style={{ background: '#FDF4E8', border: '2px solid #914600' }}
+          >
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+              <Sparkles style={{ color: '#AF5500' }} size={24} />
+              Hair Health Profile
+            </h3>
+
+            {isEditing ? (
+              editedProfile ? (
+                <div className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Hair Porosity</p>
+                      <div className="space-y-2">
+                        {porosityOptions.map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => updateEditedProfile({ hairPorosity: option.id })}
+                            className="w-full px-4 py-3 rounded-xl border-2 text-left transition-all"
+                            style={editedProfile.hairPorosity === option.id
+                              ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
+                          >
+                            <span className="font-semibold block" style={{ color: '#643100' }}>{option.label}</span>
+                            <span className="text-xs" style={{ color: '#914600' }}>{option.description}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Hair Length</p>
+                      <div className="flex flex-wrap gap-3">
+                        {lengthOptions.map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => updateEditedProfile({ hairLength: option.id })}
+                            className="px-4 py-3 rounded-xl border-2 transition-all"
+                            style={editedProfile.hairLength === option.id
+                              ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
+                          >
+                            <span className="text-xl mr-2">{option.emoji}</span>
+                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Hair Density</p>
+                      <div className="flex flex-wrap gap-3">
+                        {densityOptions.map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => updateEditedProfile({ hairDensity: option.id })}
+                            className="px-4 py-3 rounded-xl border-2 transition-all"
+                            style={editedProfile.hairDensity === option.id
+                              ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
+                          >
+                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Strand Thickness</p>
+                      <div className="flex flex-wrap gap-3">
+                        {strandOptions.map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => updateEditedProfile({ strandThickness: option.id })}
+                            className="px-4 py-3 rounded-xl border-2 transition-all"
+                            style={editedProfile.strandThickness === option.id
+                              ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
+                          >
+                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Elasticity</p>
+                      <div className="space-y-2">
+                        {elasticityOptions.map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => updateEditedProfile({ elasticity: option.id })}
+                            className="w-full px-4 py-3 rounded-xl border-2 text-left transition-all"
+                            style={editedProfile.elasticity === option.id
+                              ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
+                          >
+                            <span className="font-semibold block" style={{ color: '#643100' }}>{option.label}</span>
+                            <span className="text-xs" style={{ color: '#914600' }}>{option.description}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Scalp Condition</p>
+                      <div className="flex flex-wrap gap-3">
+                        {scalpOptions.map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => updateEditedProfile({ scalpCondition: option.id })}
+                            className="px-4 py-3 rounded-xl border-2 transition-all"
+                            style={editedProfile.scalpCondition === option.id
+                              ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
+                          >
+                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Current Concerns</p>
+                    <div className="flex flex-wrap gap-2">
+                      {concernOptions.map((concern) => (
+                        <button
+                          key={concern.id}
+                          onClick={() => toggleEditedListValue('currentConcerns', concern.id)}
+                          className="px-3 py-2 rounded-lg border-2 text-sm transition-all flex items-center gap-2"
+                          style={editedProfile.currentConcerns.includes(concern.id)
+                            ? { borderColor: '#9E6240', background: 'rgba(158, 98, 64, 0.2)', color: '#643100' }
+                            : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white', color: '#914600' }}
+                        >
+                          <span>{concern.emoji}</span>
+                          <span>{concern.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Budget</p>
+                      <div className="space-y-2">
+                        {budgetOptions.map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => updateEditedProfile({ budget: option.id })}
+                            className="w-full px-4 py-3 rounded-xl border-2 text-left transition-all"
+                            style={editedProfile.budget === option.id
+                              ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
+                          >
+                            <span className="font-semibold block" style={{ color: '#643100' }}>{option.label}</span>
+                            <span className="text-xs" style={{ color: '#914600' }}>{option.description}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Climate</p>
+                      <div className="flex flex-wrap gap-3">
+                        {climateOptions.map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => updateEditedProfile({ climate: option.id })}
+                            className="px-4 py-3 rounded-xl border-2 transition-all"
+                            style={editedProfile.climate === option.id
+                              ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
+                          >
+                            <span className="text-xl mr-2">{option.emoji}</span>
+                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Wash Frequency / Week</p>
+                      <input
+                        type="number"
+                        min={0}
+                        max={10}
+                        step="0.5"
+                        value={editedProfile.washFrequencyPerWeek ?? ''}
+                        onChange={(event) => updateEditedProfile({
+                          washFrequencyPerWeek: event.target.value === '' ? null : Number(event.target.value)
+                        })}
+                        className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent"
+                        style={{ borderColor: '#9E6240', background: 'white', color: '#643100' }}
+                      />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Protective Style Frequency</p>
+                      <div className="flex flex-wrap gap-3">
+                        {protectiveStyleOptions.map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => updateEditedProfile({ protectiveStyleFrequency: option.id })}
+                            className="px-4 py-3 rounded-xl border-2 transition-all"
+                            style={editedProfile.protectiveStyleFrequency === option.id
+                              ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
+                          >
+                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Activity Level</p>
+                      <div className="flex flex-wrap gap-3">
+                        {activityOptions.map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => updateEditedProfile({ activityLevel: option.id })}
+                            className="px-4 py-3 rounded-xl border-2 transition-all"
+                            style={editedProfile.activityLevel === option.id
+                              ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
+                          >
+                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Water Exposure</p>
+                      <div className="flex flex-wrap gap-3">
+                        {waterOptions.map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => updateEditedProfile({ waterExposure: option.id })}
+                            className="px-4 py-3 rounded-xl border-2 transition-all"
+                            style={editedProfile.waterExposure === option.id
+                              ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
+                              : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
+                          >
+                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Ingredient Allergies</p>
+                    <div className="flex flex-wrap gap-2">
+                      {allergyOptions.map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => toggleEditedListValue('ingredientAllergies', option)}
+                          className="px-3 py-2 rounded-lg border-2 text-sm transition-all"
+                          style={editedProfile.ingredientAllergies.includes(option)
+                            ? { borderColor: '#9E6240', background: 'rgba(158, 98, 64, 0.2)', color: '#643100' }
+                            : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white', color: '#914600' }}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Sensitivities / Things to Limit</p>
+                    <div className="flex flex-wrap gap-2">
+                      {sensitivityOptions.map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => toggleEditedListValue('ingredientSensitivities', option)}
+                          className="px-3 py-2 rounded-lg border-2 text-sm transition-all"
+                          style={editedProfile.ingredientSensitivities.includes(option)
+                            ? { borderColor: '#9E6240', background: 'rgba(158, 98, 64, 0.2)', color: '#643100' }
+                            : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white', color: '#914600' }}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Product Preferences</p>
+                    <div className="flex flex-wrap gap-2">
+                      {preferenceOptions.map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => toggleEditedListValue('preferredProductAttributes', option)}
+                          className="px-3 py-2 rounded-lg border-2 text-sm transition-all"
+                          style={editedProfile.preferredProductAttributes.includes(option)
+                            ? { borderColor: '#9E6240', background: 'rgba(158, 98, 64, 0.2)', color: '#643100' }
+                            : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white', color: '#914600' }}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Current Routine Notes</p>
+                    <textarea
+                      value={editedProfile.currentRegimenNotes ?? ''}
+                      onChange={(event) => updateEditedProfile({ currentRegimenNotes: event.target.value })}
+                      rows={3}
+                      className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent"
+                      style={{ borderColor: '#9E6240', background: 'white', color: '#643100', resize: 'vertical' }}
+                      placeholder="Products you rotate, areas of focus, reactions to note..."
+                    />
+                  </div>
+                </div>
+              ) : null
+            ) : (
+              <div className="space-y-6">
+                <div>
+                  <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Hair & Scalp Snapshot</p>
+                  <div className="flex flex-wrap gap-2">
+                    {[{
+                      label: 'Porosity',
+                      value: profile.hairPorosity
+                    }, {
+                      label: 'Length',
+                      value: profile.hairLength
+                    }, {
+                      label: 'Density',
+                      value: profile.hairDensity
+                    }, {
+                      label: 'Strand Thickness',
+                      value: profile.strandThickness
+                    }, {
+                      label: 'Elasticity',
+                      value: profile.elasticity
+                    }, {
+                      label: 'Scalp',
+                      value: profile.scalpCondition
+                    }].map((item) => (
+                      <div
+                        key={item.label}
+                        className="px-3 py-2 rounded-full text-sm"
+                        style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#643100' }}
+                      >
+                        <span className="font-semibold mr-1">{item.label}:</span>
+                        <span className="capitalize">{item.value || 'Not set'}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Primary Concerns</p>
+                  {profile.currentConcerns.length ? (
+                    <div className="flex flex-wrap gap-2">
+                      {profile.currentConcerns.map((concernId: string) => {
+                        const concern = concernOptions.find((item) => item.id === concernId);
+                        return concern ? (
+                          <div key={concernId} className="px-3 py-2 rounded-full text-sm flex items-center gap-2"
+                            style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#643100' }}>
+                            <span>{concern.emoji}</span>
+                            <span>{concern.label}</span>
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-sm" style={{ color: '#914600' }}>No concerns set yet.</p>
+                  )}
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Budget & Climate</p>
+                    <div className="space-y-1 text-sm" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                      <div><span className="font-semibold">Budget:</span> {profile.budget || 'Not set'}</div>
+                      <div><span className="font-semibold">Climate:</span> {profile.climate || 'Not set'}</div>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Routine Overview</p>
+                    <div className="space-y-1 text-sm" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                      <div><span className="font-semibold">Wash Frequency:</span> {profile.washFrequencyPerWeek !== null ? `${profile.washFrequencyPerWeek} / week` : 'Not set'}</div>
+                      <div><span className="font-semibold">Protective Styles:</span> {profile.protectiveStyleFrequency || 'Not set'}</div>
+                      <div><span className="font-semibold">Activity Level:</span> {profile.activityLevel || 'Not set'}</div>
+                      <div><span className="font-semibold">Water Exposure:</span> {profile.waterExposure || 'Not set'}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Ingredient Notes</p>
+                  <div className="space-y-2">
+                    <div>
+                      <span className="text-xs uppercase tracking-wide" style={{ color: '#AF5500' }}>Allergies</span>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {profile.ingredientAllergies.length ? profile.ingredientAllergies.map((item: string) => (
+                          <span key={item} className="px-3 py-1 rounded-full text-xs"
+                            style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#643100' }}>
+                            {item}
+                          </span>
+                        )) : <span className="text-sm" style={{ color: '#914600' }}>None added</span>}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-xs uppercase tracking-wide" style={{ color: '#AF5500' }}>Sensitivities</span>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {profile.ingredientSensitivities.length ? profile.ingredientSensitivities.map((item: string) => (
+                          <span key={item} className="px-3 py-1 rounded-full text-xs"
+                            style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#643100' }}>
+                            {item}
+                          </span>
+                        )) : <span className="text-sm" style={{ color: '#914600' }}>None added</span>}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-xs uppercase tracking-wide" style={{ color: '#AF5500' }}>Preferences</span>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {profile.preferredProductAttributes.length ? profile.preferredProductAttributes.map((item: string) => (
+                          <span key={item} className="px-3 py-1 rounded-full text-xs"
+                            style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#643100' }}>
+                            {item}
+                          </span>
+                        )) : <span className="text-sm" style={{ color: '#914600' }}>None added</span>}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Routine Notes</p>
+                  <p className="text-sm" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    {profile.currentRegimenNotes ? profile.currentRegimenNotes : 'No notes captured yet.'}
+                  </p>
+                </div>
               </div>
             )}
           </motion.div>
@@ -555,7 +1146,7 @@ export default function Profile() {
               </div>
             ) : (
               <div className="space-y-4">
-                {profile.savedRoutines.map((routine, idx) => (
+                {profile.savedRoutines.map((routine: SavedRoutine, idx: number) => (
                   <div
                     key={routine.id}
                     className="rounded-xl p-4 hover:shadow-md transition-all"
