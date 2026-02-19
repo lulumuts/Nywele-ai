@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Upload, Loader, X, CheckCircle, AlertTriangle, Download, ExternalLink, FileText } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Upload, Loader, X, CheckCircle, AlertTriangle, Download, ExternalLink, FileText, Sparkles } from 'lucide-react';
 import { generateJobSpec, mapStyleToTemplateSlug, JobSpec } from '@/lib/specs';
 import SpecSummary from '@/app/components/SpecSummary';
-import Navbar from '@/app/components/Navbar';
+import BottomNav from '@/app/components/BottomNav';
 import { downloadHairPassport } from '@/lib/hairPassport';
 import { normalizeUserProfile, type UserProfile } from '@/types/userProfile';
 import { trackStyleAssessmentCompleted, trackExternalBookingLinkClick, trackPassportExport } from '@/lib/analytics';
@@ -31,6 +31,7 @@ export default function StyleAdvisor() {
   const [jobSpec, setJobSpec] = useState<JobSpec | null>(null);
   const [styleCompatibility, setStyleCompatibility] = useState<'compatible' | 'risky' | 'unknown'>('unknown');
   const [compatibilityReason, setCompatibilityReason] = useState<string>('');
+  const [loadingStyleInspiration, setLoadingStyleInspiration] = useState(false);
 
   useEffect(() => {
     // Load user profile
@@ -110,6 +111,45 @@ export default function StyleAdvisor() {
     } else {
       setStyleCompatibility('compatible');
       setCompatibilityReason('This style is compatible with your hair profile!');
+    }
+  };
+
+  const handlePreviewStyleInspiration = async () => {
+    if (!desiredStyle) return;
+    setLoadingStyleInspiration(true);
+    try {
+      const profile = localStorage.getItem('nywele-user-profile');
+      const profileData = profile ? JSON.parse(profile) : {};
+      const resolvedHairType = userProfile?.hairType || hairType || profileData.hairType || '4c';
+      const response = await fetch('/api/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          hairType: resolvedHairType,
+          goals: userProfile?.hairGoals || profileData.hairGoals || ['moisture', 'growth'],
+          currentStyle: 'natural',
+          desiredStyle,
+          porosity: userProfile?.hairPorosity || profileData.hairPorosity || 'unsure',
+          concerns: userProfile?.currentConcerns || profileData.currentConcerns || [],
+          budget: userProfile?.budget || profileData.budget || 'any',
+          durationPreference: '30 minutes',
+        }),
+      });
+      const result = await response.json();
+      if (result.success && result.data) {
+        sessionStorage.setItem('recommendation', JSON.stringify(result.data));
+        sessionStorage.setItem('desiredStyle', desiredStyle);
+        sessionStorage.setItem('hairType', resolvedHairType);
+        sessionStorage.setItem('currentStyle', desiredStyle);
+        sessionStorage.setItem('ethnicity', 'Black Woman');
+        sessionStorage.setItem('length', 'Shoulder-Length');
+        sessionStorage.setItem('vibe', 'Professional Studio Portrait');
+        router.push('/results');
+      }
+    } catch (error) {
+      console.error('Failed to get style inspiration:', error);
+    } finally {
+      setLoadingStyleInspiration(false);
     }
   };
 
@@ -206,8 +246,8 @@ export default function StyleAdvisor() {
   const styleCost = desiredStyle ? getStyleCost(desiredStyle) : null;
 
   return (
-    <div className="min-h-screen" style={{ background: '#FDF4E8' }}>
-      <Navbar />
+    <div className="min-h-screen flex flex-col" style={{ background: '#FFFEE1' }}>
+      <BottomNav />
       
       {/* Progress Steps */}
       {currentStep > 0 && (
@@ -219,7 +259,7 @@ export default function StyleAdvisor() {
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold`}
                     style={{
                       background: currentStep >= step ? '#643100' : '#E5D4C1',
-                      color: currentStep >= step ? 'white' : '#914600',
+                      color: '#DD8106',
                       fontFamily: 'Bricolage Grotesque, sans-serif'
                     }}>
                     {step}
@@ -230,7 +270,7 @@ export default function StyleAdvisor() {
                 </div>
               ))}
             </div>
-            <div className="mt-2 text-center text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+            <div className="mt-2 text-center text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
               {currentStep === 1 && 'Style Compatibility'}
               {currentStep === 2 && 'Export & Integration'}
             </div>
@@ -238,7 +278,7 @@ export default function StyleAdvisor() {
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-6xl mx-auto px-4 py-12 pb-24 md:pb-12 flex-1">
         <AnimatePresence mode="wait">
           {/* Step 0: Style Selection */}
           {currentStep === 0 && (
@@ -255,10 +295,10 @@ export default function StyleAdvisor() {
                 {/* Left Section */}
                 <div className="flex flex-col justify-center">
                   <h1 className="text-5xl md:text-6xl font-bold mb-6" 
-                    style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                    style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                     Get Style<br />Advice
                   </h1>
-                  <p className="text-xl" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  <p className="text-xl" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     Check style compatibility<br />and get personalized recommendations
                   </p>
                 </div>
@@ -266,14 +306,14 @@ export default function StyleAdvisor() {
                 {/* Right Section - Form */}
                 <div className="flex flex-col justify-center">
                   <h2 className="text-3xl font-bold mb-8" 
-                    style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                    style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                     Choose Your Style
                   </h2>
                   
                   <div className="space-y-6">
                     <div>
                       <label className="block text-base font-medium mb-3" 
-                        style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                        style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                         Desired Style
                       </label>
                       <select
@@ -282,9 +322,9 @@ export default function StyleAdvisor() {
                         className="w-full px-6 py-4 pr-12 rounded-xl text-lg appearance-none"
                         disabled={!!uploadedStyleImage}
                         style={{ 
-                          backgroundColor: uploadedStyleImage ? '#E5D4C1' : '#FDF4E8', 
+                          backgroundColor: uploadedStyleImage ? '#E5D4C1' : '#FFFEE1', 
                           border: '2px solid #914600',
-                          color: '#643100',
+                          color: '#DD8106',
                           fontFamily: 'Bricolage Grotesque, sans-serif',
                           backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23914600' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
                           backgroundPosition: 'right 1rem center',
@@ -307,7 +347,7 @@ export default function StyleAdvisor() {
                       {/* OR Divider */}
                       <div className="flex items-center gap-3 my-4">
                         <div className="flex-1 h-px" style={{ background: '#CE935F' }}></div>
-                        <span className="text-sm font-medium" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>OR</span>
+                        <span className="text-sm font-medium" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>OR</span>
                         <div className="flex-1 h-px" style={{ background: '#CE935F' }}></div>
                       </div>
 
@@ -315,18 +355,18 @@ export default function StyleAdvisor() {
                       {!uploadedStyleImage ? (
                         <label className="block cursor-pointer">
                           <div className="border-2 border-dashed rounded-xl p-6 text-center transition-all hover:border-solid hover:shadow-md"
-                            style={{ borderColor: '#914600', backgroundColor: '#FDF4E8' }}>
+                            style={{ borderColor: '#914600', backgroundColor: '#FFFEE1' }}>
                             <input
                               type="file"
                               accept="image/*"
                               onChange={handleStyleImageUpload}
                               className="hidden"
                             />
-                            <Upload size={32} style={{ color: '#914600' }} className="mx-auto mb-2" />
-                            <p className="text-base font-medium mb-1" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                            <Upload size={32} style={{ color: '#DD8106' }} className="mx-auto mb-2" />
+                            <p className="text-base font-medium mb-1" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                               Upload a photo of your desired style
                             </p>
-                            <p className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                            <p className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                               AI will identify the hairstyle for you
                             </p>
                           </div>
@@ -338,21 +378,21 @@ export default function StyleAdvisor() {
                             <div className="flex-1">
                               {analyzingImage ? (
                                 <div className="flex items-center gap-2">
-                                  <Loader className="animate-spin" size={20} style={{ color: '#914600' }} />
-                                  <p className="text-sm font-medium" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  <Loader className="animate-spin" size={20} style={{ color: '#DD8106' }} />
+                                  <p className="text-sm font-medium" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                     Analyzing your photo...
                                   </p>
                                 </div>
                               ) : styleDetectionResult ? (
                                 <div>
-                                  <p className="text-sm font-bold mb-1" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  <p className="text-sm font-bold mb-1" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                     Detected: {styleDetectionResult.detectedStyle}
                                   </p>
-                                  <p className="text-xs mb-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  <p className="text-xs mb-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                     Confidence: {styleDetectionResult.confidence}
                                   </p>
                                   {styleDetectionResult.description && (
-                                    <p className="text-xs" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                    <p className="text-xs" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                       {styleDetectionResult.description}
                                     </p>
                                   )}
@@ -362,7 +402,7 @@ export default function StyleAdvisor() {
                             <button
                               onClick={clearStyleImage}
                               className="p-2 rounded-lg hover:bg-white/50 transition-colors"
-                              style={{ color: '#914600' }}
+                              style={{ color: '#DD8106' }}
                             >
                               <X size={20} />
                             </button>
@@ -404,7 +444,7 @@ export default function StyleAdvisor() {
               style={{ background: '#FFFBF5', border: '2px solid #914600', minHeight: 'calc(100vh - 250px)' }}
             >
               <div className="p-8">
-                <h2 className="text-3xl font-bold mb-6" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                <h2 className="text-3xl font-bold mb-6" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                   Style Compatibility Analysis
                 </h2>
                 
@@ -423,11 +463,11 @@ export default function StyleAdvisor() {
                         className="w-full h-80 object-cover rounded-xl mb-6 shadow-lg"
                       />
                     )}
-                    <h3 className="text-3xl font-bold mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                    <h3 className="text-3xl font-bold mb-4" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                       {desiredStyle === 'custom-style' ? 'Custom Style' : desiredStyle}
                     </h3>
                     {styleCost && (
-                      <div className="space-y-2 mb-6" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                      <div className="space-y-2 mb-6" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                         <p><strong>Duration:</strong> Lasts {styleCost.duration}</p>
                         <p><strong>Estimated Cost:</strong> ${styleCost.min} - ${styleCost.max}</p>
                         <p><strong>Maintenance:</strong> Low</p>
@@ -484,7 +524,7 @@ export default function StyleAdvisor() {
                   <button
                     onClick={() => setCurrentStep(0)}
                     className="flex-1 py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
-                    style={{ background: '#FDF4E8', color: '#914600', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    style={{ background: '#FFFEE1', color: '#DD8106', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
                     <ArrowLeft size={20} />
                     Back
@@ -513,15 +553,52 @@ export default function StyleAdvisor() {
               style={{ background: '#FFFBF5', border: '2px solid #914600', minHeight: 'calc(100vh - 250px)' }}
             >
               <div className="p-8">
-                <h2 className="text-3xl font-bold mb-6" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                <h2 className="text-3xl font-bold mb-6" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                   Export & Integration Options
                 </h2>
 
                 {styleCompatibility === 'compatible' ? (
                   <div className="space-y-6">
-                    <p className="text-lg mb-8" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    <p className="text-lg mb-8" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                       Your style is compatible! Choose how you'd like to proceed:
                     </p>
+
+                    {/* Preview Style Inspiration (Gemini) */}
+                    <motion.button
+                      onClick={handlePreviewStyleInspiration}
+                      disabled={loadingStyleInspiration}
+                      whileHover={{ scale: loadingStyleInspiration ? 1 : 1.02 }}
+                      whileTap={{ scale: loadingStyleInspiration ? 1 : 0.98 }}
+                      className="w-full rounded-xl shadow-lg p-6 text-left transition-all hover:shadow-xl disabled:opacity-70"
+                      style={{ background: '#FFFEE1', border: '2px solid #914600' }}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ background: 'rgba(206, 147, 95, 0.2)' }}>
+                          <Sparkles size={32} style={{ color: '#DD8106' }} />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-2xl font-bold mb-2"
+                            style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
+                            Preview Style Inspiration
+                          </h3>
+                          <p className="mb-3"
+                            style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                            Get AI-generated style visuals and a personalized routine for {desiredStyle}
+                          </p>
+                          <div className="flex items-center gap-2" style={{ color: '#DD8106' }}>
+                            {loadingStyleInspiration ? (
+                              <Loader size={16} className="animate-spin" />
+                            ) : (
+                              <Sparkles size={16} />
+                            )}
+                            <span className="text-sm font-semibold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                              {loadingStyleInspiration ? 'Generating...' : 'View Results'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.button>
 
                     {/* Hair Passport */}
                     <motion.button
@@ -529,23 +606,23 @@ export default function StyleAdvisor() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className="w-full rounded-xl shadow-lg p-6 text-left transition-all hover:shadow-xl"
-                      style={{ background: '#FDF4E8', border: '2px solid #914600' }}
+                      style={{ background: '#FFFEE1', border: '2px solid #914600' }}
                     >
                       <div className="flex items-start gap-4">
                         <div className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0"
                           style={{ background: 'rgba(206, 147, 95, 0.2)' }}>
-                          <FileText size={32} style={{ color: '#643100' }} />
+                          <FileText size={32} style={{ color: '#DD8106' }} />
                         </div>
                         <div className="flex-1">
                           <h3 className="text-2xl font-bold mb-2" 
-                            style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                            style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                             Download Hair Passport
                           </h3>
                           <p className="mb-3" 
-                            style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                            style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             Get a portable PDF with your hair profile to share with any stylist, anywhere in the world
                           </p>
-                          <div className="flex items-center gap-2" style={{ color: '#914600' }}>
+                          <div className="flex items-center gap-2" style={{ color: '#DD8106' }}>
                             <Download size={16} />
                             <span className="text-sm font-semibold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                               Download Now
@@ -579,23 +656,23 @@ export default function StyleAdvisor() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className="w-full rounded-xl shadow-lg p-6 text-left transition-all hover:shadow-xl"
-                      style={{ background: '#FDF4E8', border: '2px solid #914600' }}
+                      style={{ background: '#FFFEE1', border: '2px solid #914600' }}
                     >
                       <div className="flex items-start gap-4">
                         <div className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0"
                           style={{ background: 'rgba(206, 147, 95, 0.2)' }}>
-                          <ExternalLink size={32} style={{ color: '#643100' }} />
+                          <ExternalLink size={32} style={{ color: '#DD8106' }} />
                         </div>
                         <div className="flex-1">
                           <h3 className="text-2xl font-bold mb-2" 
-                            style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                            style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                             Book via Fresha
                           </h3>
                           <p className="mb-3" 
-                            style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                            style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             Book your appointment through Fresha with your hair profile automatically shared
                           </p>
-                          <div className="flex items-center gap-2" style={{ color: '#914600' }}>
+                          <div className="flex items-center gap-2" style={{ color: '#DD8106' }}>
                             <ExternalLink size={16} />
                             <span className="text-sm font-semibold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                               Open Fresha
@@ -629,23 +706,23 @@ export default function StyleAdvisor() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className="w-full rounded-xl shadow-lg p-6 text-left transition-all hover:shadow-xl"
-                      style={{ background: '#FDF4E8', border: '2px solid #914600' }}
+                      style={{ background: '#FFFEE1', border: '2px solid #914600' }}
                     >
                       <div className="flex items-start gap-4">
                         <div className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0"
                           style={{ background: 'rgba(206, 147, 95, 0.2)' }}>
-                          <ExternalLink size={32} style={{ color: '#643100' }} />
+                          <ExternalLink size={32} style={{ color: '#DD8106' }} />
                         </div>
                         <div className="flex-1">
                           <h3 className="text-2xl font-bold mb-2" 
-                            style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                            style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                             Book via Braiding Nairobi
                           </h3>
                           <p className="mb-3" 
-                            style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                            style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             Connect with Braiding Nairobi stylists with your profile ready to share
                           </p>
-                          <div className="flex items-center gap-2" style={{ color: '#914600' }}>
+                          <div className="flex items-center gap-2" style={{ color: '#DD8106' }}>
                             <ExternalLink size={16} />
                             <span className="text-sm font-semibold" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                               Open Braiding Nairobi
@@ -657,7 +734,7 @@ export default function StyleAdvisor() {
                   </div>
                 ) : (
                   <div className="rounded-xl p-6" style={{ background: 'rgba(254, 226, 226, 0.3)', border: '2px solid #fca5a5' }}>
-                    <p className="text-lg mb-4" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    <p className="text-lg mb-4" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                       {styleCompatibility === 'risky' 
                         ? 'This style may not be suitable for your hair at this time. Consider focusing on hair health first, or try alternative styles.'
                         : 'Complete your hair profile to get personalized style recommendations and export options.'}
@@ -665,7 +742,7 @@ export default function StyleAdvisor() {
                     <button
                       onClick={() => router.push('/hair-care')}
                       className="px-6 py-3 rounded-xl font-semibold transition-all"
-                      style={{ background: '#643100', color: '#FDF4E8', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                      style={{ background: '#643100', color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                     >
                       Complete Your Profile
                     </button>
@@ -676,7 +753,7 @@ export default function StyleAdvisor() {
                   <button
                     onClick={() => setCurrentStep(1)}
                     className="w-full py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
-                    style={{ background: '#FDF4E8', color: '#914600', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    style={{ background: '#FFFEE1', color: '#DD8106', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
                     <ArrowLeft size={20} />
                     Back

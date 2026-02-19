@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { User, Mail, Edit2, Save, ArrowRight, Calendar, Heart, Sparkles, Trash2, FileText, Plus } from 'lucide-react';
-import Navbar from '@/app/components/Navbar';
+import BottomNav from '@/app/components/BottomNav';
 import { normalizeUserProfile, PROFILE_VERSION, type UserProfile, type SavedRoutine } from '@/types/userProfile';
 
 export default function Profile() {
@@ -257,7 +258,7 @@ export default function Profile() {
 
   if (!profile || !minLoadingComplete) {
     return (
-      <div className="min-h-screen flex items-center justify-center relative" style={{ background: '#FDF4E8' }}>
+      <div className="min-h-screen flex items-center justify-center relative" style={{ background: '#FFFEE1' }}>
         <style jsx>{`
           @keyframes blobPulse {
             0%, 100% {
@@ -360,7 +361,7 @@ export default function Profile() {
             textAlign: 'center'
           }}>
             <span className="text-2xl font-bold" 
-              style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+              style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
               Loading...
             </span>
           </div>
@@ -371,8 +372,8 @@ export default function Profile() {
 
   return (
     <>
-      <Navbar />
-      <div className="min-h-screen relative" style={{ background: '#FDF4E8' }}>
+      <BottomNav />
+      <div className="min-h-screen relative pb-24 md:pb-0" style={{ background: '#FFFEE1' }}>
         {/* Wavy Background Pattern */}
         <div style={{
           position: 'fixed',
@@ -402,13 +403,13 @@ export default function Profile() {
         >
           <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
             style={{ background: '#AF5500' }}>
-            <User style={{ color: '#FDF4E8' }} size={40} />
+            <User style={{ color: '#DD8106' }} size={40} />
           </div>
           <h2 className="text-4xl font-bold mb-2" 
-            style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+            style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
             Welcome back, {profile.name}!
           </h2>
-          <p style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+          <p style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
             Manage your hair care profile
           </p>
         </motion.div>
@@ -419,11 +420,11 @@ export default function Profile() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="rounded-2xl shadow-xl p-6"
-            style={{ background: '#FDF4E8', border: '2px solid #914600' }}
+            style={{ background: '#FFFEE1', border: '2px solid #914600' }}
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold flex items-center gap-2"
-                style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                 <User style={{ color: '#AF5500' }} size={24} />
                 Profile Information
               </h3>
@@ -431,38 +432,38 @@ export default function Profile() {
 
             <div className="space-y-3">
               <div>
-                <label className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                <label className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   Name
                 </label>
                 <p className="text-lg font-semibold" 
-                  style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   {profile.name}
                 </p>
               </div>
               <div>
-                <label className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                <label className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   Email
                 </label>
                 <p className="text-lg font-semibold" 
-                  style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   {profile.email}
                 </p>
               </div>
               <div>
-                <label className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                <label className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   Hair Type
                 </label>
                 <p className="text-lg font-semibold" 
-                  style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   {profile.hairType.toUpperCase()}
                 </p>
               </div>
               <div>
-                <label className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                <label className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   Member Since
                 </label>
                 <p className="text-lg font-semibold" 
-                  style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   {new Date(profile.createdAt).toLocaleDateString('en', { 
                     month: 'long', 
                     day: 'numeric', 
@@ -479,11 +480,11 @@ export default function Profile() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="rounded-2xl shadow-xl p-6"
-            style={{ background: '#FDF4E8', border: '2px solid #914600' }}
+            style={{ background: '#FFFEE1', border: '2px solid #914600' }}
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold flex items-center gap-2"
-                style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                 <Heart style={{ color: '#AF5500' }} size={24} />
                 Hair Goals
               </h3>
@@ -519,7 +520,7 @@ export default function Profile() {
                   className="px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2"
                   style={{ 
                     background: '#AF5500', 
-                    color: '#FDF4E8',
+                    color: '#DD8106',
                     fontFamily: 'Bricolage Grotesque, sans-serif'
                   }}
                 >
@@ -556,7 +557,7 @@ export default function Profile() {
                     <div className="flex items-center gap-2">
                       <span className="text-xl">{goal.emoji}</span>
                       <p className="text-sm font-semibold" 
-                        style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                        style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                         {goal.label}
                       </p>
                     </div>
@@ -575,7 +576,7 @@ export default function Profile() {
                     >
                       <span>{goal.emoji}</span>
                       <span className="text-sm font-medium" 
-                        style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                        style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                         {goal.label}
                       </span>
                     </div>
@@ -591,9 +592,9 @@ export default function Profile() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
             className="rounded-2xl shadow-xl p-6"
-            style={{ background: '#FDF4E8', border: '2px solid #914600' }}
+            style={{ background: '#FFFEE1', border: '2px solid #914600' }}
           >
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
               <Sparkles style={{ color: '#AF5500' }} size={24} />
               Hair Health Profile
             </h3>
@@ -603,7 +604,7 @@ export default function Profile() {
                 <div className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-3">
                     <div>
-                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Hair Porosity</p>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Hair Porosity</p>
                       <div className="space-y-2">
                         {porosityOptions.map((option) => (
                           <button
@@ -614,14 +615,14 @@ export default function Profile() {
                               ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
                           >
-                            <span className="font-semibold block" style={{ color: '#643100' }}>{option.label}</span>
-                            <span className="text-xs" style={{ color: '#914600' }}>{option.description}</span>
+                            <span className="font-semibold block" style={{ color: '#DD8106' }}>{option.label}</span>
+                            <span className="text-xs" style={{ color: '#DD8106' }}>{option.description}</span>
                           </button>
                         ))}
                       </div>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Hair Length</p>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Hair Length</p>
                       <div className="flex flex-wrap gap-3">
                         {lengthOptions.map((option) => (
                           <button
@@ -633,7 +634,7 @@ export default function Profile() {
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
                           >
                             <span className="text-xl mr-2">{option.emoji}</span>
-                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                            <span className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</span>
                           </button>
                         ))}
                       </div>
@@ -642,7 +643,7 @@ export default function Profile() {
 
                   <div className="grid md:grid-cols-2 gap-3">
                     <div>
-                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Hair Density</p>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Hair Density</p>
                       <div className="flex flex-wrap gap-3">
                         {densityOptions.map((option) => (
                           <button
@@ -653,13 +654,13 @@ export default function Profile() {
                               ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
                           >
-                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                            <span className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</span>
                           </button>
                         ))}
                       </div>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Strand Thickness</p>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Strand Thickness</p>
                       <div className="flex flex-wrap gap-3">
                         {strandOptions.map((option) => (
                           <button
@@ -670,7 +671,7 @@ export default function Profile() {
                               ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
                           >
-                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                            <span className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</span>
                           </button>
                         ))}
                       </div>
@@ -679,7 +680,7 @@ export default function Profile() {
 
                   <div className="grid md:grid-cols-2 gap-3">
                     <div>
-                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Elasticity</p>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Elasticity</p>
                       <div className="space-y-2">
                         {elasticityOptions.map((option) => (
                           <button
@@ -690,14 +691,14 @@ export default function Profile() {
                               ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
                           >
-                            <span className="font-semibold block" style={{ color: '#643100' }}>{option.label}</span>
-                            <span className="text-xs" style={{ color: '#914600' }}>{option.description}</span>
+                            <span className="font-semibold block" style={{ color: '#DD8106' }}>{option.label}</span>
+                            <span className="text-xs" style={{ color: '#DD8106' }}>{option.description}</span>
                           </button>
                         ))}
                       </div>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Scalp Condition</p>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Scalp Condition</p>
                       <div className="flex flex-wrap gap-3">
                         {scalpOptions.map((option) => (
                           <button
@@ -708,7 +709,7 @@ export default function Profile() {
                               ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
                           >
-                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                            <span className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</span>
                           </button>
                         ))}
                       </div>
@@ -716,7 +717,7 @@ export default function Profile() {
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Current Concerns</p>
+                    <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Current Concerns</p>
                     <div className="flex flex-wrap gap-2">
                       {concernOptions.map((concern) => (
                         <button
@@ -724,8 +725,8 @@ export default function Profile() {
                           onClick={() => toggleEditedListValue('currentConcerns', concern.id)}
                           className="px-3 py-2 rounded-lg border-2 text-sm transition-all flex items-center gap-2"
                           style={editedProfile.currentConcerns.includes(concern.id)
-                            ? { borderColor: '#9E6240', background: 'rgba(158, 98, 64, 0.2)', color: '#643100' }
-                            : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white', color: '#914600' }}
+                            ? { borderColor: '#9E6240', background: 'rgba(158, 98, 64, 0.2)', color: '#DD8106' }
+                            : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white', color: '#DD8106' }}
                         >
                           <span>{concern.emoji}</span>
                           <span>{concern.label}</span>
@@ -736,7 +737,7 @@ export default function Profile() {
 
                   <div className="grid md:grid-cols-2 gap-3">
                     <div>
-                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Budget</p>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Budget</p>
                       <div className="space-y-2">
                         {budgetOptions.map((option) => (
                           <button
@@ -747,14 +748,14 @@ export default function Profile() {
                               ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
                           >
-                            <span className="font-semibold block" style={{ color: '#643100' }}>{option.label}</span>
-                            <span className="text-xs" style={{ color: '#914600' }}>{option.description}</span>
+                            <span className="font-semibold block" style={{ color: '#DD8106' }}>{option.label}</span>
+                            <span className="text-xs" style={{ color: '#DD8106' }}>{option.description}</span>
                           </button>
                         ))}
                       </div>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Climate</p>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Climate</p>
                       <div className="flex flex-wrap gap-3">
                         {climateOptions.map((option) => (
                           <button
@@ -766,7 +767,7 @@ export default function Profile() {
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
                           >
                             <span className="text-xl mr-2">{option.emoji}</span>
-                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                            <span className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</span>
                           </button>
                         ))}
                       </div>
@@ -775,7 +776,7 @@ export default function Profile() {
 
                   <div className="grid md:grid-cols-2 gap-3">
                     <div>
-                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Wash Frequency / Week</p>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Wash Frequency / Week</p>
                       <input
                         type="number"
                         min={0}
@@ -786,11 +787,11 @@ export default function Profile() {
                           washFrequencyPerWeek: event.target.value === '' ? null : Number(event.target.value)
                         })}
                         className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent"
-                        style={{ borderColor: '#9E6240', background: 'white', color: '#643100' }}
+                        style={{ borderColor: '#9E6240', background: 'white', color: '#DD8106' }}
                       />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Protective Style Frequency</p>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Protective Style Frequency</p>
                       <div className="flex flex-wrap gap-3">
                         {protectiveStyleOptions.map((option) => (
                           <button
@@ -801,7 +802,7 @@ export default function Profile() {
                               ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
                           >
-                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                            <span className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</span>
                           </button>
                         ))}
                       </div>
@@ -810,7 +811,7 @@ export default function Profile() {
 
                   <div className="grid md:grid-cols-2 gap-3">
                     <div>
-                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Activity Level</p>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Activity Level</p>
                       <div className="flex flex-wrap gap-3">
                         {activityOptions.map((option) => (
                           <button
@@ -821,13 +822,13 @@ export default function Profile() {
                               ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
                           >
-                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                            <span className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</span>
                           </button>
                         ))}
                       </div>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Water Exposure</p>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Water Exposure</p>
                       <div className="flex flex-wrap gap-3">
                         {waterOptions.map((option) => (
                           <button
@@ -838,7 +839,7 @@ export default function Profile() {
                               ? { borderColor: '#9E6240', background: 'rgba(254, 244, 230, 0.8)' }
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white' }}
                           >
-                            <span className="font-semibold" style={{ color: '#643100' }}>{option.label}</span>
+                            <span className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</span>
                           </button>
                         ))}
                       </div>
@@ -846,7 +847,7 @@ export default function Profile() {
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Ingredient Allergies</p>
+                    <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Ingredient Allergies</p>
                     <div className="flex flex-wrap gap-2">
                       {allergyOptions.map((option) => (
                         <button
@@ -854,8 +855,8 @@ export default function Profile() {
                           onClick={() => toggleEditedListValue('ingredientAllergies', option)}
                           className="px-3 py-2 rounded-lg border-2 text-sm transition-all"
                           style={editedProfile.ingredientAllergies.includes(option)
-                            ? { borderColor: '#9E6240', background: 'rgba(158, 98, 64, 0.2)', color: '#643100' }
-                            : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white', color: '#914600' }}
+                            ? { borderColor: '#9E6240', background: 'rgba(158, 98, 64, 0.2)', color: '#DD8106' }
+                            : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white', color: '#DD8106' }}
                         >
                           {option}
                         </button>
@@ -864,7 +865,7 @@ export default function Profile() {
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Sensitivities / Things to Limit</p>
+                    <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Sensitivities / Things to Limit</p>
                     <div className="flex flex-wrap gap-2">
                       {sensitivityOptions.map((option) => (
                         <button
@@ -872,8 +873,8 @@ export default function Profile() {
                           onClick={() => toggleEditedListValue('ingredientSensitivities', option)}
                           className="px-3 py-2 rounded-lg border-2 text-sm transition-all"
                           style={editedProfile.ingredientSensitivities.includes(option)
-                            ? { borderColor: '#9E6240', background: 'rgba(158, 98, 64, 0.2)', color: '#643100' }
-                            : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white', color: '#914600' }}
+                            ? { borderColor: '#9E6240', background: 'rgba(158, 98, 64, 0.2)', color: '#DD8106' }
+                            : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white', color: '#DD8106' }}
                         >
                           {option}
                         </button>
@@ -882,7 +883,7 @@ export default function Profile() {
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Product Preferences</p>
+                    <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Product Preferences</p>
                     <div className="flex flex-wrap gap-2">
                       {preferenceOptions.map((option) => (
                         <button
@@ -890,8 +891,8 @@ export default function Profile() {
                           onClick={() => toggleEditedListValue('preferredProductAttributes', option)}
                           className="px-3 py-2 rounded-lg border-2 text-sm transition-all"
                           style={editedProfile.preferredProductAttributes.includes(option)
-                            ? { borderColor: '#9E6240', background: 'rgba(158, 98, 64, 0.2)', color: '#643100' }
-                            : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white', color: '#914600' }}
+                            ? { borderColor: '#9E6240', background: 'rgba(158, 98, 64, 0.2)', color: '#DD8106' }
+                            : { borderColor: 'rgba(158, 98, 64, 0.3)', background: 'white', color: '#DD8106' }}
                         >
                           {option}
                         </button>
@@ -900,13 +901,13 @@ export default function Profile() {
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Current Routine Notes</p>
+                    <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Current Routine Notes</p>
                     <textarea
                       value={editedProfile.currentRegimenNotes ?? ''}
                       onChange={(event) => updateEditedProfile({ currentRegimenNotes: event.target.value })}
                       rows={3}
                       className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent"
-                      style={{ borderColor: '#9E6240', background: 'white', color: '#643100', resize: 'vertical' }}
+                      style={{ borderColor: '#9E6240', background: 'white', color: '#DD8106', resize: 'vertical' }}
                       placeholder="Products you rotate, areas of focus, reactions to note..."
                     />
                   </div>
@@ -915,7 +916,7 @@ export default function Profile() {
             ) : (
               <div className="space-y-6">
                 <div>
-                  <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Hair & Scalp Snapshot</p>
+                  <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Hair & Scalp Snapshot</p>
                   <div className="flex flex-wrap gap-2">
                     {[{
                       label: 'Porosity',
@@ -939,7 +940,7 @@ export default function Profile() {
                       <div
                         key={item.label}
                         className="px-3 py-2 rounded-full text-sm"
-                        style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#643100' }}
+                        style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#DD8106' }}
                       >
                         <span className="font-semibold mr-1">{item.label}:</span>
                         <span className="capitalize">{item.value || 'Not set'}</span>
@@ -949,14 +950,14 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Primary Concerns</p>
+                  <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Primary Concerns</p>
                   {profile.currentConcerns.length ? (
                     <div className="flex flex-wrap gap-2">
                       {profile.currentConcerns.map((concernId: string) => {
                         const concern = concernOptions.find((item) => item.id === concernId);
                         return concern ? (
                           <div key={concernId} className="px-3 py-2 rounded-full text-sm flex items-center gap-2"
-                            style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#643100' }}>
+                            style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#DD8106' }}>
                             <span>{concern.emoji}</span>
                             <span>{concern.label}</span>
                           </div>
@@ -964,21 +965,21 @@ export default function Profile() {
                       })}
                     </div>
                   ) : (
-                    <p className="text-sm" style={{ color: '#914600' }}>No concerns set yet.</p>
+                    <p className="text-sm" style={{ color: '#DD8106' }}>No concerns set yet.</p>
                   )}
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-3">
                   <div>
-                    <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Budget & Climate</p>
-                    <div className="space-y-1 text-sm" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Budget & Climate</p>
+                    <div className="space-y-1 text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                       <div><span className="font-semibold">Budget:</span> {profile.budget || 'Not set'}</div>
                       <div><span className="font-semibold">Climate:</span> {profile.climate || 'Not set'}</div>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Routine Overview</p>
-                    <div className="space-y-1 text-sm" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Routine Overview</p>
+                    <div className="space-y-1 text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                       <div><span className="font-semibold">Wash Frequency:</span> {profile.washFrequencyPerWeek !== null ? `${profile.washFrequencyPerWeek} / week` : 'Not set'}</div>
                       <div><span className="font-semibold">Protective Styles:</span> {profile.protectiveStyleFrequency || 'Not set'}</div>
                       <div><span className="font-semibold">Activity Level:</span> {profile.activityLevel || 'Not set'}</div>
@@ -988,17 +989,17 @@ export default function Profile() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Ingredient Notes</p>
+                  <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Ingredient Notes</p>
                   <div className="space-y-2">
                     <div>
                       <span className="text-xs uppercase tracking-wide" style={{ color: '#AF5500' }}>Allergies</span>
                       <div className="flex flex-wrap gap-2 mt-1">
                         {profile.ingredientAllergies.length ? profile.ingredientAllergies.map((item: string) => (
                           <span key={item} className="px-3 py-1 rounded-full text-xs"
-                            style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#643100' }}>
+                            style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#DD8106' }}>
                             {item}
                           </span>
-                        )) : <span className="text-sm" style={{ color: '#914600' }}>None added</span>}
+                        )) : <span className="text-sm" style={{ color: '#DD8106' }}>None added</span>}
                       </div>
                     </div>
                     <div>
@@ -1006,10 +1007,10 @@ export default function Profile() {
                       <div className="flex flex-wrap gap-2 mt-1">
                         {profile.ingredientSensitivities.length ? profile.ingredientSensitivities.map((item: string) => (
                           <span key={item} className="px-3 py-1 rounded-full text-xs"
-                            style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#643100' }}>
+                            style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#DD8106' }}>
                             {item}
                           </span>
-                        )) : <span className="text-sm" style={{ color: '#914600' }}>None added</span>}
+                        )) : <span className="text-sm" style={{ color: '#DD8106' }}>None added</span>}
                       </div>
                     </div>
                     <div>
@@ -1017,18 +1018,18 @@ export default function Profile() {
                       <div className="flex flex-wrap gap-2 mt-1">
                         {profile.preferredProductAttributes.length ? profile.preferredProductAttributes.map((item: string) => (
                           <span key={item} className="px-3 py-1 rounded-full text-xs"
-                            style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#643100' }}>
+                            style={{ background: 'rgba(175, 85, 0, 0.2)', border: '1px solid #AF5500', color: '#DD8106' }}>
                             {item}
                           </span>
-                        )) : <span className="text-sm" style={{ color: '#914600' }}>None added</span>}
+                        )) : <span className="text-sm" style={{ color: '#DD8106' }}>None added</span>}
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <p className="text-sm font-semibold mb-2" style={{ color: '#914600' }}>Routine Notes</p>
-                  <p className="text-sm" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  <p className="text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Routine Notes</p>
+                  <p className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     {profile.currentRegimenNotes ? profile.currentRegimenNotes : 'No notes captured yet.'}
                   </p>
                 </div>
@@ -1047,37 +1048,37 @@ export default function Profile() {
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold flex items-center gap-2"
-                  style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-                  <Calendar style={{ color: '#643100' }} size={24} />
+                  style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
+                  <Calendar style={{ color: '#DD8106' }} size={24} />
                   Latest Booking
                 </h3>
               </div>
 
               <div className="space-y-2">
                 <div>
-                  <label className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  <label className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     Style
                   </label>
                   <p className="text-lg font-semibold capitalize" 
-                    style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     {profile.lastBooking.style.replace(/-/g, ' ')}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  <label className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     Date
                   </label>
                   <p className="text-lg font-semibold" 
-                    style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     {profile.lastBooking.date}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  <label className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     Stylist
                   </label>
                   <p className="text-lg font-semibold" 
-                    style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     {profile.lastBooking.stylist}
                   </p>
                 </div>
@@ -1088,7 +1089,7 @@ export default function Profile() {
                 className="mt-4 w-full py-3 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
                 style={{ 
                   background: '#643100', 
-                  color: '#FDF4E8',
+                  color: '#DD8106',
                   fontFamily: 'Bricolage Grotesque, sans-serif'
                 }}
               >
@@ -1104,11 +1105,11 @@ export default function Profile() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className="rounded-2xl shadow-xl p-6"
-            style={{ background: '#FDF4E8', border: '2px solid #914600' }}
+            style={{ background: '#FFFEE1', border: '2px solid #914600' }}
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold flex items-center gap-2"
-                style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                 <FileText style={{ color: '#AF5500' }} size={24} />
                 Saved Routines
               </h3>
@@ -1117,7 +1118,7 @@ export default function Profile() {
                 className="px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2"
                 style={{ 
                   background: '#AF5500', 
-                  color: '#FDF4E8',
+                  color: '#DD8106',
                   fontFamily: 'Bricolage Grotesque, sans-serif'
                 }}
               >
@@ -1129,7 +1130,7 @@ export default function Profile() {
             {!profile.savedRoutines || profile.savedRoutines.length === 0 ? (
               <div className="text-center py-8">
                 <FileText className="mx-auto mb-3" style={{ color: '#CE935F' }} size={48} />
-                <p className="mb-4" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                <p className="mb-4" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   No saved routines yet
                 </p>
                 <button
@@ -1137,7 +1138,7 @@ export default function Profile() {
                   className="px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
                   style={{ 
                     background: '#643100', 
-                    color: '#FDF4E8',
+                    color: '#DD8106',
                     fontFamily: 'Bricolage Grotesque, sans-serif'
                   }}
                 >
@@ -1154,7 +1155,7 @@ export default function Profile() {
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
-                        <p className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                        <p className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                           {new Date(routine.createdAt).toLocaleDateString('en', {
                             month: 'long',
                             day: 'numeric',
@@ -1165,11 +1166,11 @@ export default function Profile() {
                         </p>
                         <div className="flex gap-2 mt-2">
                           <span className="px-3 py-1 rounded-full text-xs font-semibold"
-                            style={{ background: 'rgba(175, 85, 0, 0.2)', color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                            style={{ background: 'rgba(175, 85, 0, 0.2)', color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             {routine.hairAnalysis?.hairType?.hairType || routine.hairAnalysis?.hairType || '4c'}
                           </span>
                           <span className="px-3 py-1 rounded-full text-xs font-semibold"
-                            style={{ background: 'rgba(206, 147, 95, 0.3)', color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                            style={{ background: 'rgba(206, 147, 95, 0.3)', color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             Health: {routine.hairAnalysis?.health?.healthScore || routine.hairAnalysis?.health?.score || 65}/100
                           </span>
                         </div>
@@ -1177,7 +1178,7 @@ export default function Profile() {
                       <button
                         onClick={() => deleteRoutine(routine.id)}
                         className="p-2 rounded-lg transition-all"
-                        style={{ color: '#914600' }}
+                        style={{ color: '#DD8106' }}
                         title="Delete routine"
                       >
                         <Trash2 size={18} />
@@ -1189,26 +1190,26 @@ export default function Profile() {
                       style={{ background: 'rgba(206, 147, 95, 0.15)' }}>
                       <div className="grid grid-cols-3 gap-2 text-center">
                         <div>
-                          <p className="text-xs" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          <p className="text-xs" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             Daily Steps
                           </p>
-                          <p className="text-lg font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                          <p className="text-lg font-bold" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                             {routine.routine?.personalizedRoutine?.daily?.length || 0}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          <p className="text-xs" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             Weekly Steps
                           </p>
-                          <p className="text-lg font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                          <p className="text-lg font-bold" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                             {routine.routine?.personalizedRoutine?.weekly?.length || 0}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          <p className="text-xs" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             Monthly Steps
                           </p>
-                          <p className="text-lg font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                          <p className="text-lg font-bold" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                             {routine.routine?.personalizedRoutine?.monthly?.length || 0}
                           </p>
                         </div>
@@ -1218,7 +1219,7 @@ export default function Profile() {
                     {/* Notes */}
                     <div className="mb-3">
                       <label className="text-xs mb-1 block" 
-                        style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                        style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                         Notes:
                       </label>
                       <textarea
@@ -1228,7 +1229,7 @@ export default function Profile() {
                         className="w-full px-3 py-2 rounded-lg text-sm"
                         style={{ 
                           border: '2px solid #914600', 
-                          color: '#643100',
+                          color: '#DD8106',
                           fontFamily: 'Bricolage Grotesque, sans-serif'
                         }}
                         rows={2}
@@ -1242,7 +1243,7 @@ export default function Profile() {
                         className="py-2 rounded-lg text-sm font-semibold transition-all"
                         style={{ 
                           background: 'rgba(175, 85, 0, 0.15)', 
-                          color: '#643100',
+                          color: '#DD8106',
                           border: '1px solid #AF5500',
                           fontFamily: 'Bricolage Grotesque, sans-serif'
                         }}
@@ -1254,7 +1255,7 @@ export default function Profile() {
                         className="py-2 rounded-lg text-sm font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
                         style={{ 
                           background: '#643100', 
-                          color: '#FDF4E8',
+                          color: '#DD8106',
                           fontFamily: 'Bricolage Grotesque, sans-serif'
                         }}
                       >
@@ -1268,17 +1269,17 @@ export default function Profile() {
                       <div className="mt-4 pt-4 space-y-3" style={{ borderTop: '2px solid #CE935F' }}>
                         <div>
                           <h4 className="font-semibold mb-2" 
-                            style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                            style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                             Expected Results:
                           </h4>
-                          <p className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          <p className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             {routine.routine?.expectedResults?.timeline || 'View your routine for details'}
                           </p>
                           {routine.routine?.expectedResults?.improvements && (
                             <ul className="mt-2 space-y-1">
                               {routine.routine.expectedResults.improvements.slice(0, 3).map((imp: string, i: number) => (
                                 <li key={i} className="text-xs flex items-start gap-2" 
-                                  style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                   <span style={{ color: '#AF5500' }}>•</span>
                                   <span>{imp}</span>
                                 </li>
@@ -1289,14 +1290,14 @@ export default function Profile() {
                         
                         <div>
                           <h4 className="font-semibold mb-2" 
-                            style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                            style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                             Products Recommended:
                           </h4>
                           {routine.routine?.productRecommendations?.essential && (
                             <div className="space-y-1">
                               {routine.routine.productRecommendations.essential.slice(0, 3).map((product: any, i: number) => (
                                 <p key={i} className="text-xs" 
-                                  style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                   • {product.brand} - {product.name}
                                 </p>
                               ))}
@@ -1321,14 +1322,14 @@ export default function Profile() {
             <button
               onClick={() => router.push('/recommendations')}
               className="p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-left"
-              style={{ background: '#FDF4E8', border: '2px solid #914600' }}
+              style={{ background: '#FFFEE1', border: '2px solid #914600' }}
             >
               <Sparkles className="mb-3" style={{ color: '#AF5500' }} size={32} />
               <h4 className="font-bold mb-1" 
-                style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                 Daily Tips
               </h4>
-              <p className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              <p className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 View your personalized recommendations
               </p>
             </button>
@@ -1336,18 +1337,28 @@ export default function Profile() {
             <button
               onClick={() => router.push('/stylists')}
               className="p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all text-left"
-              style={{ background: '#FDF4E8', border: '2px solid #914600' }}
+              style={{ background: '#FFFEE1', border: '2px solid #914600' }}
             >
               <User className="mb-3" style={{ color: '#AF5500' }} size={32} />
               <h4 className="font-bold mb-1" 
-                style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                 Find Stylists
               </h4>
-              <p className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              <p className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 Browse verified professionals
               </p>
             </button>
           </motion.div>
+
+          <p className="text-center mt-8">
+            <Link
+              href="/?replay=1"
+              className="text-sm underline hover:no-underline"
+              style={{ color: '#AF5500', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+            >
+              Replay intro video
+            </Link>
+          </p>
         </div>
       </div>
       </div>

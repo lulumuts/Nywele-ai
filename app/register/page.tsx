@@ -183,7 +183,7 @@ export default function Register() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center space-x-2">
             <img src="/coil.svg" alt="Nywele.ai" className="w-8 h-8" />
-            <h1 className="text-2xl font-bold" style={{ fontFamily: 'Caprasimo, serif', color: '#9E6240' }}>
+            <h1 className="text-2xl font-bold" style={{ fontFamily: 'Caprasimo, serif', color: '#DD8106' }}>
               nywele.ai
           </h1>
           </div>
@@ -235,13 +235,13 @@ export default function Register() {
               <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#9E6240' }}>
                 <User size={32} style={{ color: '#FFFFFF' }} />
               </div>
-              <h2 className="text-3xl font-bold mb-2" style={{ color: '#9E6240' }}>Welcome to Nywele.ai!</h2>
-              <p style={{ color: '#914600' }}>Let's create your profile</p>
+              <h2 className="text-3xl font-bold mb-2" style={{ color: '#DD8106' }}>Welcome to Nywele.ai!</h2>
+              <p style={{ color: '#DD8106' }}>Let's create your profile</p>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: '#914600' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>
                   Your Name *
                 </label>
                 <input
@@ -255,7 +255,7 @@ export default function Register() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: '#914600' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>
                   Email Address *
                 </label>
                 <input
@@ -293,8 +293,8 @@ export default function Register() {
               <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#9E6240' }}>
                 <Sparkles size={32} style={{ color: '#FFFFFF' }} />
               </div>
-              <h2 className="text-3xl font-bold mb-2" style={{ color: '#9E6240' }}>What's Your Hair Type?</h2>
-              <p style={{ color: '#914600' }}>This helps us personalize your recommendations</p>
+              <h2 className="text-3xl font-bold mb-2" style={{ color: '#DD8106' }}>What's Your Hair Type?</h2>
+              <p style={{ color: '#DD8106' }}>This helps us personalize your recommendations</p>
             </div>
 
             <div className="grid grid-cols-3 gap-4 mb-8">
@@ -314,8 +314,8 @@ export default function Register() {
                   }
                 >
                   <div className="text-center">
-                    <p className="text-2xl font-bold mb-1" style={{ color: '#9E6240' }}>{type.toUpperCase()}</p>
-                    <p className="text-xs" style={{ color: '#914600' }}>
+                    <p className="text-2xl font-bold mb-1" style={{ color: '#DD8106' }}>{type.toUpperCase()}</p>
+                    <p className="text-xs" style={{ color: '#DD8106' }}>
                       {type === '4a' && 'Coily, S-pattern'}
                       {type === '4b' && 'Coily, Z-pattern'}
                       {type === '4c' && 'Tightly coiled'}
@@ -329,7 +329,7 @@ export default function Register() {
               <button
                 onClick={() => setStep(1)}
                 className="px-6 py-4 border-2 rounded-xl font-semibold transition-all"
-                style={{ borderColor: '#9E6240', color: '#914600', backgroundColor: 'white' }}
+                style={{ borderColor: '#9E6240', color: '#DD8106', backgroundColor: 'white' }}
               >
                 Back
               </button>
@@ -358,8 +358,8 @@ export default function Register() {
               <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#9E6240' }}>
                 <Sparkles size={32} style={{ color: '#FFFFFF' }} />
               </div>
-              <h2 className="text-3xl font-bold mb-2" style={{ color: '#9E6240' }}>What Are Your Hair Goals?</h2>
-              <p style={{ color: '#914600' }}>Select all that apply</p>
+              <h2 className="text-3xl font-bold mb-2" style={{ color: '#DD8106' }}>What Are Your Hair Goals?</h2>
+              <p style={{ color: '#DD8106' }}>Select all that apply</p>
             </div>
 
             {/* Hair Goals Selection */}
@@ -382,10 +382,10 @@ export default function Register() {
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{goal.emoji}</span>
                     <div>
-                      <p className="font-semibold" style={{ color: '#9E6240' }}>{goal.label}</p>
+                      <p className="font-semibold" style={{ color: '#DD8106' }}>{goal.label}</p>
                     </div>
                     {selectedGoals.includes(goal.id) && (
-                      <Check className="ml-auto" size={20} style={{ color: '#9E6240' }} />
+                      <Check className="ml-auto" size={20} style={{ color: '#DD8106' }} />
                     )}
                   </div>
                 </button>
@@ -393,7 +393,7 @@ export default function Register() {
             </div>
 
             <div className="rounded-xl p-4 mb-6" style={{ backgroundColor: 'rgba(158, 98, 64, 0.2)' }}>
-              <p className="text-sm text-center" style={{ color: '#914600' }}>
+              <p className="text-sm text-center" style={{ color: '#DD8106' }}>
                 Selected: <span className="font-bold">{selectedGoals.length}</span> goal(s)
               </p>
             </div>
@@ -405,7 +405,7 @@ export default function Register() {
                 className="w-full py-3 rounded-xl border-2 font-medium transition-all flex items-center justify-center gap-2"
                 style={{ 
                   borderColor: '#9E6240', 
-                  color: '#914600', 
+                  color: '#DD8106', 
                   backgroundColor: showOptional ? 'rgba(254, 244, 230, 0.8)' : 'white'
                 }}
               >
@@ -427,7 +427,7 @@ export default function Register() {
               >
               {/* Hair Porosity */}
               <div>
-                  <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                  <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                     Hair Porosity (Optional)
                   </label>
                 <div className="grid grid-cols-3 gap-3">
@@ -446,8 +446,8 @@ export default function Register() {
                           : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
                       }
                     >
-                      <p className="font-semibold mb-1" style={{ color: '#9E6240' }}>{option.label}</p>
-                      <p className="text-xs" style={{ color: '#914600' }}>{option.desc}</p>
+                      <p className="font-semibold mb-1" style={{ color: '#DD8106' }}>{option.label}</p>
+                      <p className="text-xs" style={{ color: '#DD8106' }}>{option.desc}</p>
                     </button>
                   ))}
                 </div>
@@ -455,7 +455,7 @@ export default function Register() {
 
               {/* Hair Length */}
               <div>
-                  <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                  <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                     Current Hair Length (Optional)
                   </label>
                 <div className="grid grid-cols-3 gap-3">
@@ -475,7 +475,7 @@ export default function Register() {
                       }
                     >
                       <p className="text-2xl mb-1">{option.emoji}</p>
-                      <p className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</p>
+                      <p className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</p>
                     </button>
                   ))}
                 </div>
@@ -483,7 +483,7 @@ export default function Register() {
 
               {/* Current Concerns */}
               <div>
-                <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                   Current Concerns (Optional)
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -500,9 +500,9 @@ export default function Register() {
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-xl">{concern.emoji}</span>
-                        <p className="text-sm font-semibold" style={{ color: '#9E6240' }}>{concern.label}</p>
+                        <p className="text-sm font-semibold" style={{ color: '#DD8106' }}>{concern.label}</p>
                         {selectedConcerns.includes(concern.id) && (
-                          <Check className="ml-auto" size={16} style={{ color: '#9E6240' }} />
+                          <Check className="ml-auto" size={16} style={{ color: '#DD8106' }} />
                         )}
                       </div>
                     </button>
@@ -512,7 +512,7 @@ export default function Register() {
 
               {/* Budget */}
               <div>
-                <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                   Monthly Hair Care Budget (Optional)
                 </label>
                 <div className="grid grid-cols-3 gap-3">
@@ -531,8 +531,8 @@ export default function Register() {
                           : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
                       }
                     >
-                      <p className="font-semibold mb-1" style={{ color: '#9E6240' }}>{option.label}</p>
-                      <p className="text-xs" style={{ color: '#914600' }}>{option.desc}</p>
+                      <p className="font-semibold mb-1" style={{ color: '#DD8106' }}>{option.label}</p>
+                      <p className="text-xs" style={{ color: '#DD8106' }}>{option.desc}</p>
                     </button>
                   ))}
                 </div>
@@ -540,7 +540,7 @@ export default function Register() {
 
               {/* Climate */}
               <div>
-                <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                   Your Climate (Optional)
                 </label>
                 <div className="grid grid-cols-3 gap-3">
@@ -560,7 +560,7 @@ export default function Register() {
                       }
                     >
                       <p className="text-2xl mb-1">{option.emoji}</p>
-                      <p className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</p>
+                      <p className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</p>
                       </button>
                     ))}
                   </div>
@@ -568,7 +568,7 @@ export default function Register() {
 
                 <div className="grid md:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                       Hair Density
                     </label>
                     <div className="flex flex-wrap gap-3">
@@ -583,14 +583,14 @@ export default function Register() {
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
                           }
                         >
-                          <span className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</span>
+                          <span className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</span>
                         </button>
                       ))}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                       Strand Thickness
                     </label>
                     <div className="flex flex-wrap gap-3">
@@ -605,7 +605,7 @@ export default function Register() {
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
                           }
                         >
-                          <span className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</span>
+                          <span className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</span>
                         </button>
                       ))}
                     </div>
@@ -614,7 +614,7 @@ export default function Register() {
 
                 <div className="grid md:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                       Elasticity
                     </label>
                     <div className="space-y-2">
@@ -629,15 +629,15 @@ export default function Register() {
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
                           }
                         >
-                          <span className="font-semibold block" style={{ color: '#9E6240' }}>{option.label}</span>
-                          <span className="text-xs" style={{ color: '#914600' }}>{option.description}</span>
+                          <span className="font-semibold block" style={{ color: '#DD8106' }}>{option.label}</span>
+                          <span className="text-xs" style={{ color: '#DD8106' }}>{option.description}</span>
                         </button>
                       ))}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                       Scalp Condition
                     </label>
                     <div className="flex flex-wrap gap-3">
@@ -652,7 +652,7 @@ export default function Register() {
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
                           }
                         >
-                          <span className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</span>
+                          <span className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</span>
                     </button>
                   ))}
                 </div>
@@ -661,7 +661,7 @@ export default function Register() {
 
                 <div className="grid md:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                       How often do you wash per week?
                     </label>
                     <input
@@ -673,15 +673,15 @@ export default function Register() {
                       onChange={(event) => setWashFrequency(event.target.value)}
                       placeholder="e.g. 1.5"
                       className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent"
-                      style={{ borderColor: '#9E6240', backgroundColor: 'white', color: '#643100' }}
+                      style={{ borderColor: '#9E6240', backgroundColor: 'white', color: '#DD8106' }}
                     />
-                    <p className="text-xs mt-2" style={{ color: '#914600' }}>
+                    <p className="text-xs mt-2" style={{ color: '#DD8106' }}>
                       Include co-washes in your count. Use decimals for alternating weeks.
               </p>
             </div>
 
                   <div>
-                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                       Protective Style Frequency
                     </label>
                     <div className="flex flex-wrap gap-3">
@@ -696,7 +696,7 @@ export default function Register() {
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
                           }
                         >
-                          <span className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</span>
+                          <span className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</span>
                         </button>
                       ))}
                     </div>
@@ -705,7 +705,7 @@ export default function Register() {
 
                 <div className="grid md:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                       Activity Level
                     </label>
                     <div className="flex flex-wrap gap-3">
@@ -720,14 +720,14 @@ export default function Register() {
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
                           }
                         >
-                          <span className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</span>
+                          <span className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</span>
                         </button>
                       ))}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                    <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                       Water Exposure
                     </label>
                     <div className="flex flex-wrap gap-3">
@@ -742,7 +742,7 @@ export default function Register() {
                               : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white' }
                           }
                         >
-                          <span className="font-semibold" style={{ color: '#9E6240' }}>{option.label}</span>
+                          <span className="font-semibold" style={{ color: '#DD8106' }}>{option.label}</span>
                         </button>
                       ))}
                     </div>
@@ -750,7 +750,7 @@ export default function Register() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                  <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                     Ingredient Allergies
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -761,8 +761,8 @@ export default function Register() {
                         className="px-3 py-2 rounded-lg border-2 text-sm transition-all"
                         style={
                           selectedAllergies.includes(option)
-                            ? { borderColor: '#9E6240', backgroundColor: 'rgba(158, 98, 64, 0.2)', color: '#643100' }
-                            : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white', color: '#914600' }
+                            ? { borderColor: '#9E6240', backgroundColor: 'rgba(158, 98, 64, 0.2)', color: '#DD8106' }
+                            : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white', color: '#DD8106' }
                         }
                       >
                         {option}
@@ -772,7 +772,7 @@ export default function Register() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                  <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                     Sensitivities / Things to Limit
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -783,8 +783,8 @@ export default function Register() {
                         className="px-3 py-2 rounded-lg border-2 text-sm transition-all"
                         style={
                           selectedSensitivities.includes(option)
-                            ? { borderColor: '#9E6240', backgroundColor: 'rgba(158, 98, 64, 0.2)', color: '#643100' }
-                            : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white', color: '#914600' }
+                            ? { borderColor: '#9E6240', backgroundColor: 'rgba(158, 98, 64, 0.2)', color: '#DD8106' }
+                            : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white', color: '#DD8106' }
                         }
                       >
                         {option}
@@ -794,7 +794,7 @@ export default function Register() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold mb-3" style={{ color: '#914600' }}>
+                  <label className="block text-sm font-semibold mb-3" style={{ color: '#DD8106' }}>
                     Product Preferences
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -805,8 +805,8 @@ export default function Register() {
                         className="px-3 py-2 rounded-lg border-2 text-sm transition-all"
                         style={
                           selectedPreferences.includes(option)
-                            ? { borderColor: '#9E6240', backgroundColor: 'rgba(158, 98, 64, 0.2)', color: '#643100' }
-                            : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white', color: '#914600' }
+                            ? { borderColor: '#9E6240', backgroundColor: 'rgba(158, 98, 64, 0.2)', color: '#DD8106' }
+                            : { borderColor: 'rgba(158, 98, 64, 0.3)', backgroundColor: 'white', color: '#DD8106' }
                         }
                       >
                         {option}
@@ -816,7 +816,7 @@ export default function Register() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold mb-2" style={{ color: '#914600' }}>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>
                     Current Routine Notes
                   </label>
                   <textarea
@@ -825,7 +825,7 @@ export default function Register() {
                     placeholder="Products you rotate, areas of focus, reactions to note..."
                     rows={3}
                     className="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:border-transparent"
-                    style={{ borderColor: '#9E6240', backgroundColor: 'white', color: '#643100', resize: 'vertical' }}
+                    style={{ borderColor: '#9E6240', backgroundColor: 'white', color: '#DD8106', resize: 'vertical' }}
                   />
                 </div>
               </motion.div>
@@ -835,7 +835,7 @@ export default function Register() {
               <button
                 onClick={() => setStep(2)}
                 className="px-6 py-4 border-2 rounded-xl font-semibold transition-all"
-                style={{ borderColor: '#9E6240', color: '#914600', backgroundColor: 'white' }}
+                style={{ borderColor: '#9E6240', color: '#DD8106', backgroundColor: 'white' }}
               >
                 Back
               </button>

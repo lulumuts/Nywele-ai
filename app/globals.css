@@ -3,30 +3,40 @@
 @tailwind utilities;
 
 :root {
-  --background: #FDF4E8;
-  --foreground: #171717;
+  --background: #FFFEE1;
+  --foreground: #DD8106;
   --primary: #AF5500;
   --primary-dark: #643100;
   --accent: #CE935F;
-  --cream: #FDF4E8;
+  --cream: #FFFEE1;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #FDF4E8;
-    --foreground: #171717;
+    --background: #FFFEE1;
+    --foreground: #DD8106;
   }
 }
 
 html {
-  background: #FDF4E8;
+  background: #FFFEE1;
 }
 
 body {
   color: var(--foreground);
-  background: #FDF4E8;
+  background: #FFFEE1;
   overflow-x: hidden;
   min-height: 100vh;
+}
+
+/* Override Tailwind gray and white text to use brand color */
+.text-gray-400,
+.text-gray-500,
+.text-gray-600,
+.text-gray-700,
+.text-gray-800,
+.text-white {
+  color: #DD8106 !important;
 }
 
 @layer utilities {

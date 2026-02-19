@@ -12,8 +12,8 @@ export default function SpecSummary({ spec, showTitle = true }: SpecSummaryProps
   return (
     <div className="rounded-xl p-6" style={{ background: 'rgba(206, 147, 95, 0.15)', border: '2px solid #CE935F' }}>
       {showTitle && (
-        <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#643100' }}>
-          <Package style={{ color: '#914600' }} size={24} />
+        <h3 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: '#DD8106' }}>
+          <Package style={{ color: '#DD8106' }} size={24} />
           Job Specification
         </h3>
       )}
@@ -21,10 +21,10 @@ export default function SpecSummary({ spec, showTitle = true }: SpecSummaryProps
       {/* Time Estimate */}
       <div className="mb-4 p-3 rounded-lg" style={{ background: '#FFFBF5' }}>
         <div className="flex items-center gap-2 mb-1">
-          <Clock style={{ color: '#914600' }} size={18} />
-          <p className="font-semibold" style={{ color: '#643100' }}>Time Estimate</p>
+          <Clock style={{ color: '#DD8106' }} size={18} />
+          <p className="font-semibold" style={{ color: '#DD8106' }}>Time Estimate</p>
         </div>
-        <p className="ml-6" style={{ color: '#914600' }}>
+        <p className="ml-6" style={{ color: '#DD8106' }}>
           {spec.time_min_hours}-{spec.time_max_hours} hours
         </p>
       </div>
@@ -33,23 +33,23 @@ export default function SpecSummary({ spec, showTitle = true }: SpecSummaryProps
       {spec.hair_extensions.quantity_max > 0 && (
         <div className="mb-4 p-4 rounded-lg" style={{ background: '#FFFBF5', border: '2px solid #CE935F' }}>
           <div className="flex items-center gap-2 mb-3">
-            <ShoppingBag style={{ color: '#914600' }} size={20} />
-            <h4 className="font-bold" style={{ color: '#643100' }}>Hair Extensions</h4>
+            <ShoppingBag style={{ color: '#DD8106' }} size={20} />
+            <h4 className="font-bold" style={{ color: '#DD8106' }}>Hair Extensions</h4>
           </div>
           <div className="space-y-2 pl-7">
-            <p style={{ color: '#914600' }}>
+            <p style={{ color: '#DD8106' }}>
               <span className="font-medium">Type:</span> {spec.hair_extensions.type}
             </p>
-            <p style={{ color: '#914600' }}>
+            <p style={{ color: '#DD8106' }}>
               <span className="font-medium">Quantity:</span> {spec.hair_extensions.quantity_min}-
               {spec.hair_extensions.quantity_max} packs
             </p>
-            <p style={{ color: '#914600' }}>
+            <p style={{ color: '#DD8106' }}>
               <span className="font-medium">Cost per pack:</span> KES{' '}
               {spec.hair_extensions.cost_per_pack_kes.toLocaleString()}
             </p>
             <div className="pt-2 mt-2 border-t" style={{ borderColor: '#E5D4C1' }}>
-              <p className="text-lg font-bold" style={{ color: '#914600' }}>
+              <p className="text-lg font-bold" style={{ color: '#DD8106' }}>
                 KES {spec.total_extensions_min_kes.toLocaleString()} -{' '}
                 {spec.total_extensions_max_kes.toLocaleString()}
               </p>
@@ -61,19 +61,19 @@ export default function SpecSummary({ spec, showTitle = true }: SpecSummaryProps
       {/* Labor Cost */}
       <div className="mb-4 p-4 rounded-lg" style={{ background: '#FFFBF5', border: '2px solid #CE935F' }}>
         <div className="flex items-center gap-2 mb-3">
-          <Scissors style={{ color: '#914600' }} size={20} />
-          <h4 className="font-bold" style={{ color: '#643100' }}>Labor Cost</h4>
+          <Scissors style={{ color: '#DD8106' }} size={20} />
+          <h4 className="font-bold" style={{ color: '#DD8106' }}>Labor Cost</h4>
         </div>
         <div className="space-y-2 pl-7">
-          <p style={{ color: '#914600' }}>
+          <p style={{ color: '#DD8106' }}>
             <span className="font-medium">Base rate:</span> KES{' '}
             {spec.labor.base_rate_per_hour_kes.toLocaleString()}/hour
           </p>
-          <p style={{ color: '#914600' }}>
+          <p style={{ color: '#DD8106' }}>
             <span className="font-medium">Time:</span> {spec.time_min_hours}-{spec.time_max_hours} hours
           </p>
           <div className="pt-2 mt-2 border-t" style={{ borderColor: '#E5D4C1' }}>
-            <p className="text-lg font-bold" style={{ color: '#914600' }}>
+            <p className="text-lg font-bold" style={{ color: '#DD8106' }}>
               KES {spec.total_labor_min_kes.toLocaleString()} -{' '}
               {spec.total_labor_max_kes.toLocaleString()}
             </p>
@@ -85,24 +85,24 @@ export default function SpecSummary({ spec, showTitle = true }: SpecSummaryProps
       {spec.styling_products.length > 0 && (
         <div className="mb-4 p-4 rounded-lg" style={{ background: '#FFFBF5' }}>
           <div className="flex items-center gap-2 mb-3">
-            <Package style={{ color: '#914600' }} size={18} />
-            <h4 className="font-semibold" style={{ color: '#643100' }}>Styling Products</h4>
+            <Package style={{ color: '#DD8106' }} size={18} />
+            <h4 className="font-semibold" style={{ color: '#DD8106' }}>Styling Products</h4>
           </div>
           <div className="space-y-2 pl-7">
             {spec.styling_products.map((product, idx) => (
               <div key={idx} className="flex justify-between items-center">
-                <p className="text-sm" style={{ color: '#914600' }}>
+                <p className="text-sm" style={{ color: '#DD8106' }}>
                   {product.item} {product.optional && '(optional)'}
                 </p>
-                <p className="text-sm font-medium" style={{ color: '#643100' }}>
+                <p className="text-sm font-medium" style={{ color: '#DD8106' }}>
                   KES {product.cost_kes.toLocaleString()}
                 </p>
               </div>
             ))}
             <div className="pt-2 mt-2 border-t" style={{ borderColor: '#E5D4C1' }}>
               <div className="flex justify-between items-center">
-                <p className="text-sm font-medium" style={{ color: '#914600' }}>Subtotal:</p>
-                <p className="font-semibold" style={{ color: '#643100' }}>
+                <p className="text-sm font-medium" style={{ color: '#DD8106' }}>Subtotal:</p>
+                <p className="font-semibold" style={{ color: '#DD8106' }}>
                   KES {spec.total_styling_products_kes.toLocaleString()}
                 </p>
               </div>
@@ -112,7 +112,7 @@ export default function SpecSummary({ spec, showTitle = true }: SpecSummaryProps
       )}
 
       {/* Grand Total */}
-      <div className="p-4 rounded-lg" style={{ background: 'linear-gradient(135deg, #643100 0%, #914600 100%)', color: 'white' }}>
+      <div className="p-4 rounded-lg" style={{ background: 'linear-gradient(135deg, #643100 0%, #914600 100%)', color: '#DD8106' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp size={24} />
@@ -132,15 +132,15 @@ export default function SpecSummary({ spec, showTitle = true }: SpecSummaryProps
 
       {/* Hair Requirements */}
       <div className="mt-4 p-3 rounded-lg" style={{ background: '#FFFBF5' }}>
-        <p className="text-sm" style={{ color: '#914600' }}>
+        <p className="text-sm" style={{ color: '#DD8106' }}>
           <span className="font-semibold">Min. Hair Length:</span>{' '}
           {spec.hair_requirements.min_length}
         </p>
-        <p className="text-sm" style={{ color: '#914600' }}>
+        <p className="text-sm" style={{ color: '#DD8106' }}>
           <span className="font-semibold">Suitable for:</span>{' '}
           {spec.hair_requirements.textures.join(', ')}
         </p>
-        <p className="text-sm" style={{ color: '#914600' }}>
+        <p className="text-sm" style={{ color: '#DD8106' }}>
           <span className="font-semibold">Skill Level:</span>{' '}
           <span className="capitalize">{spec.skill_level}</span>
         </p>

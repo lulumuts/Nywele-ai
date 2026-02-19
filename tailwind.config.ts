@@ -11,15 +11,15 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        'cream': '#FDF4E8',
+        'cream': '#FFFEE1',
         'primary': '#AF5500',
         'primary-dark': '#643100',
         'accent': '#CE935F',
-        'peach': '#FDF4E8', // Updated to match new design
+        'peach': '#FFFEE1', // Updated to match new design
       },
       backgroundColor: {
-        'cream': '#FDF4E8',
-        'peach': '#FDF4E8',
+        'cream': '#FFFEE1',
+        'peach': '#FFFEE1',
         'primary': '#AF5500',
         'primary-dark': '#643100',
       },

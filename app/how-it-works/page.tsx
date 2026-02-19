@@ -117,14 +117,14 @@ export default function HowItWorks() {
         <div className="max-w-6xl mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4" 
-            style={{ backgroundColor: 'rgba(206, 147, 95, 0.2)', color: '#914600' }}>
+            style={{ backgroundColor: 'rgba(206, 147, 95, 0.2)', color: '#DD8106' }}>
             <Sparkles className="w-4 h-4" />
             AI-Powered African Hair Care
           </div>
-          <h1 className="text-5xl font-bold mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+          <h1 className="text-5xl font-bold mb-4" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
             How Nywele.ai Works
           </h1>
-          <p className="text-xl max-w-3xl mx-auto mb-6" style={{ color: '#914600' }}>
+          <p className="text-xl max-w-3xl mx-auto mb-6" style={{ color: '#DD8106' }}>
             Your complete AI-powered platform for African hair care and styling
           </p>
           <p className="text-lg max-w-4xl mx-auto" style={{ color: '#AF5500' }}>
@@ -134,7 +134,7 @@ export default function HowItWorks() {
 
         {/* Features Overview */}
         <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+          <h2 className="text-3xl font-bold text-center mb-12" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
             What We Offer
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -146,8 +146,8 @@ export default function HowItWorks() {
                   <div className={`${feature.color} p-4 rounded-xl w-fit mb-4`}>
                     <Icon className="w-8 h-8 text-white" />
         </div>
-                  <h3 className="text-xl font-bold mb-3" style={{ color: '#643100' }}>{feature.name}</h3>
-                  <p className="mb-3" style={{ color: '#914600' }}>{feature.description}</p>
+                  <h3 className="text-xl font-bold mb-3" style={{ color: '#DD8106' }}>{feature.name}</h3>
+                  <p className="mb-3" style={{ color: '#DD8106' }}>{feature.description}</p>
                   <p className="text-sm" style={{ color: '#AF5500' }}>{feature.details}</p>
             </div>
               );
@@ -157,7 +157,7 @@ export default function HowItWorks() {
 
         {/* Tech Stack Cards */}
         <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+          <h2 className="text-3xl font-bold text-center mb-12" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
             Our Technology
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -169,8 +169,8 @@ export default function HowItWorks() {
                   <div className={`${tech.color} p-3 rounded-xl w-fit mb-4`}>
                       <Icon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2" style={{ color: '#643100' }}>{tech.name}</h3>
-                  <p className="text-sm font-medium mb-3" style={{ color: '#914600' }}>{tech.role}</p>
+                  <h3 className="text-xl font-bold mb-2" style={{ color: '#DD8106' }}>{tech.name}</h3>
+                  <p className="text-sm font-medium mb-3" style={{ color: '#DD8106' }}>{tech.role}</p>
                   <p className="text-sm" style={{ color: '#AF5500' }}>{tech.description}</p>
                 </div>
               );
@@ -180,10 +180,10 @@ export default function HowItWorks() {
 
         {/* Hair Care Workflow Section */}
         <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+          <h2 className="text-3xl font-bold text-center mb-4" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
             Hair Care Analysis Flow
           </h2>
-          <p className="text-center mb-12" style={{ color: '#914600' }}>
+          <p className="text-center mb-12" style={{ color: '#DD8106' }}>
             Get personalised hair care routines powered by Gemini AI
           </p>
           <div className="grid md:grid-cols-4 gap-6">
@@ -196,12 +196,12 @@ export default function HowItWorks() {
                     style={{ backgroundColor: '#914600' }}>
                     {item.step}
                   </div>
-                  <h3 className="font-bold text-lg mb-2" style={{ color: '#643100' }}>{item.title}</h3>
+                  <h3 className="font-bold text-lg mb-2" style={{ color: '#DD8106' }}>{item.title}</h3>
                   <p className="text-sm" style={{ color: '#AF5500' }}>{item.description}</p>
                 </div>
                 {idx < 3 && (
                   <div className="hidden md:block absolute top-1/2 -right-3 transform translate-x-1/2 -translate-y-1/2 z-10">
-                    <ArrowRight className="w-6 h-6" style={{ color: '#914600' }} />
+                    <ArrowRight className="w-6 h-6" style={{ color: '#DD8106' }} />
                   </div>
                 )}
               </div>
@@ -211,10 +211,10 @@ export default function HowItWorks() {
 
         {/* Booking Workflow Section */}
         <div className="mb-20">
-          <h2 className="text-3xl font-bold text-center mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+          <h2 className="text-3xl font-bold text-center mb-4" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
             Style Booking Flow
           </h2>
-          <p className="text-center mb-12" style={{ color: '#914600' }}>
+          <p className="text-center mb-12" style={{ color: '#DD8106' }}>
             Find the perfect salon to bring your hairstyle vision to life
           </p>
           <div className="grid md:grid-cols-4 gap-6">
@@ -227,7 +227,7 @@ export default function HowItWorks() {
                     style={{ backgroundColor: '#AF5500' }}>
                     {item.step}
                   </div>
-                  <h3 className="font-bold text-lg mb-2" style={{ color: '#643100' }}>{item.title}</h3>
+                  <h3 className="font-bold text-lg mb-2" style={{ color: '#DD8106' }}>{item.title}</h3>
                   <p className="text-sm" style={{ color: '#AF5500' }}>{item.description}</p>
                 </div>
                 {idx < 3 && (
@@ -243,7 +243,7 @@ export default function HowItWorks() {
         {/* Key Features Section */}
         <div className="mb-20 bg-white/60 backdrop-blur-sm rounded-3xl border-2 shadow-lg p-10"
           style={{ borderColor: '#CE935F' }}>
-          <h2 className="text-3xl font-bold mb-8 text-center" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+          <h2 className="text-3xl font-bold mb-8 text-center" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
             Key Features
           </h2>
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -258,8 +258,8 @@ export default function HowItWorks() {
               "Secure data storage with Supabase"
             ].map((feature, idx) => (
               <div key={idx} className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#914600' }} />
-                <p style={{ color: '#643100' }}>{feature}</p>
+                <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#DD8106' }} />
+                <p style={{ color: '#DD8106' }}>{feature}</p>
               </div>
             ))}
           </div>
@@ -296,19 +296,19 @@ export default function HowItWorks() {
         {/* API Integration Section */}
         <div className="mb-20 bg-white/60 backdrop-blur-sm rounded-3xl border-2 shadow-lg p-10"
           style={{ borderColor: '#CE935F' }}>
-          <h2 className="text-3xl font-bold mb-6 text-center" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+          <h2 className="text-3xl font-bold mb-6 text-center" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
             API Integration
           </h2>
-          <p className="text-lg text-center max-w-4xl mx-auto mb-8" style={{ color: '#914600' }}>
+          <p className="text-lg text-center max-w-4xl mx-auto mb-8" style={{ color: '#DD8106' }}>
             Nywele.ai is exportable as an API, allowing your business to plug our AI-powered hair care analysis and recommendations directly into your existing services.
           </p>
           
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             <div className="rounded-xl p-6" style={{ backgroundColor: 'rgba(175, 85, 0, 0.05)' }}>
-              <h3 className="font-bold text-lg mb-4" style={{ color: '#643100' }}>
+              <h3 className="font-bold text-lg mb-4" style={{ color: '#DD8106' }}>
                 🔌 Available Endpoints
               </h3>
-              <ul className="space-y-2" style={{ color: '#914600' }}>
+              <ul className="space-y-2" style={{ color: '#DD8106' }}>
                 <li>• <strong>Hair Analysis API</strong> - Detect hair type, health & styling needs</li>
                 <li>• <strong>Routine Generation API</strong> - Personalised care routines with products</li>
                 <li>• <strong>Style Detection API</strong> - Identify hairstyles from photos</li>
@@ -317,10 +317,10 @@ export default function HowItWorks() {
             </div>
             
             <div className="rounded-xl p-6" style={{ backgroundColor: 'rgba(175, 85, 0, 0.05)' }}>
-              <h3 className="font-bold text-lg mb-4" style={{ color: '#643100' }}>
+              <h3 className="font-bold text-lg mb-4" style={{ color: '#DD8106' }}>
                 🏢 Perfect For
               </h3>
-              <ul className="space-y-2" style={{ color: '#914600' }}>
+              <ul className="space-y-2" style={{ color: '#DD8106' }}>
                 <li>• Salon booking platforms</li>
                 <li>• E-commerce beauty stores</li>
                 <li>• Mobile hair care apps</li>

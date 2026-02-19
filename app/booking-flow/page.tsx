@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, MapPin, Star, Phone, Instagram, DollarSign, Check, ArrowRight, ArrowLeft, Clock, Sparkles, Upload, Loader, X, Image as ImageIcon } from 'lucide-react';
 import { generateJobSpec, mapStyleToTemplateSlug, JobSpec } from '@/lib/specs';
 import SpecSummary from '@/app/components/SpecSummary';
-import Navbar from '@/app/components/Navbar';
+import BottomNav from '@/app/components/BottomNav';
 
 interface Stylist {
   id: string;
@@ -352,9 +352,8 @@ function BookingFlowContent() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: '#FDF4E8' }}>
-      {/* Use the same Navbar as other pages */}
-      <Navbar />
+    <div className="min-h-screen flex flex-col" style={{ background: '#FFFEE1' }}>
+      <BottomNav />
       
       {/* Progress Steps - Only show when past step 0 */}
       {currentStep > 0 && (
@@ -366,7 +365,7 @@ function BookingFlowContent() {
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold`}
                     style={{
                       background: currentStep >= step ? '#643100' : '#E5D4C1',
-                      color: currentStep >= step ? 'white' : '#914600',
+                      color: '#DD8106',
                       fontFamily: 'Bricolage Grotesque, sans-serif'
                     }}>
                   {step}
@@ -377,7 +376,7 @@ function BookingFlowContent() {
               </div>
             ))}
           </div>
-            <div className="mt-2 text-center text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+            <div className="mt-2 text-center text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
             {currentStep === 1 && 'Confirm Your Style'}
             {currentStep === 2 && 'Choose Date & Time'}
             {currentStep === 3 && 'Select Your Stylist'}
@@ -387,7 +386,7 @@ function BookingFlowContent() {
       </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-6xl mx-auto px-4 py-12 pb-24 md:pb-12 flex-1">
         <AnimatePresence mode="wait">
           {/* Step 0: Initial Booking Form */}
           {currentStep === 0 && (
@@ -404,10 +403,10 @@ function BookingFlowContent() {
                   {/* Left Section */}
                   <div className="flex flex-col justify-center">
                     <h1 className="text-5xl md:text-6xl font-bold mb-6" 
-                      style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                      style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                       Book Your<br />Perfect<br />Braiding<br />Style
                     </h1>
-                    <p className="text-xl" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    <p className="text-xl" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                       Connect with expert stylists<br />and get your dream hairstyle
                     </p>
                   </div>
@@ -415,14 +414,14 @@ function BookingFlowContent() {
                   {/* Right Section - Form */}
                   <div className="flex flex-col justify-center">
                     <h2 className="text-3xl font-bold mb-8" 
-                      style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                      style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                       Let's Get Started
                     </h2>
                     
                     <div className="space-y-6">
                 <div>
                         <label className="block text-base font-medium mb-3" 
-                          style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                           Desired Style
                         </label>
                         <select
@@ -431,9 +430,9 @@ function BookingFlowContent() {
                           className="w-full px-6 py-4 pr-12 rounded-xl text-lg appearance-none"
                           disabled={!!uploadedStyleImage}
                           style={{ 
-                            backgroundColor: uploadedStyleImage ? '#E5D4C1' : '#FDF4E8', 
+                            backgroundColor: uploadedStyleImage ? '#E5D4C1' : '#FFFEE1', 
                             border: '2px solid #914600',
-                            color: '#643100',
+                            color: '#DD8106',
                             fontFamily: 'Bricolage Grotesque, sans-serif',
                             backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23914600' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
                             backgroundPosition: 'right 1rem center',
@@ -456,7 +455,7 @@ function BookingFlowContent() {
                         {/* OR Divider */}
                         <div className="flex items-center gap-3 my-4">
                           <div className="flex-1 h-px" style={{ background: '#CE935F' }}></div>
-                          <span className="text-sm font-medium" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>OR</span>
+                          <span className="text-sm font-medium" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>OR</span>
                           <div className="flex-1 h-px" style={{ background: '#CE935F' }}></div>
                         </div>
 
@@ -464,18 +463,18 @@ function BookingFlowContent() {
                         {!uploadedStyleImage ? (
                           <label className="block cursor-pointer">
                             <div className="border-2 border-dashed rounded-xl p-6 text-center transition-all hover:border-solid hover:shadow-md"
-                              style={{ borderColor: '#914600', backgroundColor: '#FDF4E8' }}>
+                              style={{ borderColor: '#914600', backgroundColor: '#FFFEE1' }}>
                               <input
                                 type="file"
                                 accept="image/*"
                                 onChange={handleStyleImageUpload}
                                 className="hidden"
                               />
-                              <Upload size={32} style={{ color: '#914600' }} className="mx-auto mb-2" />
-                              <p className="text-base font-medium mb-1" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                              <Upload size={32} style={{ color: '#DD8106' }} className="mx-auto mb-2" />
+                              <p className="text-base font-medium mb-1" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                 Upload a photo of your desired style
                               </p>
-                              <p className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                              <p className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                 AI will identify the hairstyle for you
                               </p>
                             </div>
@@ -487,21 +486,21 @@ function BookingFlowContent() {
                               <div className="flex-1">
                                 {analyzingImage ? (
                                   <div className="flex items-center gap-2">
-                                    <Loader className="animate-spin" size={20} style={{ color: '#914600' }} />
-                                    <p className="text-sm font-medium" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                    <Loader className="animate-spin" size={20} style={{ color: '#DD8106' }} />
+                                    <p className="text-sm font-medium" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                       Analyzing your photo...
                                     </p>
                                   </div>
                                 ) : styleDetectionResult ? (
                                   <div>
-                                    <p className="text-sm font-bold mb-1" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                    <p className="text-sm font-bold mb-1" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                       Detected: {styleDetectionResult.detectedStyle}
                                     </p>
-                                    <p className="text-xs mb-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                    <p className="text-xs mb-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                       Confidence: {styleDetectionResult.confidence}
                                     </p>
                                     {styleDetectionResult.description && (
-                                      <p className="text-xs" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                      <p className="text-xs" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                         {styleDetectionResult.description}
                                       </p>
                                     )}
@@ -511,7 +510,7 @@ function BookingFlowContent() {
                               <button
                                 onClick={clearStyleImage}
                                 className="p-2 rounded-lg hover:bg-white/50 transition-colors"
-                                style={{ color: '#914600' }}
+                                style={{ color: '#DD8106' }}
                               >
                                 <X size={20} />
                               </button>
@@ -522,7 +521,7 @@ function BookingFlowContent() {
 
                 <div>
                         <label className="block text-base font-medium mb-3" 
-                          style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                           Budget
                         </label>
                         <select
@@ -530,9 +529,9 @@ function BookingFlowContent() {
                           onChange={(e) => setBudgetInput(e.target.value)}
                           className="w-full px-6 py-4 pr-12 rounded-xl text-lg appearance-none"
                           style={{ 
-                            backgroundColor: '#FDF4E8', 
+                            backgroundColor: '#FFFEE1', 
                             border: '2px solid #914600',
-                            color: '#643100',
+                            color: '#DD8106',
                             fontFamily: 'Bricolage Grotesque, sans-serif',
                             backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23914600' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
                             backgroundPosition: 'right 1rem center',
@@ -550,7 +549,7 @@ function BookingFlowContent() {
 
                       <div>
                         <label className="block text-base font-medium mb-3" 
-                          style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                           Time Preference
                         </label>
                         <select
@@ -558,9 +557,9 @@ function BookingFlowContent() {
                           onChange={(e) => setTimePreferenceInput(e.target.value)}
                           className="w-full px-6 py-4 pr-12 rounded-xl text-lg appearance-none"
                           style={{ 
-                            backgroundColor: '#FDF4E8', 
+                            backgroundColor: '#FFFEE1', 
                             border: '2px solid #914600',
-                            color: '#643100',
+                            color: '#DD8106',
                             fontFamily: 'Bricolage Grotesque, sans-serif',
                             backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23914600' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
                             backgroundPosition: 'right 1rem center',
@@ -609,7 +608,7 @@ function BookingFlowContent() {
               style={{ background: '#FFFBF5', border: '2px solid #914600', height: 'calc(100vh - 250px)', display: 'flex', flexDirection: 'column' }}
             >
               <div className="p-8 overflow-y-auto flex-1">
-              <h2 className="text-3xl font-bold mb-6" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>Your Style Choice</h2>
+              <h2 className="text-3xl font-bold mb-6" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>Your Style Choice</h2>
               
               <div className="max-w-xl mx-auto mb-8">
                 <div className="text-center">
@@ -626,10 +625,10 @@ function BookingFlowContent() {
                       className="w-full h-80 object-cover rounded-xl mb-6 shadow-lg"
                     />
                   )}
-                  <h3 className="text-3xl font-bold mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                  <h3 className="text-3xl font-bold mb-4" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                     {desiredStyle === 'custom-style' ? 'Custom Style' : desiredStyle}
                   </h3>
-                  <div className="space-y-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  <div className="space-y-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     <p><strong>Duration:</strong> Lasts {styleCost.duration}</p>
                     <p><strong>Maintenance:</strong> Low</p>
                     <p><strong>Budget:</strong> {budget}</p>
@@ -668,10 +667,10 @@ function BookingFlowContent() {
               style={{ background: '#FFFBF5', border: '2px solid #914600', height: 'calc(100vh - 250px)', display: 'flex', flexDirection: 'column' }}
             >
               <div className="p-8 overflow-y-auto flex-1">
-              <h2 className="text-3xl font-bold mb-6" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>When Would You Like Your Appointment?</h2>
+              <h2 className="text-3xl font-bold mb-6" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>When Would You Like Your Appointment?</h2>
               
               <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Choose a Date</h3>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Choose a Date</h3>
                 <div className="grid grid-cols-7 gap-2">
                   {getAvailableDates().map(date => {
                     const dateString = date.toISOString().split('T')[0];
@@ -687,8 +686,8 @@ function BookingFlowContent() {
                           fontFamily: 'Bricolage Grotesque, sans-serif'
                         }}
                       >
-                        <p className="text-xs" style={{ color: '#914600' }}>{date.toLocaleDateString('en', { weekday: 'short' })}</p>
-                        <p className="text-lg font-bold" style={{ color: '#643100' }}>{date.getDate()}</p>
+                        <p className="text-xs" style={{ color: '#DD8106' }}>{date.toLocaleDateString('en', { weekday: 'short' })}</p>
+                        <p className="text-lg font-bold" style={{ color: '#DD8106' }}>{date.getDate()}</p>
                     </button>
                     );
                   })}
@@ -697,7 +696,7 @@ function BookingFlowContent() {
 
               {selectedDate && (
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold mb-4" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Preferred Time</h3>
+                  <h3 className="text-lg font-semibold mb-4" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Preferred Time</h3>
                   <div className="grid grid-cols-4 gap-3">
                     {['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'].map(time => {
                       const isSelected = selectedTime === time;
@@ -726,7 +725,7 @@ function BookingFlowContent() {
                 <button
                   onClick={() => setCurrentStep(1)}
                   className="flex-1 py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
-                  style={{ background: '#FDF4E8', color: '#914600', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ background: '#FFFEE1', color: '#DD8106', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   <ArrowLeft size={20} />
                   Back
@@ -756,8 +755,8 @@ function BookingFlowContent() {
               style={{ background: '#FFFBF5', border: '2px solid #914600', height: 'calc(100vh - 250px)', display: 'flex', flexDirection: 'column' }}
             >
               <div className="p-8 overflow-y-auto flex-1">
-              <h2 className="text-3xl font-bold mb-2" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>Available Stylists for {desiredStyle}</h2>
-              <p className="mb-6" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              <h2 className="text-3xl font-bold mb-2" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>Available Stylists for {desiredStyle}</h2>
+              <p className="mb-6" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 {new Date(selectedDate).toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' })} at {selectedTime}
               </p>
 
@@ -781,10 +780,10 @@ function BookingFlowContent() {
                         className="w-24 h-24 rounded-xl object-cover"
                       />
                       <div className="flex-1">
-                          <h3 className="text-xl font-bold" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{stylist.name}</h3>
-                          <p className="font-medium mb-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{stylist.business_name}</p>
+                          <h3 className="text-xl font-bold" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{stylist.name}</h3>
+                          <p className="font-medium mb-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{stylist.business_name}</p>
                         
-                          <div className="flex items-center gap-4 text-sm mb-3" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          <div className="flex items-center gap-4 text-sm mb-3" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                           <span className="flex items-center gap-1">
                             <Star className="text-yellow-400 fill-yellow-400" size={16} />
                             {stylist.average_rating} ({stylist.total_reviews} reviews)
@@ -803,7 +802,7 @@ function BookingFlowContent() {
                             <span
                               key={specialty}
                                 className="text-xs px-2 py-1 rounded-full"
-                                style={{ background: 'rgba(206, 147, 95, 0.2)', color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                                style={{ background: 'rgba(206, 147, 95, 0.2)', color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                             >
                               {specialty}
                             </span>
@@ -814,7 +813,7 @@ function BookingFlowContent() {
                           <a
                             href={`tel:${stylist.phone}`}
                               className="flex items-center gap-1 text-sm hover:opacity-80 transition-opacity"
-                              style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                              style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                           >
                             <Phone size={14} />
                             Call
@@ -824,7 +823,7 @@ function BookingFlowContent() {
                             target="_blank"
                             rel="noopener noreferrer"
                               className="flex items-center gap-1 text-sm hover:opacity-80 transition-opacity"
-                              style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                              style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                           >
                             <Instagram size={14} />
                             Instagram
@@ -849,7 +848,7 @@ function BookingFlowContent() {
                 <button
                   onClick={() => setCurrentStep(2)}
                   className="flex-1 py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
-                  style={{ background: '#FDF4E8', color: '#914600', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ background: '#FFFEE1', color: '#DD8106', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   <ArrowLeft size={20} />
                   Back
@@ -879,29 +878,29 @@ function BookingFlowContent() {
               style={{ background: '#FFFBF5', border: '2px solid #914600', height: 'calc(100vh - 250px)', display: 'flex', flexDirection: 'column' }}
             >
               <div className="p-8 overflow-y-auto flex-1">
-              <h2 className="text-3xl font-bold mb-6" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>Confirm Your Booking</h2>
+              <h2 className="text-3xl font-bold mb-6" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>Confirm Your Booking</h2>
 
               <div className="rounded-xl p-6 mb-6" style={{ background: 'linear-gradient(135deg, rgba(206, 147, 95, 0.2), rgba(175, 85, 0, 0.1))' }}>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <h3 className="font-semibold mb-3" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Style</h3>
-                    <p className="text-2xl font-bold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>{desiredStyle}</p>
-                    <p className="mt-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Estimated: ${styleCost.min} - ${styleCost.max}</p>
+                    <h3 className="font-semibold mb-3" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Style</h3>
+                    <p className="text-2xl font-bold" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>{desiredStyle}</p>
+                    <p className="mt-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Estimated: ${styleCost.min} - ${styleCost.max}</p>
                   </div>
 
                   <div>
-                    <h3 className="font-semibold mb-3" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Date & Time</h3>
-                    <p className="text-lg font-semibold" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    <h3 className="font-semibold mb-3" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Date & Time</h3>
+                    <p className="text-lg font-semibold" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                       {new Date(selectedDate).toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                     </p>
-                    <p className="text-lg" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{selectedTime}</p>
+                    <p className="text-lg" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{selectedTime}</p>
                   </div>
                 </div>
               </div>
 
               {selectedStylist && (
                 <div className="rounded-xl p-6 mb-6" style={{ border: '2px solid #CE935F' }}>
-                  <h3 className="font-semibold mb-4" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Your Stylist</h3>
+                  <h3 className="font-semibold mb-4" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Your Stylist</h3>
                   <div className="flex items-center gap-4">
                     <img
                       src={selectedStylist.profile_image_url}
@@ -909,9 +908,9 @@ function BookingFlowContent() {
                       className="w-20 h-20 rounded-xl object-cover"
                     />
                     <div>
-                      <p className="text-xl font-bold" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{selectedStylist.name}</p>
-                      <p className="font-medium" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{selectedStylist.business_name}</p>
-                      <p className="flex items-center gap-1 mt-1" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                      <p className="text-xl font-bold" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{selectedStylist.name}</p>
+                      <p className="font-medium" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{selectedStylist.business_name}</p>
+                      <p className="flex items-center gap-1 mt-1" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                         <MapPin size={14} />
                         {selectedStylist.location_city}
                       </p>
@@ -921,7 +920,7 @@ function BookingFlowContent() {
               )}
 
               <div className="rounded-xl p-4 mb-6" style={{ background: 'rgba(255, 200, 100, 0.2)', border: '2px solid rgba(255, 200, 100, 0.5)' }}>
-                <p className="text-sm" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                <p className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   <strong>Note:</strong> This booking will be saved to your calendar and expenses will be tracked automatically. 
                   Contact the stylist directly to confirm availability.
                 </p>
@@ -931,7 +930,7 @@ function BookingFlowContent() {
                 <button
                   onClick={() => setCurrentStep(3)}
                   className="flex-1 py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
-                  style={{ background: '#FDF4E8', color: '#914600', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ background: '#FFFEE1', color: '#DD8106', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   <ArrowLeft size={20} />
                   Back
@@ -962,8 +961,8 @@ function BookingFlowContent() {
                 <Check className="text-green-600" size={48} />
               </div>
 
-              <h2 className="text-4xl font-bold mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>Booking Confirmed! 🎉</h2>
-              <p className="text-xl mb-4" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              <h2 className="text-4xl font-bold mb-4" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>Booking Confirmed! 🎉</h2>
+              <p className="text-xl mb-4" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 Your appointment has been saved
               </p>
 
@@ -994,7 +993,7 @@ function BookingFlowContent() {
                       setQuote(bookingInfo.quote);
                     }}
                     className="text-sm font-medium underline hover:opacity-80 transition-opacity"
-                    style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
                     View Quote
                   </button>
@@ -1002,10 +1001,10 @@ function BookingFlowContent() {
               </div>
 
               <div className="rounded-xl p-6 mb-8 text-left max-w-md mx-auto" style={{ background: 'rgba(206, 147, 95, 0.1)', border: '2px solid #CE935F' }}>
-                <p className="mb-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}><strong>Style:</strong> {desiredStyle}</p>
-                <p className="mb-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}><strong>Date:</strong> {new Date(selectedDate).toLocaleDateString()}</p>
-                <p className="mb-2" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}><strong>Time:</strong> {selectedTime}</p>
-                <p style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}><strong>Stylist:</strong> {selectedStylist?.name}</p>
+                <p className="mb-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}><strong>Style:</strong> {desiredStyle}</p>
+                <p className="mb-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}><strong>Date:</strong> {new Date(selectedDate).toLocaleDateString()}</p>
+                <p className="mb-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}><strong>Time:</strong> {selectedTime}</p>
+                <p style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}><strong>Stylist:</strong> {selectedStylist?.name}</p>
               </div>
 
               {/* Quote Details Modal */}
@@ -1033,12 +1032,12 @@ function BookingFlowContent() {
                     {/* Labor */}
                     <div className="p-4 rounded-lg mb-6" style={{ background: 'rgba(206, 147, 95, 0.2)' }}>
                       <div className="flex justify-between mb-2">
-                        <span className="font-semibold" style={{ color: '#643100' }}>Labor Cost:</span>
-                        <span className="font-bold" style={{ color: '#643100' }}>KES {quote.labor_cost_kes.toLocaleString()}</span>
+                        <span className="font-semibold" style={{ color: '#DD8106' }}>Labor Cost:</span>
+                        <span className="font-bold" style={{ color: '#DD8106' }}>KES {quote.labor_cost_kes.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-lg">
-                        <span className="font-bold" style={{ color: '#643100' }}>Total:</span>
-                        <span className="font-bold" style={{ color: '#914600' }}>KES {quote.total_kes.toLocaleString()}</span>
+                        <span className="font-bold" style={{ color: '#DD8106' }}>Total:</span>
+                        <span className="font-bold" style={{ color: '#DD8106' }}>KES {quote.total_kes.toLocaleString()}</span>
                       </div>
                     </div>
 
@@ -1100,7 +1099,7 @@ function BookingFlowContent() {
                     window.location.href = '/booking-flow';
                   }}
                   className="py-3 rounded-xl font-semibold transition-all"
-                  style={{ background: '#FDF4E8', color: '#914600', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ background: '#FFFEE1', color: '#DD8106', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   Book Another Style
                 </button>
@@ -1118,8 +1117,8 @@ export default function BookingFlow() {
     <Suspense fallback={
       <div style={{ minHeight: '100vh', backgroundColor: '#FFFBF5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
-          <Loader className="animate-spin mx-auto mb-4" size={40} style={{ color: '#914600' }} />
-          <p style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Loading booking flow...</p>
+          <Loader className="animate-spin mx-auto mb-4" size={40} style={{ color: '#DD8106' }} />
+          <p style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Loading booking flow...</p>
         </div>
       </div>
     }>

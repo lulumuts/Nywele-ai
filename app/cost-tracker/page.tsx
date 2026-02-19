@@ -110,10 +110,10 @@ export default function CostTracker() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
-            <h1 className="text-5xl font-bold mb-4" style={{ color: '#9E6240', fontFamily: 'Caprasimo, serif' }}>
+            <h1 className="text-5xl font-bold mb-4" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
               Hair Care Budget Tracker
             </h1>
-            <p className="text-xl" style={{ color: '#914600' }}>
+            <p className="text-xl" style={{ color: '#DD8106' }}>
               Track your spending and save money on your hair care routine
             </p>
           </motion.div>
@@ -128,7 +128,7 @@ export default function CostTracker() {
               style={{ backgroundColor: 'white', border: '2px solid #9E6240' }}
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold" style={{ color: '#914600' }}>Monthly Budget</h3>
+                <h3 className="text-lg font-bold" style={{ color: '#DD8106' }}>Monthly Budget</h3>
                 <DollarSign size={24} style={{ color: '#AF5500' }} />
               </div>
               <div className="flex items-baseline gap-2 mb-4">
@@ -139,12 +139,12 @@ export default function CostTracker() {
                   className="text-3xl font-bold border-none outline-none bg-transparent"
                   style={{ color: '#AF5500', width: '120px' }}
                 />
-                <span className="text-xl" style={{ color: '#914600' }}>KES</span>
+                <span className="text-xl" style={{ color: '#DD8106' }}>KES</span>
               </div>
               <button
                 onClick={saveBudget}
                 className="w-full py-2 rounded-lg font-semibold transition-all"
-                style={{ backgroundColor: '#9E6240', color: 'white' }}
+                style={{ backgroundColor: '#9E6240', color: '#DD8106' }}
               >
                 Save Budget
               </button>
@@ -158,7 +158,7 @@ export default function CostTracker() {
               style={{ backgroundColor: 'white', border: '2px solid #9E6240' }}
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold" style={{ color: '#914600' }}>Total Spent</h3>
+                <h3 className="text-lg font-bold" style={{ color: '#DD8106' }}>Total Spent</h3>
                 {budgetPercentage > 100 ? (
                   <TrendingUp size={24} style={{ color: '#DC2626' }} />
                 ) : (
@@ -177,7 +177,7 @@ export default function CostTracker() {
                   }}
                 />
               </div>
-              <p className="text-sm mt-2" style={{ color: '#914600' }}>
+              <p className="text-sm mt-2" style={{ color: '#DD8106' }}>
                 {budgetPercentage.toFixed(0)}% of budget used
               </p>
             </motion.div>
@@ -190,13 +190,13 @@ export default function CostTracker() {
               style={{ backgroundColor: 'white', border: '2px solid #9E6240' }}
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold" style={{ color: '#914600' }}>Remaining</h3>
+                <h3 className="text-lg font-bold" style={{ color: '#DD8106' }}>Remaining</h3>
                 <Calendar size={24} style={{ color: '#AF5500' }} />
               </div>
               <p className="text-3xl font-bold mb-2" style={{ color: budgetRemaining < 0 ? '#DC2626' : '#16A34A' }}>
                 KES {Math.abs(budgetRemaining).toLocaleString()}
               </p>
-              <p className="text-sm" style={{ color: '#914600' }}>
+              <p className="text-sm" style={{ color: '#DD8106' }}>
                 {budgetRemaining < 0 ? 'Over budget' : 'Left to spend this month'}
               </p>
             </motion.div>
@@ -211,14 +211,14 @@ export default function CostTracker() {
             style={{ backgroundColor: 'white', border: '2px solid #9E6240' }}
           >
             <div className="flex items-center gap-3 mb-6">
-              <PieChart size={28} style={{ color: '#914600' }} />
-              <h2 className="text-2xl font-bold" style={{ color: '#914600' }}>Category Breakdown</h2>
+              <PieChart size={28} style={{ color: '#DD8106' }} />
+              <h2 className="text-2xl font-bold" style={{ color: '#DD8106' }}>Category Breakdown</h2>
             </div>
             
             <div className="grid md:grid-cols-2 gap-4">
               {Object.entries(categoryTotals).map(([category, amount]) => (
                 <div key={category} className="flex items-center justify-between p-4 rounded-xl" style={{ backgroundColor: 'rgba(158, 98, 64, 0.1)' }}>
-                  <span className="font-semibold" style={{ color: '#914600' }}>{categoryLabels[category]}</span>
+                  <span className="font-semibold" style={{ color: '#DD8106' }}>{categoryLabels[category]}</span>
                   <span className="text-lg font-bold" style={{ color: '#AF5500' }}>KES {amount.toLocaleString()}</span>
                 </div>
               ))}
@@ -230,7 +230,7 @@ export default function CostTracker() {
             <button
               onClick={() => setShowAddForm(!showAddForm)}
               className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all shadow-lg"
-              style={{ backgroundColor: '#914600', color: 'white' }}
+              style={{ backgroundColor: '#914600', color: '#DD8106' }}
             >
               <Plus size={20} />
               Add New Expense
@@ -245,11 +245,11 @@ export default function CostTracker() {
               className="rounded-2xl shadow-xl p-6 mb-8"
               style={{ backgroundColor: 'white', border: '2px solid #9E6240' }}
             >
-              <h3 className="text-xl font-bold mb-4" style={{ color: '#914600' }}>Add Expense</h3>
+              <h3 className="text-xl font-bold mb-4" style={{ color: '#DD8106' }}>Add Expense</h3>
               
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold mb-2" style={{ color: '#914600' }}>Date</label>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Date</label>
                   <input
                     type="date"
                     value={newExpense.date}
@@ -260,7 +260,7 @@ export default function CostTracker() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold mb-2" style={{ color: '#914600' }}>Category</label>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Category</label>
                   <select
                     value={newExpense.category}
                     onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value as any })}
@@ -275,7 +275,7 @@ export default function CostTracker() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold mb-2" style={{ color: '#914600' }}>Amount (KES)</label>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Amount (KES)</label>
                   <input
                     type="number"
                     value={newExpense.amount || ''}
@@ -287,7 +287,7 @@ export default function CostTracker() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold mb-2" style={{ color: '#914600' }}>Style (Optional)</label>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Style (Optional)</label>
                   <input
                     type="text"
                     value={newExpense.style || ''}
@@ -299,7 +299,7 @@ export default function CostTracker() {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold mb-2" style={{ color: '#914600' }}>Description</label>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: '#DD8106' }}>Description</label>
                   <input
                     type="text"
                     value={newExpense.description || ''}
@@ -315,14 +315,14 @@ export default function CostTracker() {
                 <button
                   onClick={addExpense}
                   className="flex-1 py-3 rounded-xl font-semibold transition-all"
-                  style={{ backgroundColor: '#914600', color: 'white' }}
+                  style={{ backgroundColor: '#914600', color: '#DD8106' }}
                 >
                   Add Expense
                 </button>
                 <button
                   onClick={() => setShowAddForm(false)}
                   className="px-6 py-3 border-2 rounded-xl font-semibold transition-all"
-                  style={{ borderColor: '#9E6240', color: '#914600' }}
+                  style={{ borderColor: '#9E6240', color: '#DD8106' }}
                 >
                   Cancel
                 </button>
@@ -338,12 +338,12 @@ export default function CostTracker() {
             className="rounded-2xl shadow-xl p-6"
             style={{ backgroundColor: 'white', border: '2px solid #9E6240' }}
           >
-            <h2 className="text-2xl font-bold mb-6" style={{ color: '#914600' }}>Recent Expenses</h2>
+            <h2 className="text-2xl font-bold mb-6" style={{ color: '#DD8106' }}>Recent Expenses</h2>
             
             {expenses.length === 0 ? (
               <div className="text-center py-12">
                 <DollarSign size={48} className="mx-auto mb-4" style={{ color: 'rgba(158, 98, 64, 0.3)' }} />
-                <p style={{ color: '#914600' }}>No expenses tracked yet. Add your first expense to get started!</p>
+                <p style={{ color: '#DD8106' }}>No expenses tracked yet. Add your first expense to get started!</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -355,12 +355,12 @@ export default function CostTracker() {
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-1">
-                        <span className="text-sm font-semibold px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(158, 98, 64, 0.2)', color: '#914600' }}>
+                        <span className="text-sm font-semibold px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(158, 98, 64, 0.2)', color: '#DD8106' }}>
                           {categoryLabels[expense.category]}
                         </span>
-                        <span className="text-sm" style={{ color: '#914600' }}>{new Date(expense.date).toLocaleDateString()}</span>
+                        <span className="text-sm" style={{ color: '#DD8106' }}>{new Date(expense.date).toLocaleDateString()}</span>
                       </div>
-                      <p className="font-semibold" style={{ color: '#914600' }}>{expense.description}</p>
+                      <p className="font-semibold" style={{ color: '#DD8106' }}>{expense.description}</p>
                       {expense.style && (
                         <p className="text-sm" style={{ color: '#AF5500' }}>Style: {expense.style}</p>
                       )}
@@ -389,21 +389,21 @@ export default function CostTracker() {
             className="rounded-2xl shadow-xl p-6 mt-8"
             style={{ backgroundColor: 'rgba(127, 62, 0, 0.1)', border: '2px solid #9E6240' }}
           >
-            <h3 className="text-xl font-bold mb-4" style={{ color: '#914600' }}>💡 Cost-Saving Tips</h3>
+            <h3 className="text-xl font-bold mb-4" style={{ color: '#DD8106' }}>💡 Cost-Saving Tips</h3>
             <ul className="space-y-2">
-              <li className="flex items-start gap-2" style={{ color: '#914600' }}>
+              <li className="flex items-start gap-2" style={{ color: '#DD8106' }}>
                 <span className="text-lg">•</span>
                 <span>Buy products in bulk during sales to save 20-30%</span>
               </li>
-              <li className="flex items-start gap-2" style={{ color: '#914600' }}>
+              <li className="flex items-start gap-2" style={{ color: '#DD8106' }}>
                 <span className="text-lg">•</span>
                 <span>Protective styles can last 6-8 weeks, reducing maintenance costs</span>
               </li>
-              <li className="flex items-start gap-2" style={{ color: '#914600' }}>
+              <li className="flex items-start gap-2" style={{ color: '#DD8106' }}>
                 <span className="text-lg">•</span>
                 <span>DIY deep conditioning treatments save KES 1,500+ monthly</span>
               </li>
-              <li className="flex items-start gap-2" style={{ color: '#914600' }}>
+              <li className="flex items-start gap-2" style={{ color: '#DD8106' }}>
                 <span className="text-lg">•</span>
                 <span>Multi-use products (leave-in that works as detangler) reduce spending</span>
               </li>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { trackProductClick, trackSalonView } from '@/lib/analytics';
 import { supabase } from '@/lib/supabase';
+import BottomNav from '@/app/components/BottomNav';
 
 // Custom loader component
 const LoaderSVG = () => (
@@ -20,8 +21,8 @@ const LoaderSVG = () => (
     >
       <defs>
         <linearGradient id="loaderGradientResults" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#9333ea" />
-          <stop offset="100%" stopColor="#ec4899" />
+          <stop offset="0%" stopColor="#643100" />
+          <stop offset="100%" stopColor="#AF5500" />
         </linearGradient>
       </defs>
       <path 
@@ -30,7 +31,7 @@ const LoaderSVG = () => (
         d="M26.4966 2.48801C26.3951 2.53364 19 5.49999 16.9876 6.83816C14.9751 8.17632 12.5 8.99998 11 10.5C9.5 12 8.99996 12.5 6.99998 15C4.99999 17.5 3.37849 22 2.49998 25C1.62146 28 1.4946 31.8377 1.62146 34C1.7588 36.3409 2.43922 39.7477 4.99999 44.5C6.82391 47.8848 11.324 50.4672 13.912 50.9836C16.5 51.5 18.739 52.5752 27.4314 52.3941C30.6672 52.3267 33.607 51.305 37.7457 49.8486C42.891 48.0379 45.9529 46.2163 46.875 45.6195C49.5 43.9205 50.7563 41.0973 51.4698 38.7876C52.0196 37.0077 51.259 35.1854 50.1632 33.8197C48.365 31.5788 43.594 30.5623 39 34.5C35.5 37.5 35.1779 38.9373 33.3263 43.0524C31.1063 47.986 30.7288 51.8903 30.6185 53.7675C30.4765 56.1835 30.886 58.0631 31.4959 59.8257C32.6579 63.1839 34.1784 65.9852 35.4366 67.8103C38.9107 72.8493 42.4709 74.0663 44.473 74.7322C47.2709 75.6628 52.7689 74.3876 57.9048 72.796C61.2178 71.7692 65.7232 69.5839 68.1525 68.3926C70.5817 67.2014 70.7364 66.8879 70.7973 66.5293C70.9233 65.7867 70.5795 64.9206 70.0774 64.14C69.8357 63.7643 69.3855 63.6101 69.026 63.5327C67.0206 63.1012 64.5379 65.1637 63.7591 66.2724C62.2038 68.4866 65.3164 71.8607 66.8905 73.2153C69.8084 74.7556 71.1363 74.9986 73.0121 75.015C74.2992 75.0036 76.2669 74.9524 78.6547 74.461"
       />
     </svg>
-    <h2 className="text-2xl font-normal" style={{ color: '#c22a9f' }}>
+    <h2 className="text-2xl font-normal" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
       Generating your style
     </h2>
   </div>
@@ -182,27 +183,28 @@ export default function Results() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your personalized routine...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#AF5500] mx-auto mb-4" style={{ borderColor: '#AF5500' }}></div>
+          <p style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Loading your personalized routine...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col" style={{ background: '#FFFEE1' }}>
+      <BottomNav />
       {/* Header */}
-      <header className="backdrop-blur-md border-b border-white/10">
+      <header className="backdrop-blur-md border-b" style={{ borderColor: 'rgba(175, 85, 0, 0.2)' }}>
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <svg version="1.1" viewBox="0 0 848 1008" className="w-8 h-10">
               <defs>
-                <linearGradient id="navCoilGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#9333ea" />
-                  <stop offset="100%" stopColor="#ec4899" />
+                <linearGradient id="navCoilGradientResults" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#643100" />
+                  <stop offset="100%" stopColor="#AF5500" />
                 </linearGradient>
               </defs>
-              <path fill="url(#navCoilGradient)" opacity="1.000000" stroke="none" 
+              <path fill="url(#navCoilGradientResults)" opacity="1.000000" stroke="none" 
                 d="
 M418.117828,82.304749 
 	C404.651764,81.515762 394.465210,88.399132 383.992218,94.581772 
@@ -281,24 +283,24 @@ M435.981049,329.291046
 z"/>
             </svg>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                 Nywele.ai
               </h1>
-              <p className="text-gray-600 text-sm">Your Personalized Hair Care Plan</p>
+              <p style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Your Personalized Hair Care Plan</p>
             </div>
           </div>
           <div className="flex gap-6 items-center">
             <Link 
               href="/how-it-works"
-              className="font-semibold hover:opacity-80 transition-opacity underline decoration-2 underline-offset-4"
-              style={{ color: '#c22a9f' }}
+              className="font-semibold hover:opacity-80 transition-opacity"
+              style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}
             >
               How It Works
             </Link>
             <button
               onClick={() => router.push('/')}
-              className="font-semibold hover:opacity-80 transition-opacity underline decoration-2 underline-offset-4"
-              style={{ color: '#c22a9f' }}
+              className="font-semibold hover:opacity-80 transition-opacity"
+              style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}
             >
               Start Over
             </button>
@@ -306,9 +308,9 @@ z"/>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-12 pb-24 md:pb-12 flex-1">
         {/* Stylist Tip */}
-        <div className="mb-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-8 text-white shadow-2xl">
+        <div className="mb-8 rounded-3xl p-8 shadow-2xl" style={{ background: 'linear-gradient(135deg, #643100 0%, #AF5500 100%)' }}>
           <div className="flex items-start gap-4">
             <div className="text-4xl">💡</div>
             <div>
@@ -322,17 +324,17 @@ z"/>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Style Inspiration Section - AI-Generated (LEFT COLUMN) */}
           {loadingImage && (
-            <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 flex items-center justify-center" style={{ minHeight: '700px' }}>
+            <div className="rounded-3xl shadow-2xl p-8 flex items-center justify-center" style={{ minHeight: '700px', background: 'rgba(255,255,255,0.8)', border: '2px solid rgba(175, 85, 0, 0.2)' }}>
               <LoaderSVG />
             </div>
           )}
 
           {styleImage && !loadingImage && (
-            <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto">
+            <div className="rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto" style={{ background: 'rgba(255,255,255,0.8)', border: '2px solid rgba(175, 85, 0, 0.2)' }}>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-3xl font-bold text-[#E9A96A]">Style Inspiration</h2>
-                <div className="px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full">
-                  <span className="text-sm font-semibold text-purple-700">✨ AI-Powered by Gemini</span>
+                <h2 className="text-3xl font-bold" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>Style Inspiration</h2>
+                <div className="px-4 py-2 rounded-full" style={{ background: 'rgba(206, 147, 95, 0.2)' }}>
+                  <span className="text-sm font-semibold" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>✨ AI-Powered by Gemini</span>
                 </div>
               </div>
               <div className="relative">
@@ -347,35 +349,35 @@ z"/>
                   </p>
                 </div>
               </div>
-              <div className="mt-4 p-4 bg-purple-50 rounded-xl">
-                <p className="text-gray-700 text-center">
+              <div className="mt-4 p-4 rounded-xl" style={{ background: 'rgba(206, 147, 95, 0.1)', border: '1px solid rgba(175, 85, 0, 0.2)' }}>
+                <p className="text-center" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   <span className="font-semibold">Style:</span> {sessionStorage.getItem('currentStyle') || 'Natural'}
                 </p>
               </div>
               
               {/* AI Prompt Details - Shows advanced prompt engineering to judges */}
               <details className="mt-6">
-                <summary className="cursor-pointer text-purple-600 font-semibold hover:text-purple-700 flex items-center justify-center gap-2">
+                <summary className="cursor-pointer font-semibold flex items-center justify-center gap-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   🤖 View AI Prompt Engineering Details
                 </summary>
-                <div className="mt-4 p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200">
-                  <h4 className="font-bold text-[#E9A96A] mb-3">Advanced Prompt Engineering:</h4>
-                  <p className="text-sm text-gray-700 leading-relaxed mb-4">
+                <div className="mt-4 p-6 rounded-xl" style={{ background: 'rgba(206, 147, 95, 0.1)', border: '2px solid rgba(175, 85, 0, 0.2)' }}>
+                  <h4 className="font-bold mb-3" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>Advanced Prompt Engineering:</h4>
+                  <p className="text-sm leading-relaxed mb-4" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     This image was generated using a highly-detailed, bias-countering prompt specifically designed for authentic African hair representation. Our system uses explicit ethnicity markers and detailed texture descriptions to counter AI biases and ensure culturally accurate results.
                   </p>
-                  <div className="bg-white p-4 rounded-lg border border-purple-200">
-                    <p className="text-xs font-mono text-gray-600">
+                  <div className="p-4 rounded-lg" style={{ background: '#FFFEE1', border: '1px solid rgba(175, 85, 0, 0.2)' }}>
+                    <p className="text-xs font-mono" style={{ color: '#DD8106' }}>
                       {sessionStorage.getItem('aiPrompt') || 'Detailed prompt used for AI generation'}
                     </p>
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                    <div className="bg-white p-3 rounded-lg">
-                      <div className="font-semibold text-purple-700">Hair Type</div>
-                      <div className="text-gray-600">{sessionStorage.getItem('hairType')}</div>
+                    <div className="p-3 rounded-lg" style={{ background: '#FFFEE1' }}>
+                      <div className="font-semibold" style={{ color: '#DD8106' }}>Hair Type</div>
+                      <div style={{ color: '#DD8106' }}>{sessionStorage.getItem('hairType')}</div>
                     </div>
-                    <div className="bg-white p-3 rounded-lg">
-                      <div className="font-semibold text-purple-700">Vibe</div>
-                      <div className="text-gray-600">{sessionStorage.getItem('vibe')}</div>
+                    <div className="p-3 rounded-lg" style={{ background: '#FFFEE1' }}>
+                      <div className="font-semibold" style={{ color: '#DD8106' }}>Vibe</div>
+                      <div style={{ color: '#DD8106' }}>{sessionStorage.getItem('vibe')}</div>
                     </div>
                   </div>
                 </div>
@@ -384,35 +386,35 @@ z"/>
           )}
 
           {/* Routine Section (RIGHT COLUMN) */}
-          <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto">
+          <div className="rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto" style={{ background: 'rgba(255,255,255,0.8)', border: '2px solid rgba(175, 85, 0, 0.2)' }}>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold text-[#C87726]">Your Hair Care Routine</h2>
+            <h2 className="text-3xl font-bold" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>Your Hair Care Routine</h2>
             <div className="text-right">
-              <div className="text-sm text-gray-500">Total Time</div>
-              <div className="text-2xl font-bold text-purple-600">{data.routine.totalTime}</div>
-              <div className="text-sm text-gray-500">{data.routine.frequency}</div>
+              <div className="text-sm" style={{ color: '#DD8106' }}>Total Time</div>
+              <div className="text-2xl font-bold" style={{ color: '#DD8106' }}>{data.routine.totalTime}</div>
+              <div className="text-sm" style={{ color: '#DD8106' }}>{data.routine.frequency}</div>
             </div>
           </div>
 
           <div className="space-y-6">
             {data.routine.steps.map((step, index) => (
-              <div key={index} className="relative flex gap-4 p-6 border-2 border-[#E9A96A] rounded-2xl bg-transparent">
+              <div key={index} className="relative flex gap-4 p-6 rounded-2xl" style={{ border: '2px solid rgba(175, 85, 0, 0.3)', background: 'rgba(206, 147, 95, 0.1)' }}>
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 border-2 border-[#E9A96A] rounded-full flex items-center justify-center text-[#E9A96A] font-bold text-sm bg-transparent">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm" style={{ border: '2px solid #AF5500', color: '#DD8106', background: '#FFFEE1' }}>
                     {step.stepNumber}
                   </div>
                 </div>
                 <div className="flex-grow">
-                  <h3 className="text-xl font-bold text-[#C87726] mb-2 pr-20">{step.action}</h3>
-                  <p className="text-[#C87726] mb-2">{step.instructions}</p>
+                  <h3 className="text-xl font-bold mb-2 pr-20" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>{step.action}</h3>
+                  <p className="mb-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{step.instructions}</p>
                   {step.productName && (
                     <div className="text-sm">
-                      <span className="text-[#C87726]">🧴 {step.productName}</span>
+                      <span style={{ color: '#DD8106' }}>🧴 {step.productName}</span>
                     </div>
                   )}
                 </div>
                 <div className="absolute top-6 right-6">
-                  <span className="text-purple-600 font-semibold text-sm">⏱️ {step.duration}</span>
+                  <span className="font-semibold text-sm" style={{ color: '#AF5500' }}>⏱️ {step.duration}</span>
                 </div>
               </div>
             ))}
@@ -422,11 +424,11 @@ z"/>
         {/* End Two Column Layout */}
 
         {/* Products */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[80vh] overflow-y-auto">
-          <h2 className="text-3xl font-bold text-[#E9A96A] mb-6">Recommended Products</h2>
+        <div className="rounded-3xl shadow-2xl p-8 max-h-[80vh] overflow-y-auto" style={{ background: 'rgba(255,255,255,0.8)', border: '2px solid rgba(175, 85, 0, 0.2)' }}>
+          <h2 className="text-3xl font-bold mb-6" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>Recommended Products</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {data.products.map((product, index) => (
-              <div key={index} className="border-2 border-[#E9A96A] rounded-2xl p-6 hover:border-purple-300 hover:shadow-lg transition-all">
+              <div key={index} className="rounded-2xl p-6 transition-all hover:shadow-lg" style={{ border: '2px solid rgba(175, 85, 0, 0.3)', background: 'rgba(253, 244, 232, 0.5)' }}>
                 {product.imageUrl && (
                   <img
                     src={product.imageUrl}
@@ -434,12 +436,12 @@ z"/>
                     className="w-full h-48 object-cover rounded-xl mb-4"
                   />
                 )}
-                <div className="text-sm text-purple-600 font-semibold mb-1">{product.brand}</div>
-                <h3 className="text-lg font-bold text-[#E9A96A] mb-2">{product.name}</h3>
-                <p className="text-[#E9A96A] text-sm mb-4">{product.reason}</p>
+                <div className="text-sm font-semibold mb-1" style={{ color: '#DD8106' }}>{product.brand}</div>
+                <h3 className="text-lg font-bold mb-2" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>{product.name}</h3>
+                <p className="text-sm mb-4" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{product.reason}</p>
                 <div className="flex items-center justify-between">
                   {product.price && (
-                    <span className="text-2xl font-bold text-[#E9A96A]">${product.price}</span>
+                    <span className="text-2xl font-bold" style={{ color: '#DD8106' }}>${product.price}</span>
                   )}
                   <a
                     href={product.affiliateLink || '#'}
@@ -453,7 +455,8 @@ z"/>
                         price: product.price,
                       });
                     }}
-                    className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+                    className="px-6 py-2 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+                    style={{ background: 'linear-gradient(135deg, #643100 0%, #AF5500 100%)', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
                     Shop Now
                   </a>
@@ -464,40 +467,41 @@ z"/>
         </div>
 
         {/* Salons Who Can Do It */}
-        <div className="mt-12 bg-white/60 backdrop-blur-sm rounded-3xl shadow-2xl p-8 max-h-[80vh] overflow-y-auto">
-          <h2 className="text-3xl font-bold text-[#E9A96A] mb-6">Salons Who Can Do This Style</h2>
+        <div className="mt-12 rounded-3xl shadow-2xl p-8 max-h-[80vh] overflow-y-auto" style={{ background: 'rgba(255,255,255,0.8)', border: '2px solid rgba(175, 85, 0, 0.2)' }}>
+          <h2 className="text-3xl font-bold mb-6" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>Salons Who Can Do This Style</h2>
 
           {loadingSalons ? (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Finding salons near you...</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#AF5500' }}></div>
+              <p style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Finding salons near you...</p>
             </div>
           ) : salons.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {salons.map((salon) => (
                 <div 
                   key={salon.id}
-                  className="border-2 border-[#E9A96A] rounded-2xl p-6 hover:border-purple-300 hover:shadow-lg transition-all"
+                  className="rounded-2xl p-6 transition-all hover:shadow-lg"
+                  style={{ border: '2px solid rgba(175, 85, 0, 0.3)', background: 'rgba(253, 244, 232, 0.5)' }}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="text-xl font-bold text-[#E9A96A]">{salon.name}</h3>
-                      <div className="flex items-center text-[#E9A96A] text-sm mt-1">
+                      <h3 className="text-xl font-bold" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>{salon.name}</h3>
+                      <div className="flex items-center text-sm mt-1" style={{ color: '#DD8106' }}>
                         <span className="mr-1">📍</span>
                         <span>{salon.area}</span>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                      <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-bold">
+                      <span className="px-2 py-1 rounded-full text-xs font-bold" style={{ background: 'rgba(206, 147, 95, 0.3)', color: '#DD8106' }}>
                         ⭐ {salon.rating.toFixed(1)}
                       </span>
-                      <span className="text-[#E9A96A] font-semibold text-sm">
+                      <span className="font-semibold text-sm" style={{ color: '#AF5500' }}>
                         {salon.price_range}
                       </span>
                     </div>
                   </div>
 
-                  <p className="text-[#E9A96A] text-sm mb-4 line-clamp-2">
+                  <p className="text-sm mb-4 line-clamp-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     {salon.description}
                   </p>
 
@@ -529,7 +533,8 @@ z"/>
                         hairType: sessionStorage.getItem('hairType') || undefined,
                       });
                     }}
-                    className="block w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold text-center hover:shadow-lg transition-all"
+                    className="block w-full px-6 py-3 text-white rounded-xl font-semibold text-center hover:shadow-lg transition-all"
+                    style={{ background: 'linear-gradient(135deg, #643100 0%, #AF5500 100%)', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
                     📞 Call to Book
                   </a>
@@ -537,9 +542,9 @@ z"/>
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 bg-gray-50 rounded-xl">
+            <div className="text-center py-12 rounded-xl" style={{ background: 'rgba(206, 147, 95, 0.1)' }}>
               <div className="text-5xl mb-4">💈</div>
-              <p className="text-gray-600">
+              <p style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 Salon recommendations will appear here after you complete the form
               </p>
             </div>
@@ -553,19 +558,22 @@ z"/>
               onClick={() => {
                 window.print();
               }}
-              className="px-8 py-4 bg-white border-2 border-purple-300 text-purple-600 rounded-xl font-bold text-lg hover:bg-purple-50 transition-all"
+              className="px-8 py-4 rounded-xl font-bold text-lg transition-all"
+              style={{ background: '#FFFEE1', border: '2px solid #914600', color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}
             >
               📄 Save as PDF
             </button>
             <button
               onClick={() => router.push('/analytics')}
-              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all"
+              className="px-8 py-4 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all"
+              style={{ background: 'linear-gradient(135deg, #643100 0%, #914600 100%)', fontFamily: 'Bricolage Grotesque, sans-serif' }}
             >
               📊 View Analytics
             </button>
             <button
               onClick={() => router.push('/')}
-              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all"
+              className="px-8 py-4 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all"
+              style={{ background: 'linear-gradient(135deg, #643100 0%, #AF5500 100%)', fontFamily: 'Bricolage Grotesque, sans-serif' }}
             >
               Create Another Routine ✨
             </button>

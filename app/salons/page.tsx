@@ -82,7 +82,7 @@ export default function SalonsPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: '#FDF4E8' }}>
+    <div className="min-h-screen" style={{ background: '#FFFEE1' }}>
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 py-12">
@@ -93,10 +93,10 @@ export default function SalonsPage() {
           className="text-center mb-12"
         >
           <h1 className="text-5xl md:text-6xl font-bold mb-4"
-            style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+            style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
             Find Your Perfect Salon
           </h1>
-          <p className="text-xl" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+          <p className="text-xl" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
             Discover expert stylists specializing in African hair care across Nairobi
           </p>
         </motion.div>
@@ -115,7 +115,7 @@ export default function SalonsPage() {
               <Search
                 className="absolute left-4 top-1/2 transform -translate-y-1/2"
                 size={20}
-                style={{ color: '#914600' }}
+                style={{ color: '#DD8106' }}
               />
               <input
                 type="text"
@@ -124,9 +124,9 @@ export default function SalonsPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-4 rounded-xl text-lg"
                 style={{
-                  background: '#FDF4E8',
+                  background: '#FFFEE1',
                   border: '2px solid #914600',
-                  color: '#643100',
+                  color: '#DD8106',
                   fontFamily: 'Bricolage Grotesque, sans-serif'
                 }}
               />
@@ -138,7 +138,7 @@ export default function SalonsPage() {
             {/* Area Filter */}
             <div>
               <label className="block text-sm font-semibold mb-2"
-                style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 <Filter size={16} className="inline mr-2" />
                 Area
               </label>
@@ -147,9 +147,9 @@ export default function SalonsPage() {
                 onChange={(e) => setSelectedArea(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl"
                 style={{
-                  background: '#FDF4E8',
+                  background: '#FFFEE1',
                   border: '2px solid #914600',
-                  color: '#643100',
+                  color: '#DD8106',
                   fontFamily: 'Bricolage Grotesque, sans-serif'
                 }}
               >
@@ -163,7 +163,7 @@ export default function SalonsPage() {
             {/* Specialty Filter */}
             <div>
               <label className="block text-sm font-semibold mb-2"
-                style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 <Filter size={16} className="inline mr-2" />
                 Specialty
               </label>
@@ -172,9 +172,9 @@ export default function SalonsPage() {
                 onChange={(e) => setSelectedSpecialty(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl"
                 style={{
-                  background: '#FDF4E8',
+                  background: '#FFFEE1',
                   border: '2px solid #914600',
-                  color: '#643100',
+                  color: '#DD8106',
                   fontFamily: 'Bricolage Grotesque, sans-serif'
                 }}
               >
@@ -188,7 +188,7 @@ export default function SalonsPage() {
         </motion.div>
 
         {/* Results Count */}
-        <div className="mb-6" style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+        <div className="mb-6" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
           Showing {filteredSalons.length} {filteredSalons.length === 1 ? 'salon' : 'salons'}
         </div>
 
@@ -196,17 +196,17 @@ export default function SalonsPage() {
         {loading ? (
           <div className="text-center py-20">
             <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-solid border-current border-r-transparent"
-              style={{ color: '#914600' }} />
-            <p className="mt-4 text-lg" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              style={{ color: '#DD8106' }} />
+            <p className="mt-4 text-lg" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
               Loading salons...
             </p>
           </div>
         ) : filteredSalons.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-2xl mb-4" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+            <p className="text-2xl mb-4" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
               No salons found
             </p>
-            <p style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+            <p style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
               Try adjusting your filters or search query
             </p>
           </div>
@@ -239,18 +239,18 @@ export default function SalonsPage() {
                 {/* Content */}
                 <div className="p-6">
                   <h3 className="text-2xl font-bold mb-2"
-                    style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                    style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
                     {salon.name}
                   </h3>
 
                   <div className="flex items-center gap-2 mb-3"
-                    style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     <MapPin size={16} />
                     <span>{salon.location}</span>
                   </div>
 
                   <p className="text-sm mb-4 line-clamp-2"
-                    style={{ color: '#914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     {salon.description}
                   </p>
 
@@ -260,7 +260,7 @@ export default function SalonsPage() {
                       <span
                         key={idx}
                         className="text-xs px-2 py-1 rounded-full"
-                        style={{ background: 'rgba(206, 147, 95, 0.2)', color: '#643100' }}
+                        style={{ background: 'rgba(206, 147, 95, 0.2)', color: '#DD8106' }}
                       >
                         {service}
                       </span>
@@ -268,7 +268,7 @@ export default function SalonsPage() {
                     {salon.services.length > 3 && (
                       <span
                         className="text-xs px-2 py-1 rounded-full"
-                        style={{ background: 'rgba(206, 147, 95, 0.2)', color: '#643100' }}
+                        style={{ background: 'rgba(206, 147, 95, 0.2)', color: '#DD8106' }}
                       >
                         +{salon.services.length - 3} more
                       </span>
@@ -279,9 +279,9 @@ export default function SalonsPage() {
                   <div className="flex items-center justify-between pt-4"
                     style={{ borderTop: '1px solid rgba(145, 70, 0, 0.2)' }}>
                     <div className="flex items-center gap-1">
-                      <DollarSign size={16} style={{ color: '#914600' }} />
+                      <DollarSign size={16} style={{ color: '#DD8106' }} />
                       <span className="text-sm font-semibold"
-                        style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                        style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                         {priceRangeIcons[salon.price_range as keyof typeof priceRangeIcons]}
                       </span>
                     </div>
