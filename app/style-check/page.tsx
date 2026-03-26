@@ -159,15 +159,15 @@ export default function StyleCheckPage() {
           ) : (
             <div className="flex min-h-0 flex-1 flex-col justify-center md:flex-none md:justify-start">
               <div
-                className="flex w-full max-h-[min(38rem,58dvh)] flex-col overflow-hidden rounded-2xl md:max-h-none md:flex-none"
+                className="flex w-full max-h-[min(50rem,85dvh)] flex-col overflow-hidden rounded-2xl p-5 md:max-h-none md:flex-none md:p-6"
                 style={{
                   background: '#FFFFFF',
                   border: '2px solid rgba(175, 85, 0, 0.25)',
                   color: '#C17208',
                 }}
               >
-                {/* Inner wrapper: padding + overflow here so bottom padding isn’t clipped by overflow-y */}
-                <div className="flex max-h-full min-h-0 flex-col gap-4 overflow-y-auto px-5 pt-5 pb-5 md:gap-5 md:px-6 md:pt-6 md:pb-6">
+                {/* Padding on this outer shell only — not on overflow-y — so bottom inset is never clipped */}
+                <div className="flex min-h-0 max-h-full flex-col gap-4 overflow-y-auto md:gap-5">
                   <div className="flex w-full items-center justify-center py-2 md:py-4">
                     <div
                       className="w-full max-w-xs rounded-2xl p-5 sm:max-w-sm md:max-w-md md:p-6"
@@ -198,7 +198,7 @@ export default function StyleCheckPage() {
                       </button>
                     </div>
                   </div>
-                  <div className="flex shrink-0 flex-col items-center gap-3 self-center pt-2 text-center">
+                  <div className="flex shrink-0 flex-col items-center gap-3 self-center pt-2 pb-2 text-center md:pb-4">
                     <p
                       className="text-sm font-medium"
                       style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
@@ -208,7 +208,7 @@ export default function StyleCheckPage() {
                     <button
                       type="button"
                       onClick={() => setShowGrid(true)}
-                      className="mb-5 w-full max-w-sm rounded-xl py-3 text-sm font-semibold transition-all md:mb-6 md:max-w-md md:text-base"
+                      className="w-full max-w-sm rounded-xl py-3 text-sm font-semibold transition-all md:max-w-md md:text-base"
                       style={{
                         background: 'rgba(193, 114, 8, 0.12)',
                         color: '#C17208',
