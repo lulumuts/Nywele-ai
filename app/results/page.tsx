@@ -308,7 +308,7 @@ z"/>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-12 pb-24 md:pb-12 flex-1">
+      <div className="max-w-7xl mx-auto px-4 py-12 pb-24 md:pt-20 md:pb-12 flex-1">
         {/* Stylist Tip */}
         <div className="mb-8 rounded-3xl p-8 shadow-2xl" style={{ background: 'linear-gradient(135deg, #643100 0%, #AF5500 100%)' }}>
           <div className="flex items-start gap-4">

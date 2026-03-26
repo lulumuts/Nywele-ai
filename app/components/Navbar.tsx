@@ -83,7 +83,7 @@ export default function Navbar() {
               transition={{ duration: 0.5 }}
               className="w-8 h-8 flex items-center justify-center"
             >
-              <img src="/coil.svg" alt="Nywele.ai" className="w-8 h-8" />
+              <img src="/icons/coil.svg" alt="Nywele.ai" className="w-8 h-8" />
             </motion.div>
             <span className="text-xl font-bold" style={{ fontFamily: 'Caprasimo, serif', color: '#AF5500' }}>
               Nywele.ai

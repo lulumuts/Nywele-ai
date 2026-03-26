@@ -43,7 +43,7 @@ export default function Products() {
     return (
       <>
         <BottomNav />
-        <div className="min-h-screen flex items-center justify-center pb-24 md:pb-0" style={{ background: '#FFFEE1' }}>
+        <div className="min-h-screen flex items-center justify-center pb-24 md:pt-20 md:pb-8" style={{ background: '#FFFEE1' }}>
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#643100] mx-auto mb-4"></div>
             <p style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Loading...</p>
@@ -57,7 +57,7 @@ export default function Products() {
     return (
       <>
         <BottomNav />
-        <div className="min-h-screen px-4 py-8 pb-24 md:pb-0" style={{ background: '#FFFEE1' }}>
+        <div className="min-h-screen px-4 py-8 pb-24 md:pt-20 md:pb-8" style={{ background: '#FFFEE1' }}>
           <div className="max-w-2xl mx-auto space-y-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -131,7 +131,7 @@ export default function Products() {
   return (
     <>
       <BottomNav />
-      <div className="min-h-screen relative pb-24 md:pb-0" style={{ background: '#FFFEE1' }}>
+      <div className="min-h-screen relative pb-24 md:pt-20 md:pb-8" style={{ background: '#FFFEE1' }}>
         <style jsx global>{`
           @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
         `}</style>

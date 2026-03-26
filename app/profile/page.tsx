@@ -373,7 +373,7 @@ export default function Profile() {
   return (
     <>
       <BottomNav />
-      <div className="min-h-screen relative pb-24 md:pb-0" style={{ background: '#FFFEE1' }}>
+      <div className="min-h-screen relative pb-24 md:pt-20 md:pb-8" style={{ background: '#FFFEE1' }}>
         {/* Wavy Background Pattern */}
         <div style={{
           position: 'fixed',
@@ -1352,7 +1352,7 @@ export default function Profile() {
 
           <p className="text-center mt-8">
             <Link
-              href="/?replay=1"
+              href="/intro"
               className="text-sm underline hover:no-underline"
               style={{ color: '#AF5500', fontFamily: 'Bricolage Grotesque, sans-serif' }}
             >

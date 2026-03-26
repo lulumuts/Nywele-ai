@@ -30,6 +30,7 @@ export interface UserProfile {
   profileVersion: number;
   name: string;
   email: string;
+  phone?: string;
   hairType: HairType;
   hairGoals: string[];
   hairPorosity: HairPorosity | '';
@@ -95,6 +96,7 @@ export function normalizeUserProfile(raw: unknown): UserProfile {
     profileVersion: typeof source.profileVersion === 'number' ? source.profileVersion : PROFILE_VERSION,
     name: typeof source.name === 'string' ? source.name : '',
     email: typeof source.email === 'string' ? source.email : '',
+    phone: typeof source.phone === 'string' ? source.phone : undefined,
     hairType: VALID_HAIR_TYPES.includes(source.hairType as HairType) ? (source.hairType as HairType) : '4c',
     hairGoals: toStringArray(source.hairGoals),
     hairPorosity: toEnumOrEmpty(source.hairPorosity ?? source.porosity, VALID_POROSITY),

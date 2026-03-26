@@ -198,7 +198,12 @@ export default function HairCarePage() {
       const newRoutine = {
         id: Date.now().toString(),
         createdAt: new Date().toISOString(),
-        hairAnalysis: hairAnalysis,
+        hairAnalysis: {
+          ...hairAnalysis,
+          healthScore: hairAnalysis.health?.healthScore ?? hairAnalysis.health?.score ?? 60,
+          damageSeverity: hairAnalysis.damage?.severity ?? 'none',
+          overallQuality: hairAnalysis.overallQuality ?? (hairAnalysis.health?.healthScore ?? hairAnalysis.health?.score ?? 60),
+        },
         routine: recommendation,
         notes: ''
       };
@@ -419,7 +424,7 @@ export default function HairCarePage() {
 
       {/* Progress Indicator */}
       {currentStep > 0 && currentStep < 4 && (
-        <div className="sticky top-14 md:top-14 z-40 backdrop-blur-sm border-b" style={{ borderColor: 'rgba(145, 70, 0, 0.2)', backgroundColor: 'rgba(253, 244, 232, 0.95)' }}>
+        <div className="sticky top-14 md:top-20 z-40 backdrop-blur-sm border-b" style={{ borderColor: 'rgba(145, 70, 0, 0.2)', backgroundColor: 'rgba(253, 244, 232, 0.95)' }}>
           <div className="max-w-4xl mx-auto px-4 py-3">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
@@ -445,7 +450,7 @@ export default function HairCarePage() {
         </div>
       )}
 
-      <div className="min-h-screen relative pb-24 md:pb-0" style={{ background: '#FFFEE1' }}>
+      <div className="min-h-screen relative pb-24 md:pt-20 md:pb-8" style={{ background: '#FFFEE1' }}>
         {/* Wavy Background Pattern */}
         <div style={{
           position: 'fixed',

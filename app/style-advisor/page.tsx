@@ -278,7 +278,7 @@ export default function StyleAdvisor() {
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-4 py-12 pb-24 md:pb-12 flex-1">
+      <div className="max-w-6xl mx-auto px-4 py-12 pb-24 md:pt-20 md:pb-12 flex-1">
         <AnimatePresence mode="wait">
           {/* Step 0: Style Selection */}
           {currentStep === 0 && (
