@@ -92,7 +92,10 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#FFFEE1' }}>
+    <div
+      className="flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden"
+      style={{ background: '#FFFEE1' }}
+    >
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
         .scrollbar-hide::-webkit-scrollbar { display: none; }
@@ -100,8 +103,8 @@ export default function Dashboard() {
       `}</style>
       <BottomNav />
 
-      <div className="flex-1 max-w-6xl mx-auto w-full px-4 py-6 md:py-8 pb-24 md:pt-20 md:pb-8">
-        <div className="mb-6 flex flex-row items-center justify-between gap-3">
+      <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col overflow-hidden px-4 pb-[max(6rem,calc(4.75rem+env(safe-area-inset-bottom,0px)))] pt-10 md:px-4 md:pb-8 md:pt-28">
+        <div className="mb-6 flex shrink-0 flex-row items-center justify-between gap-3">
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
             <img
               src="/icons/coil.svg"
@@ -110,7 +113,7 @@ export default function Dashboard() {
             />
             <h1
               className="min-w-0 text-2xl font-bold sm:text-3xl md:text-4xl"
-              style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}
+              style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
             >
               Hey {userName || 'Layla'},
             </h1>
@@ -120,7 +123,7 @@ export default function Dashboard() {
             className="w-fit shrink-0 rounded-xl px-6 py-3 text-sm font-semibold transition-all hover:shadow-lg"
             style={{
               background: '#FFFEE1',
-              color: '#DD8106',
+              color: '#3C270C',
               border: 'none',
               fontFamily: 'Bricolage Grotesque, sans-serif',
             }}
@@ -131,40 +134,68 @@ export default function Dashboard() {
 
         {userProfile && (
         <div
-          className="rounded-2xl overflow-hidden"
+          className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl"
           style={{ background: '#FFFFFF', border: '2px solid rgba(175, 85, 0, 0.25)' }}
         >
-          {/* Tab switcher */}
-          <div className="flex p-0.5" style={{ background: '#FDF4E8' }}>
-            <button
-              onClick={() => setActiveTab('routine')}
-              className="flex-1 rounded-2xl px-3 py-1.5 text-xs font-semibold transition-all sm:px-4 sm:py-2 sm:text-sm"
-              style={{
-                background: activeTab === 'routine' ? '#643100' : 'transparent',
-                color: activeTab === 'routine' ? '#FFFFFF' : '#573203',
-                fontFamily: 'Bricolage Grotesque, sans-serif',
-              }}
+          {/* Segmented toggle — single track, sliding active thumb */}
+          <div className="shrink-0 px-4 pb-3 pt-5 sm:px-5 sm:pb-4 sm:pt-6 md:px-6 md:pb-4 md:pt-8">
+            <div
+              role="tablist"
+              aria-label="Dashboard view"
+              className="relative flex h-9 w-full overflow-hidden rounded-full border-2 border-[#603E12] bg-white sm:h-10"
             >
-              Your Routine
-            </button>
-            <button
-              onClick={() => setActiveTab('metrics')}
-              className="flex-1 rounded-2xl px-3 py-1.5 text-xs font-semibold transition-all sm:px-4 sm:py-2 sm:text-sm"
-              style={{
-                background: activeTab === 'metrics' ? '#643100' : 'transparent',
-                color: activeTab === 'metrics' ? '#FFFFFF' : '#573203',
-                fontFamily: 'Bricolage Grotesque, sans-serif',
-              }}
-            >
-              Your Metrics
-            </button>
+              <motion.div
+                aria-hidden
+                className="absolute inset-y-0 rounded-full bg-[#603E12]"
+                initial={false}
+                animate={{
+                  left: activeTab === 'routine' ? '0%' : '50%',
+                  width: '50%',
+                }}
+                transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+              />
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'routine'}
+                id="dashboard-tab-routine"
+                onClick={() => setActiveTab('routine')}
+                className="relative z-10 flex flex-1 items-center justify-center px-1 py-0 text-xs font-semibold leading-tight transition-colors sm:px-2 sm:text-sm"
+                style={{
+                  color: activeTab === 'routine' ? '#FFFFFF' : '#603E12',
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  background: 'transparent',
+                }}
+              >
+                Your Routine
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'metrics'}
+                id="dashboard-tab-metrics"
+                onClick={() => setActiveTab('metrics')}
+                className="relative z-10 flex flex-1 items-center justify-center px-1 py-0 text-xs font-semibold leading-tight transition-colors sm:px-2 sm:text-sm"
+                style={{
+                  color: activeTab === 'metrics' ? '#FFFFFF' : '#603E12',
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  background: 'transparent',
+                }}
+              >
+                Your Metrics
+              </button>
+            </div>
           </div>
 
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {activeTab === 'routine' && (
           <motion.div
+            role="tabpanel"
+            id="dashboard-panel-routine"
+            aria-labelledby="dashboard-tab-routine"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 md:p-8 space-y-8"
+            className="space-y-8 p-6 md:p-8"
           >
             <div>
               <h2
@@ -173,13 +204,13 @@ export default function Dashboard() {
               >
                 Your Current Routine
               </h2>
-              <p className="text-base mb-4" style={{ color: '#6b7280', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              <p className="text-base mb-4" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 Here is your regimented routine based on your most recent scan
               </p>
               <div
                 className="rounded-xl p-4 md:p-5"
                 style={{
-                  background: '#FFFCF3',
+                  background: 'rgba(255, 254, 225, 0.43)',
                   border: '1px solid rgba(175, 85, 0, 0.14)',
                 }}
               >
@@ -188,12 +219,12 @@ export default function Dashboard() {
                   <div
                     key={card.id}
                     className="flex-shrink-0 w-[320px] px-4 py-3 rounded-xl"
-                    style={{ background: 'transparent', border: '2px solid rgba(175, 85, 0, 0.3)' }}
+                    style={{ background: '#FFFFFF', border: '1px solid rgba(175, 85, 0, 0.2)' }}
                   >
                     <div className="flex items-start justify-between gap-2 mb-0">
                       <span
                         className="text-lg font-semibold leading-tight"
-                        style={{ color: '#374151', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                        style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                       >
                         {card.title}
                       </span>
@@ -206,30 +237,30 @@ export default function Dashboard() {
                     </div>
                     <p
                       className="text-sm mb-2 mt-0 leading-tight"
-                      style={{ color: '#44403C', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                      style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                     >
                       {card.schedule}
                     </p>
                     <div className="mb-2">
                       <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#374151' }} />
-                        <span className="text-xs font-medium" style={{ color: '#374151' }}>Duration</span>
+                        <Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#3C270C' }} />
+                        <span className="text-xs font-medium" style={{ color: '#3C270C' }}>Duration</span>
                       </div>
                       <p
                         className="text-xs leading-snug mt-0.5 pl-[calc(0.875rem+0.375rem)]"
-                        style={{ color: '#9ca3af' }}
+                        style={{ color: '#3C270C' }}
                       >
                         {card.duration}
                       </p>
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <HelpCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#374151' }} />
-                        <span className="text-xs font-medium" style={{ color: '#374151' }}>Why:</span>
+                        <HelpCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#3C270C' }} />
+                        <span className="text-xs font-medium" style={{ color: '#3C270C' }}>Why:</span>
                       </div>
                       <p
                         className="text-xs leading-snug mt-0.5 pl-[calc(0.875rem+0.375rem)]"
-                        style={{ color: '#9ca3af' }}
+                        style={{ color: '#3C270C' }}
                       >
                         {card.why}
                       </p>
@@ -249,7 +280,7 @@ export default function Dashboard() {
                   >
                     Your Recommended Products
                   </h2>
-                  <p className="text-base" style={{ color: '#6b7280', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  <p className="text-base" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     Here is your regimented routine based on your most recent scan
                   </p>
                 </div>
@@ -258,7 +289,7 @@ export default function Dashboard() {
               <div
                 className="rounded-xl p-4 md:p-5"
                 style={{
-                  background: '#FFFCF3',
+                  background: 'rgba(255, 254, 225, 0.43)',
                   border: '1px solid rgba(175, 85, 0, 0.14)',
                 }}
               >
@@ -270,16 +301,16 @@ export default function Dashboard() {
                     <div
                       key={i}
                       className="flex-shrink-0 w-[240px] p-4 rounded-xl flex flex-col"
-                      style={{ background: 'transparent', border: '1px solid rgba(175, 85, 0, 0.2)' }}
+                      style={{ background: 'transparent' }}
                     >
                       <div
                         className="w-full h-24 rounded-lg flex items-center justify-center flex-shrink-0 mb-3"
-                        style={{ background: 'transparent', border: '1px solid rgba(175, 85, 0, 0.2)' }}
+                        style={{ background: 'rgba(175, 85, 0, 0.06)' }}
                       >
-                        <Package className="w-10 h-10" style={{ color: '#DD8106' }} />
+                        <Package className="w-10 h-10" style={{ color: '#3C270C' }} />
                       </div>
-                      <p className="font-bold text-sm" style={{ color: '#374151' }}>{product.name}</p>
-                      <p className="text-xs mt-1 line-clamp-3" style={{ color: '#9ca3af' }}>{product.purpose || product.name || ''}</p>
+                      <p className="font-bold text-sm" style={{ color: '#3C270C' }}>{product.name}</p>
+                      <p className="text-xs mt-1 line-clamp-3" style={{ color: '#3C270C' }}>{product.purpose || product.name || ''}</p>
                     </div>
                   ))}
                 </div>
@@ -294,7 +325,7 @@ export default function Dashboard() {
                 >
                   AI-Powered Recommendations
                 </h2>
-                <p className="text-sm mb-4" style={{ color: '#6b7280' }}>
+                <p className="text-sm mb-4" style={{ color: '#3C270C' }}>
                   Get a personalized routine and product suggestions from our AI specialist
                 </p>
                 {!aiRecommendation ? (
@@ -329,29 +360,29 @@ export default function Dashboard() {
                     {showAiRecommendation && (
                       <>
                         {aiRecommendation.stylistTip && (
-                          <p className="text-sm p-3 rounded-xl" style={{ background: 'rgba(206, 147, 95, 0.1)', color: '#DD8106' }}>
+                          <p className="text-sm p-3 rounded-xl" style={{ background: 'rgba(206, 147, 95, 0.1)', color: '#3C270C' }}>
                             <strong>Expert tip:</strong> {aiRecommendation.stylistTip}
                           </p>
                         )}
                         {aiRecommendation.routine?.steps?.length > 0 && (
-                          <ul className="list-decimal list-inside space-y-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          <ul className="list-decimal list-inside space-y-2" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             {aiRecommendation.routine.steps.map((s: any, i: number) => (
                               <li key={i}>
                                 {s.action}: {s.instructions}
-                                {s.productName && <span className="block text-sm" style={{ color: '#DD8106' }}>→ {s.productName}</span>}
+                                {s.productName && <span className="block text-sm" style={{ color: '#3C270C' }}>→ {s.productName}</span>}
                               </li>
                             ))}
                           </ul>
                         )}
                         {aiRecommendation.products?.length > 0 && (
                           <div className="space-y-2">
-                            <p className="font-semibold" style={{ color: '#DD8106' }}>Recommended products:</p>
+                            <p className="font-semibold" style={{ color: '#3C270C' }}>Recommended products:</p>
                             {aiRecommendation.products.map((p: any, i: number) => (
                               <div key={i} className="flex gap-3 p-3 rounded-xl" style={{ background: 'rgba(206, 147, 95, 0.1)' }}>
-                                <Package className="w-5 h-5 flex-shrink-0" style={{ color: '#DD8106' }} />
+                                <Package className="w-5 h-5 flex-shrink-0" style={{ color: '#3C270C' }} />
                                 <div>
-                                  <p className="font-medium" style={{ color: '#DD8106' }}>{p.brand} {p.name}</p>
-                                  <p className="text-xs" style={{ color: '#DD8106' }}>{p.reason}</p>
+                                  <p className="font-medium" style={{ color: '#3C270C' }}>{p.brand} {p.name}</p>
+                                  <p className="text-xs" style={{ color: '#3C270C' }}>{p.reason}</p>
                                 </div>
                               </div>
                             ))}
@@ -368,9 +399,12 @@ export default function Dashboard() {
 
         {activeTab === 'metrics' && (
           <motion.div
+            role="tabpanel"
+            id="dashboard-panel-metrics"
+            aria-labelledby="dashboard-tab-metrics"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 md:p-8 space-y-8"
+            className="space-y-8 p-6 md:p-8"
           >
             <div>
               <h2
@@ -379,7 +413,7 @@ export default function Dashboard() {
               >
                 Your Daily Routine
               </h2>
-              <p className="text-base mb-6" style={{ color: '#6b7280', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              <p className="text-base mb-6" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 Here is your regimented routine based on your most recent scan
               </p>
               <HealthTrendChart {...getHealthTrendData(userProfile)} />
@@ -392,7 +426,7 @@ export default function Dashboard() {
               >
                 Your Best Products
               </h2>
-              <p className="text-base mb-6" style={{ color: '#6b7280', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              <p className="text-base mb-6" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 Here is your regimented routine based on your most recent scan
               </p>
               <ProductSpendDonut {...getProductSpendData(userProfile)} />
@@ -405,7 +439,7 @@ export default function Dashboard() {
               >
                 Goal Progress
               </h2>
-              <p className="text-sm mb-6" style={{ color: '#6b7280', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              <p className="text-sm mb-6" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 How your metrics align with your hair goals
               </p>
               <GoalProgressChart {...getGoalProgressData(userProfile)} />
@@ -413,19 +447,20 @@ export default function Dashboard() {
           </motion.div>
         )}
         </div>
+        </div>
         )}
 
         {!userProfile && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-8 rounded-2xl p-8 text-center"
+            className="mt-8 flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto overscroll-contain rounded-2xl p-8 text-center"
             style={{ background: '#FFFEE1', border: '2px solid #914600' }}
           >
             <h3 className="text-2xl font-bold mb-2" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
               Create Your Profile
             </h3>
-            <p className="mb-6" style={{ color: '#DD8106' }}>
+            <p className="mb-6" style={{ color: '#3C270C' }}>
               Get personalized hair care recommendations and product suggestions
             </p>
             <button

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { gsap } from 'gsap';
+import IntroVideoFallback, { INTRO_VIDEO_SRC } from '@/app/components/IntroVideoFallback';
 
 function HomeContent() {
   const router = useRouter();
@@ -171,7 +172,7 @@ function HomeContent() {
                 style={{ width: '100%', height: '100%', objectFit: 'cover', backgroundColor: '#FFFEE1' }}
                 onError={(e) => console.error('Video failed to load:', e)}
               >
-                <source src="/videos/final-nywele-video.mp4" type="video/mp4" />
+                <source src={INTRO_VIDEO_SRC} type="video/mp4" />
               </video>
             </div>
           </div>
@@ -183,11 +184,7 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#FFFEE1' }}>
-        <div className="animate-pulse" style={{ color: '#AF5500', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Loading...</div>
-      </div>
-    }>
+    <Suspense fallback={<IntroVideoFallback />}>
       <HomeContent />
     </Suspense>
   );

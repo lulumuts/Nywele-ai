@@ -138,11 +138,11 @@ export default function StyleDetailPage() {
           products && (products.essential?.length || products.recommended?.length) ? (
             <ul
               className="list-inside list-disc space-y-1.5"
-              style={{ color: '#44403C', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+              style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
             >
               {[...(products.essential || []), ...(products.recommended || [])].map((p: any, i: number) => (
                 <li key={i}>
-                  <strong style={{ color: '#374151' }}>
+                  <strong style={{ color: '#C17208' }}>
                     {p.brand} {p.name}
                   </strong>
                   {p.estimated_price != null && ` — ${p.currency || 'KES'} ${Number(p.estimated_price).toLocaleString()}`}
@@ -185,7 +185,7 @@ export default function StyleDetailPage() {
           <div className="flex flex-1 flex-col p-6 md:p-8">
             <Link
               href="/style-check"
-              className="mb-6 inline-flex w-fit items-center gap-2 text-sm font-medium text-[#914600] transition-colors hover:text-[#643100]"
+              className="mb-6 inline-flex w-fit items-center gap-2 text-sm font-medium text-[#C17208] transition-colors hover:opacity-80"
               style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}
             >
               <ArrowLeft className="h-5 w-5" />
@@ -201,7 +201,7 @@ export default function StyleDetailPage() {
                   className="h-16 w-16 opacity-80 md:h-20 md:w-20"
                   viewBox="0 0 81 77"
                   fill="none"
-                  style={{ color: '#AF5500' }}
+                  style={{ color: '#C17208' }}
                   aria-hidden
                 >
                   <path
@@ -215,16 +215,16 @@ export default function StyleDetailPage() {
               <div>
                 <h1
                   className="mb-2 text-3xl font-bold md:text-4xl"
-                  style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                  style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
                 >
                   {style.name}
                 </h1>
-                <p className="mb-1 text-4xl font-bold md:text-5xl" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
+                <p className="mb-1 text-4xl font-bold md:text-5xl" style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}>
                   {style.score}%
                 </p>
                 <p
                   className="text-sm"
-                  style={{ color: '#6b7280', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   Compatibility score
                 </p>
@@ -241,13 +241,13 @@ export default function StyleDetailPage() {
               >
                 <h3
                   className="mb-2 text-base font-bold"
-                  style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                  style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
                 >
                   Things to know
                 </h3>
                 <ul
                   className="list-inside list-disc space-y-1 text-sm leading-relaxed md:text-base"
-                  style={{ color: '#44403C', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   {style.thingsToKnow.map((item, i) => (
                     <li key={i}>{item}</li>
@@ -263,13 +263,13 @@ export default function StyleDetailPage() {
               >
                 <h3
                   className="mb-2 text-base font-bold"
-                  style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                  style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
                 >
                   Why this works for you
                 </h3>
                 <ul
                   className="list-inside list-disc space-y-1 text-sm leading-relaxed md:text-base"
-                  style={{ color: '#44403C', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   {style.whyWorks.map((item, i) => (
                     <li key={i}>{item}</li>
@@ -287,7 +287,7 @@ export default function StyleDetailPage() {
             >
               <h3
                 className="mb-2 text-base font-bold"
-                style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
               >
                 Style inspiration
               </h3>
@@ -306,9 +306,9 @@ export default function StyleDetailPage() {
                   disabled={loadingStyleInspiration}
                   className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-sm font-semibold transition-all disabled:opacity-70 md:text-base"
                   style={{
-                    background: 'rgba(175, 85, 0, 0.12)',
-                    color: '#643100',
-                    border: '2px solid #914600',
+                    background: 'rgba(193, 114, 8, 0.12)',
+                    color: '#C17208',
+                    border: '2px solid #C17208',
                     fontFamily: 'Bricolage Grotesque, sans-serif',
                   }}
                 >

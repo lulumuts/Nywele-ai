@@ -164,14 +164,22 @@ export const CURATED_STYLES: Record<string, StyleImageSet> = {
   },
   'afro': {
     styleName: 'Afro',
-    aliases: ['afro', 'natural', 'fro', 'afro/natural', 'twa', 'afro/twa'],
+    aliases: [
+      'afro',
+      'natural',
+      'natural afro',
+      'fro',
+      'afro/natural',
+      'twa',
+      'afro/twa',
+    ],
     description: 'Full, rounded natural hair style',
     typicalDuration: 'Daily styling',
     maintenance: 'High',
     costEstimate: { min: 0, max: 20 },
     images: [
       {
-        url: '/images/styles/afro-twa.jpg',
+        url: '/images/natural-afro.svg',
         source: 'local',
         hairTypes: ['4a', '4b', '4c'],
         length: 'short',
@@ -179,9 +187,8 @@ export const CURATED_STYLES: Record<string, StyleImageSet> = {
         quality: 'high'
       },
       {
-        url: 'https://images.unsplash.com/photo-1524502397800-2eeaad7c3fe5?w=300&q=75',
-        source: 'unsplash',
-        attribution: 'Photo by Unsplash',
+        url: '/images/natural-afro.svg',
+        source: 'local',
         hairTypes: ['4a', '4b', '4c'],
         length: 'medium',
         angle: 'side',

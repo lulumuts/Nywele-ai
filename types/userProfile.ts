@@ -30,6 +30,10 @@ export interface UserProfile {
   profileVersion: number;
   name: string;
   email: string;
+  /** Optional; captured in onboarding profile flow */
+  age?: number;
+  /** Country / region label, e.g. Kenya */
+  location?: string;
   phone?: string;
   hairType: HairType;
   hairGoals: string[];
@@ -96,6 +100,13 @@ export function normalizeUserProfile(raw: unknown): UserProfile {
     profileVersion: typeof source.profileVersion === 'number' ? source.profileVersion : PROFILE_VERSION,
     name: typeof source.name === 'string' ? source.name : '',
     email: typeof source.email === 'string' ? source.email : '',
+    age:
+      typeof source.age === 'number' && !Number.isNaN(source.age)
+        ? source.age
+        : typeof source.age === 'string' && source.age.trim() !== ''
+          ? parseInt(source.age, 10) || undefined
+          : undefined,
+    location: typeof source.location === 'string' && source.location.trim() ? source.location : undefined,
     phone: typeof source.phone === 'string' ? source.phone : undefined,
     hairType: VALID_HAIR_TYPES.includes(source.hairType as HairType) ? (source.hairType as HairType) : '4c',
     hairGoals: toStringArray(source.hairGoals),

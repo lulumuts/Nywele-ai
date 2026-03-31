@@ -24,18 +24,18 @@ export default function AccordionSection({ title, children, defaultOpen = false 
         type="button"
         onClick={() => setOpen(!open)}
         className="flex w-full items-center justify-between px-4 py-3 text-left font-semibold transition-colors hover:opacity-90"
-        style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+        style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
       >
         {title}
         <ChevronDown
           className={`h-5 w-5 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
-          style={{ color: '#603E12' }}
+          style={{ color: '#C17208' }}
         />
       </button>
       {open && (
         <div
           className="px-4 pb-4 text-sm leading-relaxed md:text-base"
-          style={{ color: '#44403C', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+          style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
         >
           {children}
         </div>

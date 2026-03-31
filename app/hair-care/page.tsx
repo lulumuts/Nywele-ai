@@ -29,6 +29,7 @@ import { normalizeUserProfile, PROFILE_VERSION, type UserProfile } from '@/types
 
 export default function HairCarePage() {
   const hasLoadedRoutine = useRef(false);
+  const hairPhotoInputRef = useRef<HTMLInputElement>(null);
   const [recommendation, setRecommendation] = useState<HairCareRecommendation | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'daily' | 'weekly' | 'monthly'>('daily');
@@ -227,6 +228,12 @@ export default function HairCarePage() {
   const handleHairPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      void handleHairPhotoFile(file);
+    }
+  };
+
+  const handleHairPhotoFile = async (file: File) => {
+    if (file) {
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64Image = reader.result as string;
@@ -327,6 +334,14 @@ export default function HairCarePage() {
     }
   };
 
+  const handleHairPhotoDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const file = e.dataTransfer.files?.[0];
+    if (!file?.type.startsWith('image/') || isAnalyzing) return;
+    void handleHairPhotoFile(file);
+  };
+
   const generateRoutine = async () => {
     if (!hairAnalysis) {
       alert('Please upload a photo of your hair first!');
@@ -422,61 +437,27 @@ export default function HairCarePage() {
     <>
       <BottomNav />
 
-      {/* Progress Indicator */}
-      {currentStep > 0 && currentStep < 4 && (
-        <div className="sticky top-14 md:top-20 z-40 backdrop-blur-sm border-b" style={{ borderColor: 'rgba(145, 70, 0, 0.2)', backgroundColor: 'rgba(253, 244, 232, 0.95)' }}>
-          <div className="max-w-4xl mx-auto px-4 py-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                {currentStep === 1 && 'Step 1: Enter Your Details'}
-                {currentStep === 2 && 'Step 2: Upload Photo'}
-                {currentStep === 3 && 'Step 3: Analyzing Your Hair'}
-                {currentStep === 4 && 'Complete!'}
-              </span>
-              <span className="text-xs" style={{ color: '#DD8106' }}>
-                {currentStep} of 4
-              </span>
-            </div>
-            <div className="w-full h-2 rounded-full" style={{ backgroundColor: 'rgba(206, 147, 95, 0.3)' }}>
-              <div 
-                className="h-2 rounded-full transition-all duration-300"
-                style={{ 
-                  width: `${(currentStep / 4) * 100}%`,
-                  backgroundColor: '#643100'
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="min-h-screen relative pb-24 md:pt-20 md:pb-8" style={{ background: '#FFFEE1' }}>
-        {/* Wavy Background Pattern */}
-        <div style={{
-          position: 'fixed',
-          width: '150vmax',
-          height: '150vmax',
-          left: '27%',
-          top: '50%',
-          transform: 'translate(-50%, -50%) rotate(10deg)',
-          zIndex: 1,
-          pointerEvents: 'none',
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='500' height='1024' viewBox='0 0 500 1024' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M136.159 -64.5C495.422 135 532.329 334.5 246.879 534C-38.5715 733.5 -75.4781 933 136.159 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M149.069 -64.5C495.646 135 526.209 334.5 240.759 534C-44.6907 733.5 -75.2541 933 149.069 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M162.277 -64.5C496.167 135 520.387 334.5 234.937 534C-50.5129 733.5 -74.7329 933 162.277 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M175.761 -64.5C496.964 135 514.841 334.5 229.391 534C-56.0589 733.5 -73.9356 933 175.761 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M189.502 -64.5C498.019 135 509.552 334.5 224.102 534C-61.3482 733.5 -72.8815 933 189.502 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M203.482 -64.5C499.312 135 504.502 334.5 219.052 534C-66.3979 733.5 -71.5879 933 203.482 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M217.686 -64.5C500.829 135 499.676 334.5 214.226 534C-71.224 733.5 -70.0707 933 217.686 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M232.099 -64.5C502.556 135 495.059 334.5 209.609 534C-75.841 733.5 -68.3444 933 232.099 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M246.708 -64.5C504.478 135 490.638 334.5 205.188 534C-80.2623 733.5 -66.4223 933 246.708 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M261.5 -64.5C506.583 135 486.4 334.5 200.95 534C-84.4999 733.5 -64.3166 933 261.5 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M276.465 -64.5C508.862 135 482.335 334.5 196.885 534C-88.5651 733.5 -62.0384 933 276.465 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M291.592 -64.5C511.302 135 478.432 334.5 192.982 534C-92.4681 733.5 -59.5981 933 291.592 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M306.871 -64.5C513.895 135 474.681 334.5 189.231 534C-96.2186 733.5 -57.0052 933 306.871 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M322.295 -64.5C516.631 135 471.075 334.5 185.625 534C-99.8252 733.5 -54.2686 933 322.295 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M337.854 -64.5C519.504 135 467.604 334.5 182.154 534C-103.296 733.5 -51.3962 933 337.854 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M353.541 -64.5C522.504 135 464.261 334.5 178.811 534C-106.639 733.5 -48.3956 933 353.541 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M369.345 -64.5C525.622 135 461.035 334.5 175.585 534C-109.865 733.5 -45.2779 933 369.345 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M385.268 -64.5C528.858 135 457.928 334.5 172.478 534C-112.972 733.5 -42.0421 933 385.268 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M401.299 -64.5C532.202 135 454.929 334.5 169.479 534C-115.971 733.5 -38.6976 933 401.299 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M417.433 -64.5C535.65 135 452.033 334.5 166.583 534C-118.867 733.5 -35.25 933 417.433 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M433.665 -64.5C539.195 135 449.235 334.5 163.785 534C-121.665 733.5 -31.7046 933 433.665 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M449.991 -64.5C542.834 135 446.531 334.5 161.081 534C-124.369 733.5 -28.0661 933 449.991 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3Cpath d='M466.404 -64.5C546.561 135 443.914 334.5 158.464 534C-126.986 733.5 -24.3393 933 466.404 1132.5' stroke='%23CE935F' stroke-width='0.5' stroke-linecap='round'/%3E%3C/svg%3E")`,
-          backgroundPosition: 'center center',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: '100% 100%',
-        }} />
-
+      <div
+        className={`relative min-h-screen ${
+          currentStep === 2 && !hairImage ? 'md:pt-14' : 'md:pt-20'
+        } ${
+          currentStep === 2 && !hairImage
+            ? 'flex flex-col max-md:pb-0 md:pb-0'
+            : 'pb-24 md:pb-8'
+        }`}
+        style={{ background: '#FFFEE1' }}
+      >
         <style jsx global>{`
           @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
-          
-          @keyframes blob-pulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.05); }
-          }
         `}</style>
 
-        <div className="relative z-10 px-4 py-12">
+        <div
+          className={`relative z-10 ${
+            currentStep === 2 && !hairImage
+              ? 'flex min-h-0 flex-1 flex-col max-md:px-0 max-md:py-0 md:px-4 md:py-6'
+              : 'px-4 py-12'
+          }`}
+        >
           {/* Step 0: Profile Prompt Modal */}
           {currentStep === 0 && showProfilePrompt && (
           <motion.div
@@ -606,44 +587,84 @@ export default function HairCarePage() {
         </motion.div>
           )}
 
-          {/* Step 2: Photo Upload */}
+          {/* Step 2: upload card — same shell/inner as Style Check (!showGrid); file input via label */}
           {currentStep === 2 && !hairImage && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="w-full min-h-[calc(100vh-200px)] flex items-center justify-center px-4"
-          >
-            <div className="w-full max-w-2xl">
-              <div className="mb-6">
-                <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
-                  How Healthy is your Hair?
-                </h1>
-                <p className="text-lg" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex min-h-0 w-full min-w-0 flex-1 flex-col px-7 pb-[max(0.75rem,calc(4.75rem+env(safe-area-inset-bottom,0px)))] pt-32 sm:px-8 md:px-14 md:pb-10 md:pt-12 lg:px-16"
+            >
+              <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-3 sm:px-4 md:px-6 lg:px-8">
+                <div className="mb-2 flex items-start justify-between gap-4">
+                  <h1
+                    className="min-w-0 flex-1 text-3xl font-bold md:text-4xl"
+                    style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
+                  >
+                    How Healthy is your Hair?
+                  </h1>
+                </div>
+                <p
+                  className="mb-2 text-base md:mb-6"
+                  style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                >
                   Get immediate feedback with a quick selfie.
                 </p>
-              </div>
-              <div
-                className="rounded-2xl p-6 md:p-8"
-                style={{ background: '#FFFFFF', border: '2px solid rgba(175, 85, 0, 0.2)' }}
-              >
-                <p className="mb-6" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                  Upload a clear photo of your hair for AI-powered analysis
-                </p>
-                <label
-                  className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-xl cursor-pointer transition-all hover:bg-opacity-80"
-                  style={{ borderColor: '#CE935F', background: 'rgba(206, 147, 95, 0.1)' }}
-                >
-                  <div className="flex flex-col items-center justify-center">
-                    <Camera className="w-16 h-16 mb-4" style={{ color: '#AF5500' }} />
-                    <p className="text-sm" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                      Click to upload or drag and drop PNG, JPG or JPEG (MAX. 10MB)
-                    </p>
+                <div className="flex min-h-0 flex-1 flex-col justify-center md:flex-none md:justify-start">
+                  <div
+                    className="flex w-full max-h-[min(56rem,90dvh)] min-h-[28rem] flex-col overflow-hidden rounded-2xl p-5 md:max-h-none md:flex-none md:min-h-[32rem] md:p-6"
+                    style={{
+                      background: '#FFFFFF',
+                      border: '2px solid rgba(175, 85, 0, 0.25)',
+                      color: '#C17208',
+                    }}
+                  >
+                    <div className="flex min-h-0 max-h-full flex-1 flex-col gap-4 overflow-y-auto md:gap-5">
+                      <div className="flex w-full flex-1 items-center justify-center py-2 md:py-4">
+                        <div
+                          className="flex w-full max-w-xs flex-col rounded-2xl p-5 sm:max-w-sm md:max-w-4xl md:p-6"
+                          style={{
+                            background: '#FFFCF3',
+                            border: '1px solid rgba(193, 114, 8, 0.25)',
+                          }}
+                        >
+                          <p
+                            className="mb-5 text-center text-base md:mb-6 md:text-lg"
+                            style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                          >
+                            Upload a clear photo of your hair for AI-powered analysis.
+                          </p>
+                          <label
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={handleHairPhotoDrop}
+                            className="mx-auto flex aspect-square w-full max-w-[min(100%,17.5rem)] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all hover:bg-opacity-80 md:max-w-xs"
+                            style={{
+                              borderColor: 'rgba(193, 114, 8, 0.45)',
+                              background: 'rgba(193, 114, 8, 0.06)',
+                            }}
+                          >
+                            <Camera className="h-11 w-11 shrink-0 md:h-14 md:w-14" style={{ color: '#C17208' }} aria-hidden />
+                            <input
+                              ref={hairPhotoInputRef}
+                              type="file"
+                              className="hidden"
+                              accept="image/*"
+                              onChange={handleHairPhotoUpload}
+                              disabled={isAnalyzing}
+                            />
+                          </label>
+                          <p
+                            className="mt-5 px-2 text-center text-xs leading-snug md:mt-6 md:px-4 md:text-sm"
+                            style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                          >
+                            Click to upload or drag and drop PNG, JPG or JPEG (max. 10MB)
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <input type="file" className="hidden" accept="image/*" onChange={handleHairPhotoUpload} disabled={isAnalyzing} />
-                </label>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
           )}
 
           {/* Step 3: Analysis Results */}

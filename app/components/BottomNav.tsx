@@ -3,8 +3,71 @@
 import type { FC } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { LucideIcon } from 'lucide-react';
-import { Home, ScanLine } from 'lucide-react';
+
+function HomeNavIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <path
+        d="M3 12L5 10M5 10L12 3L19 10M5 10V20C5 20.5523 5.44772 21 6 21H9M19 10L21 12M19 10V20C19 20.5523 18.5523 21 18 21H15M9 21C9.55228 21 10 20.5523 10 20V16C10 15.4477 10.4477 15 11 15H13C13.5523 15 14 15.4477 14 16V20C14 20.5523 14.4477 21 15 21M9 21H15"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function HairProfileNavIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 61 59"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <g clipPath="url(#bottomNavHairProfileClip0)">
+        <path
+          d="M52.9452 58.7302H40.3391V53.8361H52.9452C53.6138 53.8361 54.2551 53.5783 54.7279 53.1194C55.2008 52.6605 55.4664 52.0381 55.4664 51.3891V39.1538H60.5088V51.3891C60.5088 53.3361 59.7119 55.2033 58.2935 56.5801C56.875 57.9568 54.9512 58.7302 52.9452 58.7302Z"
+          fill="currentColor"
+        />
+        <path
+          d="M5.04243 19.5765H0V7.34119C0 5.39418 0.796882 3.52692 2.21534 2.15018C3.6338 0.773444 5.55764 0 7.56365 0L20.1697 0V4.89412H7.56365C6.89498 4.89412 6.2537 5.15194 5.78088 5.61085C5.30806 6.06977 5.04243 6.69219 5.04243 7.34119V19.5765Z"
+          fill="currentColor"
+        />
+        <path
+          d="M20.1697 58.7302H7.56365C5.55764 58.7302 3.6338 57.9568 2.21534 56.5801C0.796882 55.2033 0 53.3361 0 51.3891L0 39.1538H5.04243V51.3891C5.04243 52.0381 5.30806 52.6605 5.78088 53.1194C6.2537 53.5783 6.89498 53.8361 7.56365 53.8361H20.1697V58.7302Z"
+          fill="currentColor"
+        />
+        <path
+          d="M60.5088 19.5765H55.4664V7.34117C55.4664 6.69217 55.2008 6.06975 54.7279 5.61084C54.2551 5.15192 53.6138 4.89411 52.9452 4.89411H40.3391V-1.52588e-05H52.9452C54.9512 -1.52588e-05 56.875 0.773429 58.2935 2.15017C59.7119 3.52691 60.5088 5.39417 60.5088 7.34117V19.5765Z"
+          fill="currentColor"
+        />
+      </g>
+      <g clipPath="url(#bottomNavHairProfileClip1)">
+        <path
+          d="M24.5234 39.9001L23.4551 38.1197C27.1333 35.9105 27.1333 31.1662 27.1333 28.332C27.1333 27.506 27.4614 26.7138 28.0455 26.1298C28.6296 25.5457 29.4217 25.2176 30.2477 25.2176C31.0737 25.2176 31.8659 25.5457 32.45 26.1298C33.0341 26.7138 33.3622 27.506 33.3622 28.332H31.2859C31.2859 28.0567 31.1765 27.7926 30.9818 27.5979C30.7871 27.4032 30.5231 27.2939 30.2477 27.2939C29.9724 27.2939 29.7084 27.4032 29.5137 27.5979C29.319 27.7926 29.2096 28.0567 29.2096 28.332C29.2096 31.3914 29.2096 37.0877 24.5234 39.9001ZM33.2542 31.5337L31.1821 31.3592C30.854 35.2305 29.5989 38.2266 27.4531 40.2666L28.8826 41.7708C31.4136 39.3717 32.8826 35.9261 33.2584 31.5337H33.2542ZM36.105 38.0273L34.1522 37.3234C33.7306 38.5035 33.1732 39.6305 32.4912 40.6818L34.229 41.8175C34.9995 40.6313 35.629 39.3593 36.105 38.0273ZM37.5148 28.332C37.5138 26.8613 37.0666 25.4254 36.2322 24.2143C35.3979 23.0031 34.2156 22.0736 32.8418 21.5486C31.4679 21.0236 29.9671 20.9278 28.5377 21.2739C27.1082 21.62 25.8174 22.3917 24.8359 23.487L26.3817 24.8719C27.0827 24.0894 28.0047 23.5381 29.0258 23.2907C30.0468 23.0434 31.1189 23.1117 32.1003 23.4867C33.0817 23.8616 33.9262 24.5255 34.5222 25.3907C35.1183 26.2558 35.4378 27.2814 35.4385 28.332C35.4768 30.3531 35.3161 32.373 34.9589 34.3626L36.9967 34.7592C37.381 32.6391 37.5545 30.4862 37.5148 28.332ZM25.057 28.332C25.0567 28.0423 25.0807 27.753 25.1286 27.4672L23.0845 27.1205C23.016 27.5207 22.9813 27.926 22.9807 28.332C22.9807 33.1542 21.5834 35.599 18.8281 35.599V37.6753C22.8447 37.6753 25.057 34.3533 25.057 28.332ZM41.6674 28.332C41.6722 26.6076 41.2815 24.905 40.5254 23.3551L38.6567 24.2635C39.2745 25.5306 39.5941 26.9223 39.5911 28.332C39.7332 32.5814 38.9267 36.8091 37.2303 40.7078L39.099 41.6016C40.9356 37.4258 41.8132 32.8915 41.6674 28.332ZM20.9044 28.332C20.9072 25.8548 21.8924 23.4799 23.6441 21.7283C25.3957 19.9767 27.7706 18.9914 30.2477 18.9887C32.2705 18.9819 34.2396 19.6383 35.8537 20.8573L37.0995 19.1963C35.1264 17.707 32.7198 16.9048 30.2477 16.9124C27.2202 16.916 24.3176 18.1202 22.1768 20.2611C20.036 22.4019 18.8317 25.3044 18.8281 28.332V31.4465H20.9044V28.332Z"
+          fill="currentColor"
+        />
+      </g>
+      <defs>
+        <clipPath id="bottomNavHairProfileClip0">
+          <rect width="60.5092" height="58.7295" fill="white" />
+        </clipPath>
+        <clipPath id="bottomNavHairProfileClip1">
+          <rect width="24.9155" height="24.9155" fill="white" transform="translate(17.7902 16.9125)" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}
 
 function StyleCheckNavIcon({ className }: { className?: string }) {
   return (
@@ -65,15 +128,13 @@ function ProductScanNavIcon({ className }: { className?: string }) {
   );
 }
 
-type NavItem =
-  | { name: string; href: string; kind: 'lucide'; Icon: LucideIcon }
-  | { name: string; href: string; kind: 'custom'; Icon: FC<{ className?: string }> };
+type NavItem = { name: string; href: string; Icon: FC<{ className?: string }> };
 
 const navItems: NavItem[] = [
-  { name: 'home', href: '/dashboard', kind: 'lucide', Icon: Home },
-  { name: 'scan profile', href: '/hair-care', kind: 'lucide', Icon: ScanLine },
-  { name: 'product scan', href: '/products', kind: 'custom', Icon: ProductScanNavIcon },
-  { name: 'style check', href: '/style-check', kind: 'custom', Icon: StyleCheckNavIcon },
+  { name: 'home', href: '/dashboard', Icon: HomeNavIcon },
+  { name: 'scan profile', href: '/hair-care', Icon: HairProfileNavIcon },
+  { name: 'product scan', href: '/products', Icon: ProductScanNavIcon },
+  { name: 'style check', href: '/style-check', Icon: StyleCheckNavIcon },
 ];
 
 export default function BottomNav() {
@@ -87,13 +148,18 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed left-0 right-0 z-50 shadow-lg md:shadow-none
-        bottom-0 top-auto rounded-t-2xl
-        md:top-0 md:bottom-auto md:rounded-none
-        border-t border-[rgba(175,85,0,0.15)] md:border-0
-        bg-white md:bg-transparent"
+      className="fixed bottom-0 left-0 right-0 top-auto z-50
+        px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-0
+        md:bottom-auto md:left-0 md:right-0 md:top-0 md:px-0 md:pb-0 md:pt-0"
+      aria-label="Main navigation"
     >
-      <div className="flex items-center justify-around md:justify-between gap-2 py-3 px-2 md:pr-8 md:pl-6 max-w-6xl mx-auto w-full">
+      <div
+        className="mx-auto flex w-full max-w-6xl items-center justify-around gap-1
+          rounded-full bg-white py-2.5 px-3
+          shadow-[0_10px_40px_rgba(55,73,87,0.14),0_2px_12px_rgba(55,73,87,0.08)]
+          md:justify-between md:gap-2 md:rounded-none md:bg-transparent md:py-3 md:px-2 md:pr-8 md:pl-6
+          md:shadow-none"
+      >
         <Link
           href="/dashboard"
           className="hidden shrink-0 items-center md:flex"
@@ -108,19 +174,22 @@ export default function BottomNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex flex-col items-center justify-center gap-0.5 min-w-[64px] py-1 rounded-xl transition-colors"
+                className="flex flex-col items-center justify-center gap-0.5 min-w-[72px] py-1 rounded-xl transition-colors"
                 style={{
-                  color: active ? '#DD8106' : '#9CA3AF',
-                  backgroundColor: active ? 'rgba(221, 129, 6, 0.08)' : 'transparent',
+                  color: active ? '#DD8106' : '#374957',
                 }}
               >
-                {item.kind === 'lucide' ? (
-                  <item.Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} />
-                ) : (
-                  <item.Icon className="h-5 w-5 shrink-0" />
-                )}
+                <item.Icon
+                  className={
+                    item.href === '/dashboard'
+                      ? 'h-9 w-9 shrink-0 object-contain md:h-8 md:w-8'
+                      : item.href === '/products'
+                        ? 'h-10 w-10 shrink-0 object-contain md:h-8 md:w-8'
+                        : 'h-8 w-8 shrink-0 object-contain md:h-7 md:w-7'
+                  }
+                />
                 <span
-                  className="text-[10px] font-medium capitalize"
+                  className={`text-[10px] font-medium capitalize md:text-[11px] ${item.href === '/style-check' ? 'mt-1' : ''}`}
                   style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   {item.name}
