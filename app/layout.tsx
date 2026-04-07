@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
+import RootAppWithIntro from "@/components/RootAppWithIntro";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({ 
@@ -32,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={bricolage.className}>
-        {children}
+        <RootAppWithIntro>{children}</RootAppWithIntro>
       </body>
     </html>
   );

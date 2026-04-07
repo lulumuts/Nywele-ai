@@ -15,7 +15,7 @@ const config: Config = {
         'primary': '#AF5500',
         'primary-dark': '#643100',
         'accent': '#CE935F',
-        'peach': '#FFFEE1', // Updated to match new design
+        'peach': '#FFFEE1',
       },
       backgroundColor: {
         'cream': '#FFFEE1',
