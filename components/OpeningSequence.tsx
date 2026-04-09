@@ -6,8 +6,8 @@
  * GLB layout (Khronos Blender I/O): meshes `Base-model`, `main-wireframe`, `Cube`, `Plane`.
  * We hide `Cube` / `Plane`. The file ships KHR clearcoat/specular/ior on the base mesh and
  * emissive wireframe geometry — scene.environment (PMREM DataTexture IBL), clearcoat on base mesh (no transmission).
- * Wire-form only: `WireframeGeometry` + `LineSegments` / `LineBasicMaterial` per mesh (hidden source mesh, same local transform + light scale bump). Helpers + baked `main-wireframe` removed.
- * Base + wire share `revealPlane`; wire opacity animates in. Transparent WebGL canvas (`alpha: true`); cream from the wrapper div / CSS. EffectComposer = RenderPass → RGB shift → scanlines → OutputPass.
+ * Wire overlay: world-space triplanar grid `ShaderMaterial` on a cloned mesh (silhouette conformant; hidden source mesh, same local transform + light scale bump). Helpers + baked `main-wireframe` removed.
+ * Grid overlay: triplanar lines, `uClipY` reveal/erase, tight `uScanStrength` edge at the sweep. Transparent WebGL canvas (`alpha: true`); cream from the wrapper div / CSS. EffectComposer = RenderPass → RGB shift → scanlines → OutputPass.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -25,10 +25,11 @@ import { APP_PAGE_BACKGROUND } from '@/lib/app-theme';
 const BUST_GLB_PATH = '/Final-nywele.glb?v=4';
 const OVERLAY_Z = 400_000;
 const WIRE_OVERLAY_NAME = '__wireframe_overlay__';
-const WIRE_FADE_OUT_SEC = 1.2;
-const WIRE_PEAK_OPACITY = 0.7;
+const WIRE_PEAK_OPACITY = 0.8;
 /** Slight inflate on top of source mesh scale so lines sit above z-fights; keeps full `scale.copy` from GLB. */
 const WIRE_SHELL_SCALE = 1.001;
+/** Raise the final clip/sweep floor by this fraction of mesh height so the bust reads shorter (upper-chest cut like the reference). */
+const BUST_BOTTOM_TRIM_RATIO = 0.14;
 
 const DRACO_DECODER_PATH = 'https://www.gstatic.com/draco/versioned/decoders/1.5.7/';
 
@@ -82,7 +83,6 @@ const SafeRGBShiftShader = {
 const LOOK = {
   rgbShiftAmount: 0.0003,
   rgbShiftAngle: 0,
-
   scanlineStrength: 0.04,
 } as const;
 
@@ -149,16 +149,15 @@ export default function OpeningSequence({
       return { w: Math.max(w, 2), h: Math.max(h, 2) };
     };
 
-    const revealPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-    /** Reveal clip limits in Y; set from GLB bounds after load (see loader). */
+    /** Reveal clip limits in world Y; overwritten from bust group AABB after placement (see loader). */
     let bottomY = -0.65;
     let topY = 0.65;
 
     /** Cap frame delta so a long main-thread hitch (loader, tab switch) cannot finish the whole reveal in one frame. */
     const DELTA_CAP = 1 / 24;
-    const REVEAL_SEC = 1.6;
-    const HOLD_SEC = 1.0;
-    const HIDE_SEC = WIRE_FADE_OUT_SEC;
+    const REVEAL_SEC = 2.2;
+    const HOLD_SEC = 0.8;
+    const HIDE_SEC = 1.8;
 
     let disposed = false;
     let deferredCleanupId: ReturnType<typeof setTimeout> | undefined;
@@ -166,8 +165,11 @@ export default function OpeningSequence({
     let modelReady = false;
     let phase: 'reveal' | 'hold' | 'hide' | 'done' = 'reveal';
     let progress = 0;
-    let wireOpacity = 0;
-    const wireOverlays: THREE.LineSegments[] = [];
+    const wireOverlays: {
+      material: { opacity: number };
+      _shell: THREE.Mesh;
+      _mat: THREE.ShaderMaterial;
+    }[] = [];
     let done = false;
 
     const completeOnce = () => {
@@ -190,8 +192,7 @@ export default function OpeningSequence({
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.9;
-    /* Must stay `true` for material clipping — base + wireframe use `clippingPlanes`. */
-    renderer.localClippingEnabled = true;
+    renderer.localClippingEnabled = false;
     Object.assign(renderer.domElement.style, {
       display: 'block',
       position: 'absolute',
@@ -283,41 +284,92 @@ export default function OpeningSequence({
     }
 
     const applyWireframeOnly = (rootObj: THREE.Object3D) => {
-      revealPlane.constant = bottomY;
       wireOverlays.length = 0;
 
       const attachWireframeShell = (sourceMesh: THREE.Mesh) => {
         const geo = sourceMesh.geometry;
         if (!geo?.getAttribute('position')) return;
 
-        const wireGeo = new THREE.WireframeGeometry(geo);
-        const wireMat = new THREE.LineBasicMaterial({
-          color: 0xff6600,
+        const shellGeo = geo.clone();
+
+        const gridMat = new THREE.ShaderMaterial({
           transparent: true,
-          opacity: 0,
           depthWrite: false,
           depthTest: false,
-          blending: THREE.NormalBlending,
-          clippingPlanes: [revealPlane],
+          side: THREE.DoubleSide,
+          uniforms: {
+            uOpacity: { value: WIRE_PEAK_OPACITY },
+            uGridSize: { value: 80.0 },
+            uColor: { value: new THREE.Color(0xff6600) },
+            uClipY: { value: bottomY },
+            uScanStrength: { value: 0 },
+          },
+          vertexShader: `
+            varying vec3 vWorldPos;
+            void main() {
+              vec4 worldPos = modelMatrix * vec4(position, 1.0);
+              vWorldPos = worldPos.xyz;
+              gl_Position = projectionMatrix * viewMatrix * worldPos;
+            }
+          `,
+          fragmentShader: `
+            uniform float uOpacity;
+            uniform float uGridSize;
+            uniform vec3 uColor;
+            uniform float uClipY;
+            uniform float uScanStrength;
+            varying vec3 vWorldPos;
+
+            void main() {
+              if (vWorldPos.y < uClipY) discard;
+
+              vec3 coord = vWorldPos * uGridSize;
+
+              vec2 gXY = abs(fract(coord.xy - 0.5) - 0.5) / fwidth(coord.xy);
+              vec2 gXZ = abs(fract(coord.xz - 0.5) - 0.5) / fwidth(coord.xz);
+              vec2 gYZ = abs(fract(coord.yz - 0.5) - 0.5) / fwidth(coord.yz);
+              float line = min(min(gXY.x, gXY.y), min(min(gXZ.x, gXZ.y), min(gYZ.x, gYZ.y)));
+
+              const float lineOuter = 1.42;
+              const float lineCore = 0.32;
+              float outer = 1.0 - smoothstep(0.0, lineOuter, line);
+              float core = 1.0 - smoothstep(0.0, lineCore, line);
+              vec3 lineCol = mix(uColor * 0.9, uColor * 1.04, core);
+              float baseAlpha = outer * uOpacity;
+              if (baseAlpha < 0.01) discard;
+
+              float d = vWorldPos.y - uClipY;
+              float scanLine = exp(-d * 120.0) * uScanStrength;
+
+              vec3 rgb = mix(lineCol, vec3(1.0, 0.95, 0.85), scanLine * 0.6);
+              float alpha = min(1.0, baseAlpha + scanLine * 0.5);
+              gl_FragColor = vec4(rgb, alpha);
+            }
+          `,
         });
-        (wireMat as unknown as { clipping: boolean }).clipping = true;
+        gridMat.extensions = {
+          clipCullDistance: false,
+          multiDraw: false,
+          ...( { derivatives: true } as Record<string, boolean> ),
+        };
 
-        const lines = new THREE.LineSegments(wireGeo, wireMat);
-        lines.name = WIRE_OVERLAY_NAME;
-        lines.renderOrder = 999;
-        lines.frustumCulled = false;
+        const shell = new THREE.Mesh(shellGeo, gridMat);
+        shell.name = WIRE_OVERLAY_NAME;
+        shell.renderOrder = 999;
+        shell.frustumCulled = false;
+        shell.position.copy(sourceMesh.position);
+        shell.rotation.copy(sourceMesh.rotation);
+        shell.scale.copy(sourceMesh.scale).multiplyScalar(WIRE_SHELL_SCALE);
 
-        lines.position.copy(sourceMesh.position);
-        lines.rotation.copy(sourceMesh.rotation);
-        lines.scale.copy(sourceMesh.scale).multiplyScalar(WIRE_SHELL_SCALE);
+        const parent = sourceMesh.parent ?? scene;
+        parent.add(shell);
 
-        const parent = sourceMesh.parent;
-        if (parent) {
-          parent.add(lines);
-        } else {
-          scene.add(lines);
-        }
-        wireOverlays.push(lines);
+        wireOverlays.push({
+          material: { opacity: WIRE_PEAK_OPACITY },
+          _shell: shell,
+          _mat: gridMat,
+        });
+
         sourceMesh.visible = false;
       };
 
@@ -381,10 +433,6 @@ export default function OpeningSequence({
           const normalizedScale = targetHeight / Math.max(bboxSize.y, 1e-6);
           const groupScale = normalizedScale * 0.85;
 
-          const halfH = (bboxSize.y * groupScale) / 2;
-          bottomY = -halfH;
-          topY = halfH;
-          revealPlane.constant = bottomY;
           try {
             applyWireframeOnly(root);
           } catch (e) {
@@ -493,6 +541,19 @@ export default function OpeningSequence({
             }
           });
 
+          group.updateMatrixWorld(true);
+          const clipBox = new THREE.Box3().setFromObject(group);
+          const rawBottom = clipBox.min.y;
+          const rawTop = clipBox.max.y;
+          const clipSpan = Math.max(rawTop - rawBottom, 1e-6);
+          const clipPad = Math.max(0.03 * clipSpan, 0.02);
+          bottomY = rawBottom + clipSpan * BUST_BOTTOM_TRIM_RATIO;
+          topY = rawTop + clipPad;
+          wireOverlays.forEach((m) => {
+            m._mat.uniforms.uClipY.value = topY;
+            m._mat.uniforms.uScanStrength.value = 1.0;
+          });
+
           deferredCleanupId = setTimeout(() => {
             deferredCleanupId = undefined;
             if (disposed) return;
@@ -529,7 +590,6 @@ export default function OpeningSequence({
           modelReady = true;
           phase = 'reveal';
           progress = 0;
-          wireOpacity = 0;
         },
         undefined,
         () => {
@@ -547,17 +607,16 @@ export default function OpeningSequence({
       const delta = Math.min(timer.getDelta(), DELTA_CAP);
 
       scanPass.uniforms.time.value = timestamp * 0.001;
+      rgbPass.uniforms.amount.value = LOOK.rgbShiftAmount;
 
       if (modelReady && phase !== 'done') {
         progress += delta;
         if (phase === 'reveal') {
           const t = easeInOutCubic(Math.min(progress / REVEAL_SEC, 1));
-          revealPlane.constant = THREE.MathUtils.lerp(bottomY, topY, t);
-
-          wireOpacity =
-            easeInOutCubic(Math.min(progress / 1.2, 1)) * WIRE_PEAK_OPACITY;
+          const clipY = THREE.MathUtils.lerp(topY, bottomY, t);
           wireOverlays.forEach((m) => {
-            (m.material as THREE.LineBasicMaterial).opacity = wireOpacity;
+            m._mat.uniforms.uClipY.value = clipY;
+            m._mat.uniforms.uScanStrength.value = 1.0;
           });
 
           if (progress >= REVEAL_SEC) {
@@ -565,20 +624,19 @@ export default function OpeningSequence({
             progress = 0;
           }
         } else if (phase === 'hold') {
+          wireOverlays.forEach((m) => {
+            m._mat.uniforms.uScanStrength.value = 0.0;
+          });
           if (progress >= HOLD_SEC) {
             phase = 'hide';
             progress = 0;
           }
         } else if (phase === 'hide') {
-          const hideT = Math.min(progress / HIDE_SEC, 1);
-          const t = easeInOutCubic(hideT);
-          revealPlane.constant = THREE.MathUtils.lerp(topY, bottomY, t);
-
-          wireOpacity =
-            (1 - easeInOutCubic(Math.min(progress / WIRE_FADE_OUT_SEC, 1))) *
-            WIRE_PEAK_OPACITY;
+          const t = easeInOutCubic(Math.min(progress / HIDE_SEC, 1));
+          const clipY = THREE.MathUtils.lerp(bottomY, topY, t);
           wireOverlays.forEach((m) => {
-            (m.material as THREE.LineBasicMaterial).opacity = wireOpacity;
+            m._mat.uniforms.uClipY.value = clipY;
+            m._mat.uniforms.uScanStrength.value = 1.0;
           });
 
           if (progress >= HIDE_SEC) {
