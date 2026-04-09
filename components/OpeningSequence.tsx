@@ -7,7 +7,7 @@
  * We hide `Cube` / `Plane`. The file ships KHR clearcoat/specular/ior on the base mesh and
  * emissive wireframe geometry — scene.environment (PMREM DataTexture IBL), clearcoat on base mesh (no transmission).
  * Wire overlay: world-space triplanar grid `ShaderMaterial` on a cloned mesh (silhouette conformant; hidden source mesh, same local transform + light scale bump). Helpers + baked `main-wireframe` removed.
- * Grid overlay: triplanar lines, `uClipY` reveal/erase, tight `uScanStrength` edge at the sweep. Transparent WebGL canvas (`alpha: true`); cream from the wrapper div / CSS. EffectComposer = RenderPass → RGB shift → scanlines → OutputPass.
+ * Grid overlay: fine triplanar mesh, warm directional highlights, subtle fresnel; `uClipY` + `uScanStrength`. Post stack stays light so `#FFFEE1` + `#FB8C1C` match the plate.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -25,7 +25,8 @@ import { APP_PAGE_BACKGROUND } from '@/lib/app-theme';
 const BUST_GLB_PATH = '/Final-nywele.glb?v=4';
 const OVERLAY_Z = 400_000;
 const WIRE_OVERLAY_NAME = '__wireframe_overlay__';
-const WIRE_PEAK_OPACITY = 0.8;
+/** Grid line visibility vs layered look on the cream plate. */
+const WIRE_PEAK_OPACITY = 0.84;
 /** Slight inflate on top of source mesh scale so lines sit above z-fights; keeps full `scale.copy` from GLB. */
 const WIRE_SHELL_SCALE = 1.001;
 /** Raise the final clip/sweep floor by this fraction of mesh height so the bust reads shorter (upper-chest cut like the reference). */
@@ -81,13 +82,24 @@ const SafeRGBShiftShader = {
  * RGB shift: subtle horizontal CA. Scanlines: light CRT-style pass (no bloom — keeps the bust clean).
  */
 const LOOK = {
-  rgbShiftAmount: 0.0003,
+  /** Kept light so the plate matches a clean reference still (cream + orange mesh). */
+  rgbShiftAmount: 0.00028,
   rgbShiftAngle: 0,
-  scanlineStrength: 0.04,
+  scanlineStrength: 0.028,
+  vignetteStrength: 0.14,
 } as const;
 
 const easeInOutCubic = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+/** Gentler at start/end than cubic — less abrupt sweep acceleration. */
+const easeInOutQuint = (t: number) =>
+  t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2;
+
+function smoothToward(current: number, target: number, dt: number, rate: number) {
+  const k = 1 - Math.exp(-rate * dt);
+  return current + (target - current) * k;
+}
 
 /** Post pass: faint horizontal scan lines (after RGB shift). */
 const ScanlineShader = {
@@ -96,6 +108,7 @@ const ScanlineShader = {
     tDiffuse: { value: null },
     time: { value: 0 },
     strength: { value: LOOK.scanlineStrength },
+    vignette: { value: LOOK.vignetteStrength },
   },
   vertexShader: /* glsl */ `
     varying vec2 vUv;
@@ -108,14 +121,20 @@ const ScanlineShader = {
     uniform sampler2D tDiffuse;
     uniform float time;
     uniform float strength;
+    uniform float vignette;
     varying vec2 vUv;
     void main() {
       vec4 base = texture2D(tDiffuse, vUv);
-      float rows = vUv.y * 720.0;
-      float scan = abs(sin(rows * 3.14159265 + time * 1.4));
-      float line = pow(scan, 18.0);
-      float dim = 1.0 - line * strength;
-      gl_FragColor = vec4(base.rgb * dim, base.a);
+      float rowsA = vUv.y * 920.0;
+      float rowsB = vUv.y * 420.0;
+      float scanA = pow(abs(sin(rowsA * 3.14159265 + time * 1.9)), 20.0);
+      float scanB = pow(abs(sin(rowsB * 3.14159265 + time * 0.75)), 10.0) * 0.35;
+      float roll = 0.965 + 0.035 * sin(vUv.y * 40.0 + time * 3.2);
+      float dim = (1.0 - strength * (scanA + scanB)) * roll;
+      vec2 q = vUv - 0.5;
+      float vig = 1.0 - dot(q, q) * vignette * 1.35;
+      vig = clamp(vig, 0.72, 1.0);
+      gl_FragColor = vec4(base.rgb * dim * vig, base.a);
     }
   `,
 };
@@ -130,6 +149,7 @@ export default function OpeningSequence({
   backgroundColor = APP_PAGE_BACKGROUND,
 }: OpeningSequenceProps) {
   const mountRef = useRef<HTMLDivElement>(null);
+  const shellRef = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(true);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
@@ -158,13 +178,18 @@ export default function OpeningSequence({
     const REVEAL_SEC = 2.2;
     const HOLD_SEC = 0.8;
     const HIDE_SEC = 1.8;
+    /** Fade the fixed shell (and CRT pass) before unmount so the app does not pop in. */
+    const UI_FADE_OUT_SEC = 0.55;
+    const SCAN_EDGE_SMOOTH_RATE = 9;
 
     let disposed = false;
     let deferredCleanupId: ReturnType<typeof setTimeout> | undefined;
     let raf = 0;
     let modelReady = false;
-    let phase: 'reveal' | 'hold' | 'hide' | 'done' = 'reveal';
+    let phase: 'reveal' | 'hold' | 'hide' | 'fadeUi' | 'done' = 'reveal';
     let progress = 0;
+    let uiFade = 0;
+    let displayScanStrength = 0;
     const wireOverlays: {
       material: { opacity: number };
       _shell: THREE.Mesh;
@@ -191,7 +216,8 @@ export default function OpeningSequence({
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.9;
+    /** Lower than earlier “luminous” pass so orange survives ACES without clipping to paper-white. */
+    renderer.toneMappingExposure = 0.92;
     renderer.localClippingEnabled = false;
     Object.assign(renderer.domElement.style, {
       display: 'block',
@@ -250,6 +276,7 @@ export default function OpeningSequence({
     const camera = new THREE.PerspectiveCamera(30, iw / ih, 0.1, 1000);
     camera.position.set(2.8, 1.6, -3.2); // behind + to the side
     camera.lookAt(0, 0.6, 0);
+    const cameraWorldPos = new THREE.Vector3();
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
 
@@ -272,6 +299,7 @@ export default function OpeningSequence({
     rgbPass.uniforms.angle.value = LOOK.rgbShiftAngle;
     const scanPass = new ShaderPass(ScanlineShader);
     scanPass.uniforms.strength.value = LOOK.scanlineStrength;
+    scanPass.uniforms.vignette.value = LOOK.vignetteStrength;
     const outputPass = new OutputPass();
     composer.addPass(renderPass);
     composer.addPass(rgbPass);
@@ -282,6 +310,11 @@ export default function OpeningSequence({
     if (typeof document !== 'undefined') {
       timer.connect(document);
     }
+
+    /** Matches scene key (~4,6,3) toward bust focal point — warm crowns / back of head in ref stills. */
+    const wireLightDir = new THREE.Vector3(4, 6, 3)
+      .sub(new THREE.Vector3(0, 0.6, 0))
+      .normalize();
 
     const applyWireframeOnly = (rootObj: THREE.Object3D) => {
       wireOverlays.length = 0;
@@ -299,14 +332,19 @@ export default function OpeningSequence({
           side: THREE.DoubleSide,
           uniforms: {
             uOpacity: { value: WIRE_PEAK_OPACITY },
-            uGridSize: { value: 80.0 },
-            uColor: { value: new THREE.Color(0xff6600) },
+            uGridSize: { value: 132.0 },
+            uColor: { value: new THREE.Color(0xfb8c1c) },
             uClipY: { value: bottomY },
             uScanStrength: { value: 0 },
+            uTime: { value: 0 },
+            uCameraPos: { value: new THREE.Vector3() },
+            uLightDir: { value: wireLightDir.clone() },
           },
           vertexShader: `
             varying vec3 vWorldPos;
+            varying vec3 vWorldNormal;
             void main() {
+              vWorldNormal = normalize(mat3(modelMatrix) * normal);
               vec4 worldPos = modelMatrix * vec4(position, 1.0);
               vWorldPos = worldPos.xyz;
               gl_Position = projectionMatrix * viewMatrix * worldPos;
@@ -318,7 +356,11 @@ export default function OpeningSequence({
             uniform vec3 uColor;
             uniform float uClipY;
             uniform float uScanStrength;
+            uniform float uTime;
+            uniform vec3 uCameraPos;
+            uniform vec3 uLightDir;
             varying vec3 vWorldPos;
+            varying vec3 vWorldNormal;
 
             void main() {
               if (vWorldPos.y < uClipY) discard;
@@ -331,18 +373,42 @@ export default function OpeningSequence({
               float line = min(min(gXY.x, gXY.y), min(min(gXZ.x, gXZ.y), min(gYZ.x, gYZ.y)));
 
               const float lineOuter = 1.42;
-              const float lineCore = 0.32;
+              const float lineCore = 0.34;
               float outer = 1.0 - smoothstep(0.0, lineOuter, line);
               float core = 1.0 - smoothstep(0.0, lineCore, line);
-              vec3 lineCol = mix(uColor * 0.9, uColor * 1.04, core);
+              float live = 0.985 + 0.015 * sin(uTime * 1.1 + dot(vWorldPos, vec3(2.2, 3.9, 1.6)));
+
+              vec3 N = normalize(vWorldNormal);
+              float ndl = max(dot(N, uLightDir), 0.0);
+              float gloss = pow(ndl, 3.2);
+              float sheen = pow(ndl, 1.12);
+              float fill = 0.74 + 0.26 * pow(ndl, 0.62);
+              vec3 baseA = uColor * 0.84;
+              vec3 baseB = uColor * 1.16;
+              vec3 lineCol = mix(baseA, baseB, core) * fill * live;
+              vec3 peak = mix(uColor, vec3(1.0, 0.97, 0.92), 0.42);
+              lineCol += peak * gloss * 0.34;
+              lineCol += peak * sheen * 0.12;
+              lineCol += uColor * outer * (0.16 + 0.24 * core);
+
               float baseAlpha = outer * uOpacity;
               if (baseAlpha < 0.01) discard;
+
+              vec3 viewDir = normalize(uCameraPos - vWorldPos);
+              float ndv = max(dot(N, viewDir), 0.0);
+              float holo = pow(1.0 - ndv, 2.35);
+              vec3 holoCol = mix(uColor, vec3(1.0, 0.97, 0.93), 0.4);
 
               float d = vWorldPos.y - uClipY;
               float scanLine = exp(-d * 120.0) * uScanStrength;
 
-              vec3 rgb = mix(lineCol, vec3(1.0, 0.95, 0.85), scanLine * 0.6);
-              float alpha = min(1.0, baseAlpha + scanLine * 0.5);
+              vec3 scanWarm = mix(uColor * 0.98, vec3(1.0, 0.97, 0.9), 0.35);
+              vec3 scanHi = mix(uColor * 1.08, vec3(1.0, 0.99, 0.95), 0.5);
+              vec3 sweepCol = mix(scanWarm, scanHi, scanLine * 0.55);
+              vec3 rgb = mix(lineCol, sweepCol, scanLine * 0.58);
+              rgb += holoCol * holo * 0.085;
+              rgb += scanHi * scanLine * 0.065;
+              float alpha = min(1.0, baseAlpha + scanLine * 0.56);
               gl_FragColor = vec4(rgb, alpha);
             }
           `,
@@ -551,7 +617,7 @@ export default function OpeningSequence({
           topY = rawTop + clipPad;
           wireOverlays.forEach((m) => {
             m._mat.uniforms.uClipY.value = topY;
-            m._mat.uniforms.uScanStrength.value = 1.0;
+            m._mat.uniforms.uScanStrength.value = 0;
           });
 
           deferredCleanupId = setTimeout(() => {
@@ -606,17 +672,17 @@ export default function OpeningSequence({
       timer.update(timestamp);
       const delta = Math.min(timer.getDelta(), DELTA_CAP);
 
-      scanPass.uniforms.time.value = timestamp * 0.001;
+      const timeSec = timestamp * 0.001;
+      scanPass.uniforms.time.value = timeSec;
       rgbPass.uniforms.amount.value = LOOK.rgbShiftAmount;
 
-      if (modelReady && phase !== 'done') {
+      if (modelReady && (phase === 'reveal' || phase === 'hold' || phase === 'hide')) {
         progress += delta;
         if (phase === 'reveal') {
-          const t = easeInOutCubic(Math.min(progress / REVEAL_SEC, 1));
+          const t = easeInOutQuint(Math.min(progress / REVEAL_SEC, 1));
           const clipY = THREE.MathUtils.lerp(topY, bottomY, t);
           wireOverlays.forEach((m) => {
             m._mat.uniforms.uClipY.value = clipY;
-            m._mat.uniforms.uScanStrength.value = 1.0;
           });
 
           if (progress >= REVEAL_SEC) {
@@ -624,25 +690,54 @@ export default function OpeningSequence({
             progress = 0;
           }
         } else if (phase === 'hold') {
-          wireOverlays.forEach((m) => {
-            m._mat.uniforms.uScanStrength.value = 0.0;
-          });
           if (progress >= HOLD_SEC) {
             phase = 'hide';
             progress = 0;
           }
         } else if (phase === 'hide') {
-          const t = easeInOutCubic(Math.min(progress / HIDE_SEC, 1));
+          const t = easeInOutQuint(Math.min(progress / HIDE_SEC, 1));
           const clipY = THREE.MathUtils.lerp(bottomY, topY, t);
           wireOverlays.forEach((m) => {
             m._mat.uniforms.uClipY.value = clipY;
-            m._mat.uniforms.uScanStrength.value = 1.0;
           });
 
           if (progress >= HIDE_SEC) {
-            phase = 'done';
+            phase = 'fadeUi';
+            uiFade = 0;
           }
         }
+      } else if (modelReady && phase === 'fadeUi') {
+        uiFade += delta;
+        const t = Math.min(uiFade / UI_FADE_OUT_SEC, 1);
+        const eased = easeInOutCubic(t);
+        if (shellRef.current) {
+          shellRef.current.style.opacity = String(1 - eased);
+        }
+        scanPass.uniforms.strength.value = LOOK.scanlineStrength * (1 - eased);
+        scanPass.uniforms.vignette.value = LOOK.vignetteStrength * (1 - eased);
+        if (t >= 1) {
+          phase = 'done';
+        }
+      }
+
+      if (modelReady && phase !== 'done') {
+        if (phase !== 'fadeUi') {
+          scanPass.uniforms.strength.value = LOOK.scanlineStrength;
+          scanPass.uniforms.vignette.value = LOOK.vignetteStrength;
+        }
+        camera.getWorldPosition(cameraWorldPos);
+        const scanTarget = phase === 'reveal' || phase === 'hide' ? 1 : 0;
+        displayScanStrength = smoothToward(
+          displayScanStrength,
+          scanTarget,
+          delta,
+          SCAN_EDGE_SMOOTH_RATE,
+        );
+        wireOverlays.forEach((m) => {
+          m._mat.uniforms.uScanStrength.value = displayScanStrength;
+          m._mat.uniforms.uTime.value = timeSec;
+          m._mat.uniforms.uCameraPos.value.copy(cameraWorldPos);
+        });
       }
 
       composer.render();
@@ -701,11 +796,13 @@ export default function OpeningSequence({
 
   return (
     <div
+      ref={shellRef}
       style={{
         position: 'fixed',
         inset: 0,
         zIndex: OVERLAY_Z,
         isolation: 'isolate',
+        opacity: 1,
         background:
           typeof document !== 'undefined'
             ? getComputedStyle(document.documentElement)
