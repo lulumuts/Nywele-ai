@@ -7,7 +7,7 @@
  * We hide `Cube` / `Plane`. The file ships KHR clearcoat/specular/ior on the base mesh and
  * emissive wireframe geometry — scene.environment (PMREM DataTexture IBL), clearcoat on base mesh (no transmission).
  * Wire overlay: world-space triplanar grid `ShaderMaterial` on a cloned mesh (silhouette conformant; hidden source mesh, same local transform + light scale bump). Helpers + baked `main-wireframe` removed.
- * Grid overlay: fine triplanar mesh, warm directional highlights, subtle fresnel; `uClipY` + `uScanStrength`. Post stack stays light so `#FFFEE1` + `#FB8C1C` match the plate.
+ * Grid overlay: triplanar mesh + light “HUD” read (drift, dual sweep, cyan-tinted rim), warm orange base; post CA / scan / vignette / grain.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -25,6 +25,8 @@ import { APP_PAGE_BACKGROUND } from '@/lib/app-theme';
 const BUST_GLB_PATH = '/Final-nywele.glb?v=4';
 const OVERLAY_Z = 400_000;
 const WIRE_OVERLAY_NAME = '__wireframe_overlay__';
+/** Grid line base — deep saturated orange for cream plate contrast. */
+const WIRE_FRAME_COLOR = 0xc76f16 as const;
 /** Grid line visibility vs layered look on the cream plate. */
 const WIRE_PEAK_OPACITY = 0.84;
 /** Slight inflate on top of source mesh scale so lines sit above z-fights; keeps full `scale.copy` from GLB. */
@@ -82,11 +84,10 @@ const SafeRGBShiftShader = {
  * RGB shift: subtle horizontal CA. Scanlines: light CRT-style pass (no bloom — keeps the bust clean).
  */
 const LOOK = {
-  /** Kept light so the plate matches a clean reference still (cream + orange mesh). */
-  rgbShiftAmount: 0.00028,
-  rgbShiftAngle: 0,
-  scanlineStrength: 0.028,
-  vignetteStrength: 0.14,
+  rgbShiftAmount: 0.00042,
+  rgbShiftAngle: 0.12,
+  scanlineStrength: 0.038,
+  vignetteStrength: 0.2,
 } as const;
 
 const easeInOutCubic = (t: number) =>
@@ -131,10 +132,16 @@ const ScanlineShader = {
       float scanB = pow(abs(sin(rowsB * 3.14159265 + time * 0.75)), 10.0) * 0.35;
       float roll = 0.965 + 0.035 * sin(vUv.y * 40.0 + time * 3.2);
       float dim = (1.0 - strength * (scanA + scanB)) * roll;
+      float gr = fract(sin(dot(floor(vUv * 800.0), vec2(12.9898, 78.233))) * 43758.5453);
+      dim *= 0.982 + 0.036 * gr;
       vec2 q = vUv - 0.5;
       float vig = 1.0 - dot(q, q) * vignette * 1.35;
-      vig = clamp(vig, 0.72, 1.0);
-      gl_FragColor = vec4(base.rgb * dim * vig, base.a);
+      vig = clamp(vig, 0.68, 1.0);
+      vec3 rgb = base.rgb * dim * vig;
+      rgb *= mix(vec3(1.0), vec3(0.96, 1.02, 1.05), (1.0 - dim) * 0.22);
+      float luma = dot(rgb, vec3(0.2126, 0.7152, 0.0722));
+      rgb = mix(vec3(luma), rgb, 1.12);
+      gl_FragColor = vec4(rgb, base.a);
     }
   `,
 };
@@ -216,8 +223,8 @@ export default function OpeningSequence({
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    /** Lower than earlier “luminous” pass so orange survives ACES without clipping to paper-white. */
-    renderer.toneMappingExposure = 0.92;
+    /** Balanced so orange stays saturated; nudged up for more “lit” mesh vs cream plate. */
+    renderer.toneMappingExposure = 0.94;
     renderer.localClippingEnabled = false;
     Object.assign(renderer.domElement.style, {
       display: 'block',
@@ -332,8 +339,8 @@ export default function OpeningSequence({
           side: THREE.DoubleSide,
           uniforms: {
             uOpacity: { value: WIRE_PEAK_OPACITY },
-            uGridSize: { value: 132.0 },
-            uColor: { value: new THREE.Color(0xfb8c1c) },
+            uGridSize: { value: 102.0 },
+            uColor: { value: new THREE.Color(WIRE_FRAME_COLOR) },
             uClipY: { value: bottomY },
             uScanStrength: { value: 0 },
             uTime: { value: 0 },
@@ -365,7 +372,12 @@ export default function OpeningSequence({
             void main() {
               if (vWorldPos.y < uClipY) discard;
 
-              vec3 coord = vWorldPos * uGridSize;
+              vec3 wob = vec3(
+                sin(uTime * 1.15 + vWorldPos.y * 2.4 + vWorldPos.x * 0.6),
+                sin(uTime * 0.95 + vWorldPos.x * 2.1 + vWorldPos.z * 0.5),
+                sin(uTime * 1.05 + vWorldPos.z * 2.2 + vWorldPos.y * 0.4)
+              ) * 0.014;
+              vec3 coord = (vWorldPos + wob) * uGridSize;
 
               vec2 gXY = abs(fract(coord.xy - 0.5) - 0.5) / fwidth(coord.xy);
               vec2 gXZ = abs(fract(coord.xz - 0.5) - 0.5) / fwidth(coord.xz);
@@ -382,14 +394,14 @@ export default function OpeningSequence({
               float ndl = max(dot(N, uLightDir), 0.0);
               float gloss = pow(ndl, 3.2);
               float sheen = pow(ndl, 1.12);
-              float fill = 0.74 + 0.26 * pow(ndl, 0.62);
+              float fill = 0.78 + 0.22 * pow(ndl, 0.62);
               vec3 baseA = uColor * 0.84;
-              vec3 baseB = uColor * 1.16;
+              vec3 baseB = uColor * 1.22;
               vec3 lineCol = mix(baseA, baseB, core) * fill * live;
-              vec3 peak = mix(uColor, vec3(1.0, 0.97, 0.92), 0.42);
-              lineCol += peak * gloss * 0.34;
-              lineCol += peak * sheen * 0.12;
-              lineCol += uColor * outer * (0.16 + 0.24 * core);
+              vec3 peak = mix(uColor, vec3(1.0, 0.97, 0.92), 0.38);
+              lineCol += peak * gloss * 0.4;
+              lineCol += peak * sheen * 0.14;
+              lineCol += uColor * outer * (0.22 + 0.32 * core);
 
               float baseAlpha = outer * uOpacity;
               if (baseAlpha < 0.01) discard;
@@ -401,13 +413,20 @@ export default function OpeningSequence({
 
               float d = vWorldPos.y - uClipY;
               float scanLine = exp(-d * 120.0) * uScanStrength;
+              float scanEdge = exp(-d * 220.0) * uScanStrength;
 
+              vec3 scanTeal = vec3(0.45, 0.94, 1.0);
               vec3 scanWarm = mix(uColor * 0.98, vec3(1.0, 0.97, 0.9), 0.35);
               vec3 scanHi = mix(uColor * 1.08, vec3(1.0, 0.99, 0.95), 0.5);
-              vec3 sweepCol = mix(scanWarm, scanHi, scanLine * 0.55);
+              vec3 sweepCol = mix(scanWarm, mix(scanHi, scanTeal, 0.35), scanLine * 0.55);
               vec3 rgb = mix(lineCol, sweepCol, scanLine * 0.58);
               rgb += holoCol * holo * 0.085;
+              rgb += mix(uColor, scanTeal, 0.55) * holo * 0.065;
               rgb += scanHi * scanLine * 0.065;
+              rgb += scanTeal * scanEdge * 0.24;
+              float lu = dot(rgb, vec3(0.2126, 0.7152, 0.0722));
+              rgb = mix(vec3(lu), rgb, 1.38);
+              rgb *= 1.02;
               float alpha = min(1.0, baseAlpha + scanLine * 0.56);
               gl_FragColor = vec4(rgb, alpha);
             }
