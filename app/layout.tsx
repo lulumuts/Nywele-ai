@@ -30,13 +30,13 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/coil.svg", type: "image/svg+xml" }
+      { url: "/icons/coil.svg", type: "image/svg+xml" }
     ],
     shortcut: [
-      { url: "/coil.svg", type: "image/svg+xml" }
+      { url: "/icons/coil.svg", type: "image/svg+xml" }
     ],
     apple: [
-      { url: "/coil.svg" }
+      { url: "/icons/coil.svg" }
     ]
   }
 };

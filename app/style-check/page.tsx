@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useCallback, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Camera } from 'lucide-react';
 import BottomNav from '@/app/components/BottomNav';
 import { StyleCheckHubWhiteCard } from '@/app/components/BottomNavHubLayout';
@@ -24,9 +24,13 @@ function slugFromName(name: string): string {
   return name.toLowerCase().replace(/\s+/g, '-');
 }
 
-export default function StyleCheckPage() {
+function StyleCheckPageContent() {
   const router = useRouter();
-  const [showGrid, setShowGrid] = useState(false);
+  const searchParams = useSearchParams();
+  const libraryFromQuery =
+    searchParams.get('library') === '1' || searchParams.get('library') === 'true';
+
+  const [showGrid, setShowGrid] = useState(libraryFromQuery);
   const [styles, setStyles] = useState<typeof FALLBACK_STYLES>(FALLBACK_STYLES);
   /** True while fetching library styles — stay on loader until data is ready (no flash of stale cards). */
   const [stylesLoading, setStylesLoading] = useState(false);
@@ -60,6 +64,12 @@ export default function StyleCheckPage() {
         setStylesLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    if (libraryFromQuery) {
+      openLibraryGrid();
+    }
+  }, [libraryFromQuery, openLibraryGrid]);
 
   return (
     <div className="flex min-h-screen flex-col" style={{ background: '#FFFEE1' }}>
@@ -267,5 +277,31 @@ export default function StyleCheckPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function StyleCheckPageFallback() {
+  return (
+    <div className="flex min-h-screen flex-col" style={{ background: '#FFFEE1' }}>
+      <BottomNav />
+      <div
+        className="bottom-nav-hub-main flex flex-1 flex-col items-center justify-center px-7 pt-24"
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <div
+          className="h-12 w-12 shrink-0 rounded-full border-4 border-[rgba(193,114,8,0.22)] border-t-[#C17208] animate-spin"
+          aria-hidden
+        />
+      </div>
+    </div>
+  );
+}
+
+export default function StyleCheckPage() {
+  return (
+    <Suspense fallback={<StyleCheckPageFallback />}>
+      <StyleCheckPageContent />
+    </Suspense>
   );
 }

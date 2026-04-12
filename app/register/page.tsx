@@ -182,7 +182,7 @@ export default function Register() {
       <div className="bg-transparent backdrop-blur-sm border-b border-transparent">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center space-x-2">
-            <img src="/coil.svg" alt="Nywele.ai" className="w-8 h-8" />
+            <img src="/icons/coil.svg" alt="Nywele.ai" className="w-8 h-8" />
             <h1 className="text-2xl font-bold" style={{ fontFamily: 'Caprasimo, serif', color: '#DD8106' }}>
               nywele.ai
           </h1>

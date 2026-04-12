@@ -3,7 +3,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
 import { gsap } from 'gsap';
 import {
   NYWELE_INTRO_CROSSFADE_EVENT,
@@ -128,15 +127,6 @@ export default function OnboardingPrompt() {
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
       `}</style>
 
-      <Link
-        href="/"
-        className="absolute top-6 left-6 flex items-center gap-2 text-[#914600] hover:text-[#643100] transition-colors"
-        style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}
-      >
-        <ArrowLeft className="w-5 h-5" />
-        <span className="text-sm font-medium">Back</span>
-      </Link>
-
       <div className="max-w-sm w-full text-left">
         <div ref={headingRef} className="opacity-0 relative">
           {/* Invisible placeholder to reserve space and prevent layout shift */}
@@ -199,7 +189,7 @@ export default function OnboardingPrompt() {
           <div ref={exploreRef} className="mt-6 text-base md:text-lg opacity-0 text-center" style={{ color: '#AF5500', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
             <p>Or</p>
             <Link
-              href="/style-check"
+              href="/style-check?library=1"
               className="font-semibold underline hover:no-underline inline-block mt-1"
               style={{ color: '#AF5500' }}
             >

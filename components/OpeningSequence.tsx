@@ -159,15 +159,15 @@ export type OpeningSequenceProps = {
   /** Fired once when the bust hide finishes and the shell/canvas fade-out begins (pair with page content fade-in). */
   onFadeUiStart?: () => void;
   backgroundColor?: string;
-  /** Shorter reveal/hold/hide for in-app route transitions (still shows bust + Loading text). */
+  /** Shorter reveal/hold/hide for in-app route transitions (still shows bust + tagline). */
   phasePreset?: 'full' | 'route';
   /**
-   * After reveal, stay in the hold phase (bust visible + “Loading…”) until this component unmounts.
+   * After reveal, stay in the hold phase (bust visible + tagline) until this component unmounts.
    * Use for long async work (e.g. hair analysis) so the sequence does not fade out early.
    */
   holdUntilUnmount?: boolean;
   /**
-   * Replaces the default “Loading…..” label; bust is moved up so this content fits below (e.g. hair-care status copy).
+   * Replaces the default tagline; bust is moved up so this content fits below (e.g. hair-care status copy).
    */
   holdStatusContent?: ReactNode;
 };
@@ -957,11 +957,15 @@ export default function OpeningSequence({
               fontFamily: 'ui-sans-serif, system-ui, sans-serif',
               fontSize: '0.9375rem',
               fontWeight: 600,
+              maxWidth: 'min(22rem, 90vw)',
+              lineHeight: 1.35,
+              paddingLeft: '1rem',
+              paddingRight: '1rem',
             }}
             aria-live="polite"
             aria-busy="true"
           >
-            Loading.....
+            AI-powered African hair care
           </div>
         ) : null}
       </div>
