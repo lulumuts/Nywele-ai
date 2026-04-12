@@ -57,13 +57,13 @@ export default function OnboardingFeatures() {
                 <div>
                   <h3
                     className="text-xl md:text-2xl font-bold mb-2"
-                    style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}
+                    style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
                   >
                     {item.title}
                   </h3>
                   <p
                     className="text-base md:text-lg leading-relaxed"
-                    style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
                     {item.description}
                   </p>
@@ -76,14 +76,14 @@ export default function OnboardingFeatures() {
           <button
             onClick={handleSkip}
             className="text-base md:text-lg font-bold"
-            style={{ color: '#AF5500', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+            style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
           >
             Skip
           </button>
           <button
             onClick={handleNext}
             className="flex items-center gap-2 text-base md:text-lg font-bold"
-            style={{ color: '#AF5500', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+            style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
           >
             Next <ArrowRight className="w-5 h-5" />
           </button>

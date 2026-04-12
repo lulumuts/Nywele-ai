@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import RootAppWithIntro from "@/components/RootAppWithIntro";
 import "./globals.css";
@@ -8,6 +8,12 @@ const bricolage = Bricolage_Grotesque({
   weight: ["200", "300", "400", "500", "600", "700", "800"],
   variable: "--font-bricolage"
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   title: "Nywele.ai - AI-Powered African Hair Care",
@@ -31,8 +37,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={bricolage.className}>
+    <html lang="en" className="h-full bg-cream">
+      <body className={`${bricolage.className} min-h-full bg-cream antialiased`}>
         <RootAppWithIntro>{children}</RootAppWithIntro>
       </body>
     </html>

@@ -161,7 +161,7 @@ export default function StyleAdvisor() {
       'Faux Locs': '/images/styles/faux-locs.jpg',
       'Cornrows': '/images/styles/cornrows.jpg',
       'Two-Strand Twists': '/images/styles/two-strand-twists.jpg',
-      'Passion Twists': '/images/styles/passion-twists.jpg',
+      'Passion Twists': '/images/passion-twists.svg',
       'Goddess Locs': '/images/styles/goddess-locs.jpg'
     };
     return styleMap[styleName] || '/images/styles/box-braids.jpg';

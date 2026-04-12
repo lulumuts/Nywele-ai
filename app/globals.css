@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    background-color: #fffee1;
+  }
+  body {
+    background-color: #fffee1;
+  }
+}
+
 :root {
   --background: #FFFEE1;
   --foreground: #DD8106;
@@ -42,6 +51,35 @@ body {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+/**
+ * Hub pages with a fixed bottom nav: Tailwind arbitrary `pb-[max(1rem,calc(...))]` often fails to
+ * emit (commas in arbitrary values). Plain CSS guarantees space above the pill.
+ */
+@layer components {
+  .bottom-nav-hub-main {
+    padding-bottom: max(1rem, calc(9rem + env(safe-area-inset-bottom, 0px)));
+  }
+  @media (min-width: 768px) {
+    .bottom-nav-hub-main {
+      padding-bottom: 2.5rem;
+    }
+  }
+
+  .style-check-hub-white-shell-mobile {
+    max-height: min(
+      74dvh,
+      calc(
+        100dvh - 12rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+      )
+    );
+  }
+  @media (min-width: 768px) {
+    .style-check-hub-white-shell-mobile {
+      max-height: none;
+    }
   }
 }
 
@@ -163,10 +201,9 @@ body {
   animation: fade-in 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-/* SVG Stroke Animation for Loader */
+/* SVG Stroke Animation for Loader — set `stroke` on the path (e.g. url(#yourGradientId) or a solid color) */
 .animated-path {
   fill: none;
-  stroke: url(#loaderGradient);
   stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;

@@ -112,7 +112,7 @@ export default function HowItWorks() {
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
       `}</style>
       
-      <div className="min-h-screen" style={{ backgroundColor: '#FFFBF5' }}>
+      <div className="min-h-screen" style={{ backgroundColor: '#FFFEE1' }}>
         {/* Hero Section */}
         <div className="max-w-6xl mx-auto px-4 py-16">
         <div className="text-center mb-16">

@@ -248,7 +248,9 @@ export const MOCK_PRODUCTS: Product[] = [
     quality: 'premium',
     communityRating: 4.8,
     expertRating: 4.7,
-    images: ['/products/xpression-braid.jpg'],
+    images: [
+      'https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&w=400&q=80',
+    ],
     stylesCompatible: ['Box Braids', 'Knotless Braids', 'Feed-in Braids'],
     alternatives: {
       budget: 'ext_002'
@@ -292,7 +294,9 @@ export const MOCK_PRODUCTS: Product[] = [
     ],
     quality: 'budget',
     communityRating: 4.5,
-    images: ['/products/darling-yaki.jpg'],
+    images: [
+      'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80',
+    ],
     stylesCompatible: ['Box Braids', 'Senegalese Twists', 'Passion Twists'],
     alternatives: {
       premium: 'ext_001'
@@ -335,7 +339,9 @@ export const MOCK_PRODUCTS: Product[] = [
     quality: 'mid-range',
     communityRating: 4.7,
     expertRating: 4.6,
-    images: ['/products/got2b-gel.jpg'],
+    images: [
+      'https://images.unsplash.com/photo-1556228578-8d97aa54cd9d?auto=format&fit=crop&w=400&q=80',
+    ],
     stylesCompatible: ['Box Braids', 'Cornrows', 'Ponytails', 'Sleek buns'],
     routineStep: 'daily'
   },
@@ -369,7 +375,9 @@ export const MOCK_PRODUCTS: Product[] = [
     ],
     quality: 'mid-range',
     communityRating: 4.6,
-    images: ['/products/eco-styler-olive.jpg'],
+    images: [
+      'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=400&q=80',
+    ],
     stylesCompatible: ['Twist-outs', 'Braid-outs', 'Sleek styles'],
     routineStep: 'daily'
   },
@@ -411,7 +419,9 @@ export const MOCK_PRODUCTS: Product[] = [
     quality: 'mid-range',
     communityRating: 4.8,
     expertRating: 4.7,
-    images: ['/products/cantu-shampoo.jpg'],
+    images: [
+      'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&w=400&q=80',
+    ],
     stylesCompatible: ['All styles'],
     routineStep: 'weekly'
   },
@@ -464,7 +474,9 @@ export const MOCK_PRODUCTS: Product[] = [
     quality: 'premium',
     communityRating: 4.9,
     expertRating: 4.8,
-    images: ['/products/shea-moisture-mask.jpg'],
+    images: [
+      'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=400&q=80',
+    ],
     stylesCompatible: ['All styles'],
     routineStep: 'weekly'
   },
@@ -518,7 +530,9 @@ export const MOCK_PRODUCTS: Product[] = [
     quality: 'premium',
     communityRating: 4.7,
     expertRating: 4.8,
-    images: ['/products/jbco.jpg'],
+    images: [
+      'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=400&q=80',
+    ],
     stylesCompatible: ['All styles'],
     routineStep: 'weekly',
     alternatives: {
@@ -567,7 +581,9 @@ export const MOCK_PRODUCTS: Product[] = [
     ],
     quality: 'mid-range',
     communityRating: 4.6,
-    images: ['/products/light-oil-blend.jpg'],
+    images: [
+      'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80',
+    ],
     stylesCompatible: ['All styles'],
     routineStep: 'daily',
     alternatives: {
@@ -633,7 +649,9 @@ export const MOCK_PRODUCTS: Product[] = [
     quality: 'budget',
     communityRating: 4.5,
     expertRating: 5.0,
-    images: ['/products/satin-bonnet.jpg'],
+    images: [
+      'https://images.unsplash.com/photo-1522338242992-e1a54906a8da?auto=format&fit=crop&w=400&q=80',
+    ],
     stylesCompatible: ['All styles'],
     routineStep: 'daily'
   },
@@ -673,7 +691,9 @@ export const MOCK_PRODUCTS: Product[] = [
     quality: 'mid-range',
     communityRating: 4.8,
     expertRating: 4.9,
-    images: ['/products/wide-tooth-comb.jpg'],
+    images: [
+      'https://images.unsplash.com/photo-1598457111964-47e0db313e33?auto=format&fit=crop&w=400&q=80',
+    ],
     stylesCompatible: ['All styles'],
     routineStep: 'weekly'
   }

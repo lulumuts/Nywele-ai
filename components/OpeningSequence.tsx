@@ -10,7 +10,7 @@
  * Grid overlay: triplanar mesh + light “HUD” read (drift, dual sweep, cyan-tinted rim), warm orange base; post CA / scan / vignette / grain.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import * as THREE from 'three';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -20,6 +20,12 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { APP_PAGE_BACKGROUND } from '@/lib/app-theme';
+import {
+  getIntroContentHoldPending,
+  INTRO_HOLD_CONTENT_MAX_SEC,
+  OPENING_CROSSFADE_SEC,
+  setIntroContentHoldPending,
+} from '@/lib/intro-crossfade';
 
 /** Cache-bust so browser picks up replaced `public/Final-nywele.glb`. Bump when asset changes. */
 const BUST_GLB_PATH = '/Final-nywele.glb?v=4';
@@ -33,6 +39,8 @@ const WIRE_PEAK_OPACITY = 0.84;
 const WIRE_SHELL_SCALE = 1.001;
 /** Raise the final clip/sweep floor by this fraction of mesh height so the bust reads shorter (upper-chest cut like the reference). */
 const BUST_BOTTOM_TRIM_RATIO = 0.14;
+/** Camera look-at Y (world). Lower values move the bust toward the top of the viewport. */
+const OPENING_LOOK_AT_Y = 0.38;
 
 const DRACO_DECODER_PATH = 'https://www.gstatic.com/draco/versioned/decoders/1.5.7/';
 
@@ -148,18 +156,38 @@ const ScanlineShader = {
 
 export type OpeningSequenceProps = {
   onComplete?: () => void;
+  /** Fired once when the bust hide finishes and the shell/canvas fade-out begins (pair with page content fade-in). */
+  onFadeUiStart?: () => void;
   backgroundColor?: string;
+  /** Shorter reveal/hold/hide for in-app route transitions (still shows bust + Loading text). */
+  phasePreset?: 'full' | 'route';
+  /**
+   * After reveal, stay in the hold phase (bust visible + “Loading…”) until this component unmounts.
+   * Use for long async work (e.g. hair analysis) so the sequence does not fade out early.
+   */
+  holdUntilUnmount?: boolean;
+  /**
+   * Replaces the default “Loading…..” label; bust is moved up so this content fits below (e.g. hair-care status copy).
+   */
+  holdStatusContent?: ReactNode;
 };
 
 export default function OpeningSequence({
   onComplete,
+  onFadeUiStart,
   backgroundColor = APP_PAGE_BACKGROUND,
+  phasePreset = 'full',
+  holdUntilUnmount = false,
+  holdStatusContent,
 }: OpeningSequenceProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(true);
+  const [openingAssetLoading, setOpeningAssetLoading] = useState(true);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
+  const onFadeUiStartRef = useRef(onFadeUiStart);
+  onFadeUiStartRef.current = onFadeUiStart;
 
   const triggerDone = useCallback(() => {
     setVisible(false);
@@ -182,11 +210,11 @@ export default function OpeningSequence({
 
     /** Cap frame delta so a long main-thread hitch (loader, tab switch) cannot finish the whole reveal in one frame. */
     const DELTA_CAP = 1 / 24;
-    const REVEAL_SEC = 2.2;
-    const HOLD_SEC = 0.8;
-    const HIDE_SEC = 1.8;
+    const REVEAL_SEC = phasePreset === 'route' ? 1.05 : 2.2;
+    const HOLD_SEC = phasePreset === 'route' ? 0.28 : 0.8;
+    const HIDE_SEC = phasePreset === 'route' ? 0.52 : 1.8;
     /** Fade the fixed shell (and CRT pass) before unmount so the app does not pop in. */
-    const UI_FADE_OUT_SEC = 0.55;
+    const UI_FADE_OUT_SEC = OPENING_CROSSFADE_SEC;
     const SCAN_EDGE_SMOOTH_RATE = 9;
 
     let disposed = false;
@@ -203,6 +231,7 @@ export default function OpeningSequence({
       _mat: THREE.ShaderMaterial;
     }[] = [];
     let done = false;
+    let loadingLabelDismissed = false;
 
     const completeOnce = () => {
       if (done || disposed) return;
@@ -236,6 +265,7 @@ export default function OpeningSequence({
     });
 
     if (!renderer.getContext()) {
+      setOpeningAssetLoading(false);
       completeOnce();
       renderer.dispose();
       return () => {
@@ -282,7 +312,7 @@ export default function OpeningSequence({
 
     const camera = new THREE.PerspectiveCamera(30, iw / ih, 0.1, 1000);
     camera.position.set(2.8, 1.6, -3.2); // behind + to the side
-    camera.lookAt(0, 0.6, 0);
+    camera.lookAt(0, OPENING_LOOK_AT_Y, 0);
     const cameraWorldPos = new THREE.Vector3();
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
@@ -678,7 +708,10 @@ export default function OpeningSequence({
         },
         undefined,
         () => {
-          if (!disposed) completeOnce();
+          if (!disposed) {
+            setOpeningAssetLoading(false);
+            completeOnce();
+          }
         },
       );
     };
@@ -709,7 +742,18 @@ export default function OpeningSequence({
             progress = 0;
           }
         } else if (phase === 'hold') {
-          if (progress >= HOLD_SEC) {
+          const waitingForContent =
+            phasePreset !== 'route' && getIntroContentHoldPending();
+          if (
+            waitingForContent &&
+            progress >= HOLD_SEC + INTRO_HOLD_CONTENT_MAX_SEC
+          ) {
+            setIntroContentHoldPending(false);
+          }
+          const minHoldDone = progress >= HOLD_SEC;
+          const contentOk =
+            phasePreset === 'route' || !getIntroContentHoldPending();
+          if (minHoldDone && contentOk && !holdUntilUnmount) {
             phase = 'hide';
             progress = 0;
           }
@@ -723,9 +767,16 @@ export default function OpeningSequence({
           if (progress >= HIDE_SEC) {
             phase = 'fadeUi';
             uiFade = 0;
+            if (!disposed && !loadingLabelDismissed) {
+              loadingLabelDismissed = true;
+              setOpeningAssetLoading(false);
+            }
           }
         }
       } else if (modelReady && phase === 'fadeUi') {
+        if (uiFade === 0) {
+          onFadeUiStartRef.current?.();
+        }
         uiFade += delta;
         const t = Math.min(uiFade / UI_FADE_OUT_SEC, 1);
         const eased = easeInOutCubic(t);
@@ -809,19 +860,26 @@ export default function OpeningSequence({
         }
       });
     };
-  }, [backgroundColor, triggerDone]);
+  }, [backgroundColor, phasePreset, triggerDone, holdUntilUnmount]);
 
   if (!visible) return null;
+
+  /** Bust uses upper viewport so status copy can sit below. */
+  const useHoldStatusLayout = Boolean(holdStatusContent);
+  const showHoldStatus =
+    Boolean(holdStatusContent) && (openingAssetLoading || holdUntilUnmount);
 
   return (
     <div
       ref={shellRef}
+      data-nywele-opening-sequence=""
       style={{
         position: 'fixed',
         inset: 0,
         zIndex: OVERLAY_Z,
         isolation: 'isolate',
         opacity: 1,
+        minHeight: '100dvh',
         background:
           typeof document !== 'undefined'
             ? getComputedStyle(document.documentElement)
@@ -831,15 +889,82 @@ export default function OpeningSequence({
       }}
     >
       <div
-        ref={mountRef}
         style={{
-          position: 'absolute',
-          inset: 0,
+          position: 'relative',
           width: '100%',
           height: '100%',
           minHeight: '100dvh',
+          display: useHoldStatusLayout ? 'flex' : 'block',
+          flexDirection: useHoldStatusLayout ? 'column' : undefined,
+          justifyContent: useHoldStatusLayout ? 'flex-start' : undefined,
         }}
-      />
+      >
+        <div
+          ref={mountRef}
+          style={
+            useHoldStatusLayout
+              ? {
+                  position: 'relative',
+                  flex: '0 0 auto',
+                  width: '100%',
+                  height: 'min(48vh, 500px)',
+                  transform: 'translateY(-2vh)',
+                }
+              : {
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                }
+          }
+        />
+        {showHoldStatus ? (
+          <div
+            style={{
+              flex: '0 0 auto',
+              width: '100%',
+              maxWidth: '36rem',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              paddingLeft: 'clamp(1rem, 4vw, 1.5rem)',
+              paddingRight: 'clamp(1rem, 4vw, 1.5rem)',
+              paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
+              paddingTop: '0.25rem',
+              zIndex: 1,
+              pointerEvents: 'none',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+            aria-live="polite"
+            aria-busy="true"
+          >
+            {holdStatusContent}
+          </div>
+        ) : null}
+        {openingAssetLoading && !useHoldStatusLayout ? (
+          <div
+            style={{
+              position: 'absolute',
+              top: '80%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 1,
+              pointerEvents: 'none',
+              textAlign: 'center',
+              color: '#AF5500',
+              fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+              fontSize: '0.9375rem',
+              fontWeight: 600,
+            }}
+            aria-live="polite"
+            aria-busy="true"
+          >
+            Loading.....
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

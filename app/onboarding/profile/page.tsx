@@ -105,7 +105,7 @@ export default function OnboardingProfile() {
 
   return (
     <div
-      className="min-h-screen flex flex-col px-4 md:px-8 py-8 md:py-12"
+      className="flex min-h-dvh flex-col px-4 md:px-8"
       style={{ background: '#FFFEE1' }}
     >
       <style jsx global>{`
@@ -114,28 +114,28 @@ export default function OnboardingProfile() {
 
       <Link
         href="/onboarding"
-        className="inline-flex items-center gap-2 mb-6 hover:opacity-80 transition-opacity w-fit"
+        className="inline-flex shrink-0 items-center gap-2 py-8 pb-4 hover:opacity-80 transition-opacity md:pt-12 md:pb-4"
         style={{ color: '#573203', fontFamily: 'Bricolage Grotesque, sans-serif' }}
       >
         <ArrowLeft className="w-5 h-5" />
         <span className="text-sm font-medium">Back</span>
       </Link>
 
-      <div className="w-full max-w-[428px] mx-auto flex-1 flex flex-col min-h-0">
-        <h1
-          className="text-3xl md:text-4xl font-bold mb-2"
-          style={{ color: '#573203', fontFamily: 'Caprasimo, serif' }}
-        >
-          Set up Your Profile
-        </h1>
-        <p
-          className="mb-6"
-          style={{ color: '#573203', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-        >
-          Fill in the short form below to get the best out of our service!
-        </p>
+      <div className="flex min-h-0 flex-1 flex-col pb-8 md:pb-12">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          <div className="flex min-h-full flex-col justify-center py-2">
+            <div className="mx-auto flex w-full max-w-[428px] flex-col">
+              <h1
+                className="mb-2 text-3xl font-bold md:text-4xl"
+                style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
+              >
+                Set up Your Profile
+              </h1>
+              <p className="mb-6" style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                Fill in the short form below to get the best out of our service!
+              </p>
 
-        <FormCard progress={progress} className="flex-1 flex flex-col min-h-0">
+              <FormCard progress={progress} className="flex flex-col">
           {step === 0 && (
             <div className="space-y-4">
               <div>
@@ -400,20 +400,24 @@ export default function OnboardingProfile() {
               </div>
             </div>
           )}
-        </FormCard>
+              </FormCard>
 
-        <div className="flex justify-end mt-6">
-          <button
-            onClick={handleNext}
-            disabled={!canProceed()}
-            className="flex items-center gap-2 px-6 py-3 font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              color: canProceed() ? '#573203' : '#9CA3AF',
-              fontFamily: 'Bricolage Grotesque, sans-serif',
-            }}
-          >
-            {step === TOTAL_STEPS - 1 ? 'Finish' : 'Next'} <ArrowRight className="w-5 h-5" />
-          </button>
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={handleNext}
+                  disabled={!canProceed()}
+                  className="flex items-center gap-2 rounded-xl px-6 py-3 font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50"
+                  style={{
+                    color: canProceed() ? '#573203' : '#9CA3AF',
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                  }}
+                >
+                  {step === TOTAL_STEPS - 1 ? 'Finish' : 'Next'}{' '}
+                  <ArrowRight className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

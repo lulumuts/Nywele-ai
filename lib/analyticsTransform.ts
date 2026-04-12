@@ -30,6 +30,13 @@ function getHealthScoreFromRoutine(routine: SavedRoutine): number {
   return direct ?? h?.healthScore ?? h?.score ?? 60;
 }
 
+/** Latest scan score from profile snapshot (same flow as hair-care “how healthy is your hair”). */
+export function getLatestHairHealthScore(profile: UserProfile | null): number | null {
+  const s = profile?.hairHealthSnapshot;
+  if (!s || typeof s.healthScore !== 'number') return null;
+  return Math.max(0, Math.min(100, s.healthScore));
+}
+
 /**
  * Get health trend data for line chart: dates and scores from saved routines.
  */
@@ -38,20 +45,61 @@ export function getHealthTrendData(profile: UserProfile | null): {
   scores: number[];
 } {
   const routines = profile?.savedRoutines ?? [];
-  if (routines.length === 0) {
+  const snap = profile?.hairHealthSnapshot;
+
+  type Point = { t: number; label: string; score: number };
+  const points: Point[] = [];
+
+  for (const r of routines) {
+    points.push({
+      t: new Date(r.createdAt).getTime(),
+      label: new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      score: getHealthScoreFromRoutine(r),
+    });
+  }
+
+  if (snap?.analyzedAt && typeof snap.healthScore === 'number') {
+    const t = new Date(snap.analyzedAt).getTime();
+    const label = new Date(snap.analyzedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    points.push({
+      t,
+      label,
+      score: Math.max(0, Math.min(100, snap.healthScore)),
+    });
+  }
+
+  const history = profile?.hairCareHistory ?? [];
+  for (const h of history) {
+    const ha = h.hairAnalysis as { health?: { healthScore?: number; score?: number }; overallQuality?: number } | undefined;
+    if (!ha || typeof ha !== 'object') continue;
+    const health = ha.health?.healthScore ?? ha.health?.score ?? ha.overallQuality;
+    if (typeof health !== 'number') continue;
+    const t = new Date(h.scannedAt).getTime();
+    const label = new Date(h.scannedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    points.push({
+      t,
+      label,
+      score: Math.max(0, Math.min(100, Math.round(health))),
+    });
+  }
+
+  if (points.length === 0) {
     return { dates: [], scores: [] };
   }
 
-  const sorted = [...routines].sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-  );
+  points.sort((a, b) => a.t - b.t);
+
+  const byDay = new Map<string, Point>();
+  for (const p of points) {
+    const day = new Date(p.t).toISOString().slice(0, 10);
+    const prev = byDay.get(day);
+    if (!prev || p.t >= prev.t) byDay.set(day, p);
+  }
+  const merged = [...byDay.values()].sort((a, b) => a.t - b.t);
 
   return {
-    dates: sorted.map((r) => {
-      const d = new Date(r.createdAt);
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    }),
-    scores: sorted.map(getHealthScoreFromRoutine),
+    dates: merged.map((p) => p.label),
+    scores: merged.map((p) => p.score),
   };
 }
 
@@ -70,7 +118,7 @@ export function getGoalProgressData(profile: UserProfile | null): {
   }
 
   const values = goals.map((goal) => {
-    if (routines.length === 0) return 0;
+    if (routines.length === 0 && !profile?.hairHealthSnapshot) return 0;
 
     const scores = routines.map((r) => {
       const health = getHealthScoreFromRoutine(r);
@@ -95,6 +143,31 @@ export function getGoalProgressData(profile: UserProfile | null): {
           return health;
       }
     });
+
+    if (scores.length === 0) {
+      const snap = profile?.hairHealthSnapshot;
+      if (!snap) return 0;
+      const health = snap.healthScore;
+      const damage = severityToNumber(snap.damageSeverity);
+      const quality = snap.overallQuality ?? health;
+      switch (goal.toLowerCase()) {
+        case 'length retention':
+        case 'thickness\ndensity':
+        case 'thickness/density':
+          return health;
+        case 'moisture':
+          return (health + damage) / 2;
+        case 'curl definition':
+          return quality;
+        case 'scalp health':
+        case 'reduce breakage':
+        case 'colour-treated care':
+        case 'heat damage repair':
+          return damage;
+        default:
+          return health;
+      }
+    }
 
     return scores.reduce((a, b) => a + b, 0) / scores.length;
   });

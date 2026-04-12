@@ -1,25 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Camera } from 'lucide-react';
 import BottomNav from '@/app/components/BottomNav';
-import { getAllStyles } from '@/lib/supabase-styles';
+import { StyleCheckHubWhiteCard } from '@/app/components/BottomNavHubLayout';
+import { STYLE_CARD_IMAGE_BY_SLUG } from '@/lib/style-check-card-images';
 
 const FALLBACK_STYLES = [
+  { slug: 'short-afro', name: 'Short Afro', compatibility: 82 },
+  { slug: 'bantu-knots', name: 'Bantu Knots', compatibility: 82 },
   { slug: 'natural-afro', name: 'Natural Afro', compatibility: 82 },
   { slug: 'lines', name: 'Lines', compatibility: 82 },
   { slug: 'box-braids', name: 'Box Braids', compatibility: 82 },
+  { slug: 'passion-twists', name: 'Passion Twists', compatibility: 82 },
   { slug: 'natural-locs', name: 'Natural Locs', compatibility: 82 },
+  { slug: 'sister-locs', name: 'Sister Locs', compatibility: 82 },
+  { slug: 'permed-hair', name: 'Permed Hair', compatibility: 82 },
+  { slug: 'lace-front-wig', name: 'Lace Front Wig', compatibility: 82 },
 ];
-
-/** Slugs that show a custom asset in the grid card (others use the default hair outline). */
-const STYLE_CARD_IMAGE_BY_SLUG: Record<string, string> = {
-  'natural-afro': '/images/natural-afro.svg',
-  lines: '/images/Lines.svg',
-  'box-braids': '/images/box-braids.svg',
-  'natural-locs': '/images/natural-locs.svg',
-};
 
 function slugFromName(name: string): string {
   return name.toLowerCase().replace(/\s+/g, '-');
@@ -29,28 +28,38 @@ export default function StyleCheckPage() {
   const router = useRouter();
   const [showGrid, setShowGrid] = useState(false);
   const [styles, setStyles] = useState<typeof FALLBACK_STYLES>(FALLBACK_STYLES);
-  const [loading, setLoading] = useState(false);
+  /** True while fetching library styles — stay on loader until data is ready (no flash of stale cards). */
+  const [stylesLoading, setStylesLoading] = useState(false);
 
-  useEffect(() => {
-    if (!showGrid) return;
-    setLoading(true);
-    getAllStyles()
-      .then((supabaseStyles) => {
+  const openLibraryGrid = useCallback(() => {
+    setShowGrid(true);
+    setStylesLoading(true);
+    fetch('/api/styles')
+      .then((res) => {
+        if (!res.ok) throw new Error('styles');
+        return res.json();
+      })
+      .then((body: { styles?: { name: string }[] }) => {
+        const supabaseStyles = body.styles;
         if (supabaseStyles && supabaseStyles.length > 0) {
           setStyles(
             supabaseStyles.map((s) => ({
               slug: slugFromName(s.name),
               name: s.name,
               compatibility: 82,
-            }))
+            })),
           );
+        } else {
+          setStyles(FALLBACK_STYLES);
         }
       })
       .catch(() => {
         setStyles(FALLBACK_STYLES);
       })
-      .finally(() => setLoading(false));
-  }, [showGrid]);
+      .finally(() => {
+        setStylesLoading(false);
+      });
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col" style={{ background: '#FFFEE1' }}>
@@ -60,8 +69,8 @@ export default function StyleCheckPage() {
       <BottomNav />
 
       <div
-        className={`flex min-h-0 flex-1 flex-col px-7 pb-[max(0.75rem,calc(4.75rem+env(safe-area-inset-bottom,0px)))] sm:px-8 md:px-14 md:pb-10 lg:px-16 ${
-          showGrid ? 'pt-16 md:pt-32' : 'pt-32 md:pt-32'
+        className={`bottom-nav-hub-main flex min-h-0 flex-1 flex-col px-7 sm:px-8 md:px-14 lg:px-16 ${
+          showGrid ? 'pt-16 md:pt-32' : 'pt-24 md:pt-28'
         }`}
       >
         <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-3 sm:px-4 md:px-6 lg:px-8">
@@ -111,12 +120,22 @@ export default function StyleCheckPage() {
               }}
             >
               <div className="grid min-h-0 w-full flex-1 auto-rows-min grid-cols-2 gap-4 overflow-y-auto md:gap-6 lg:flex lg:min-h-0 lg:flex-nowrap lg:items-start lg:overflow-x-auto lg:overflow-y-visible lg:pb-2">
-                {loading ? (
+                {stylesLoading ? (
                   <div
-                    className="col-span-2 flex justify-center py-12 text-sm md:col-span-4 lg:basis-full lg:shrink-0"
-                    style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    className="col-span-2 flex min-h-[min(50vh,28rem)] w-full flex-col items-center justify-center gap-5 py-12 md:col-span-4 lg:min-h-[min(60vh,32rem)] lg:basis-full lg:shrink-0"
+                    role="status"
+                    aria-live="polite"
                   >
-                    Loading styles…
+                    <div
+                      className="h-14 w-14 shrink-0 rounded-full border-4 border-[rgba(193,114,8,0.22)] border-t-[#C17208] animate-spin md:h-16 md:w-16"
+                      aria-hidden
+                    />
+                    <p
+                      className="text-sm md:text-base"
+                      style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    >
+                      Loading styles…
+                    </p>
                   </div>
                 ) : (
                   styles.map((style) => (
@@ -124,7 +143,7 @@ export default function StyleCheckPage() {
                       key={style.slug}
                       type="button"
                       onClick={() => router.push(`/style-check/${style.slug}`)}
-                      className="flex min-h-0 flex-col overflow-hidden rounded-[32px] border border-solid border-[rgba(193,114,8,0.35)] bg-transparent text-left shadow-none transition-colors hover:bg-[rgba(249,160,40,0.26)] active:bg-[rgba(249,160,40,0.26)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C17208] focus-visible:ring-offset-2 lg:shrink-0 lg:basis-[calc((100%-1.5rem)/2-3.625rem)]"
+                      className="flex min-h-0 flex-col overflow-hidden rounded-[32px] border-2 border-solid border-[rgba(193,114,8,0.35)] bg-transparent text-left shadow-none transition-[border-width,border-color,background-color] duration-200 hover:border-[3px] hover:border-[#C17208] hover:bg-[rgba(193,114,8,0.2)] active:border-[3px] active:border-[#C17208] active:bg-[rgba(193,114,8,0.2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C17208] focus-visible:ring-offset-2 lg:shrink-0 lg:basis-[calc((100%-1.5rem)/2-3.625rem)]"
                     >
                       <div className="px-4 pt-5 text-center md:px-5 md:pt-6 lg:pt-6">
                         <h3
@@ -142,7 +161,11 @@ export default function StyleCheckPage() {
                           <img
                             src={STYLE_CARD_IMAGE_BY_SLUG[style.slug]}
                             alt={style.name}
-                            className="mx-auto block h-72 w-72 max-h-full max-w-full shrink-0 object-contain object-center sm:h-80 sm:w-80 md:h-96 md:w-96"
+                            className={
+                              style.slug === 'sister-locs'
+                                ? 'mx-auto block h-80 w-80 max-h-full max-w-full shrink-0 object-contain object-center sm:h-[22rem] sm:w-[22rem] md:h-[28rem] md:w-[28rem] lg:h-[30rem] lg:w-[30rem]'
+                                : 'mx-auto block h-72 w-72 max-h-full max-w-full shrink-0 object-contain object-center sm:h-80 sm:w-80 md:h-96 md:w-96'
+                            }
                           />
                         ) : (
                           <svg
@@ -187,18 +210,8 @@ export default function StyleCheckPage() {
               </div>
             </div>
           ) : (
-            <div className="flex min-h-0 flex-1 flex-col justify-center md:flex-none md:justify-start">
-              <div
-                className="flex w-full max-h-[min(56rem,90dvh)] flex-col overflow-hidden rounded-2xl p-5 md:max-h-none md:flex-none md:p-6"
-                style={{
-                  background: '#FFFFFF',
-                  border: '2px solid rgba(175, 85, 0, 0.25)',
-                  color: '#C17208',
-                }}
-              >
-                {/* Padding on this outer shell only — not on overflow-y — so bottom inset is never clipped */}
-                <div className="flex min-h-0 max-h-full flex-col gap-4 overflow-y-auto md:gap-5">
-                  <div className="flex w-full items-center justify-center py-2 md:py-4">
+            <StyleCheckHubWhiteCard>
+              <div className="flex w-full items-center justify-center py-2 md:py-4">
                     <div
                       className="w-full max-w-xs rounded-2xl p-5 sm:max-w-sm md:max-w-4xl md:p-6"
                       style={{
@@ -237,7 +250,7 @@ export default function StyleCheckPage() {
                     </p>
                     <button
                       type="button"
-                      onClick={() => setShowGrid(true)}
+                      onClick={openLibraryGrid}
                       className="w-full max-w-sm rounded-xl py-3 text-sm font-semibold transition-all md:max-w-md md:text-base"
                       style={{
                         background: 'rgba(193, 114, 8, 0.12)',
@@ -249,9 +262,7 @@ export default function StyleCheckPage() {
                       Browse our library
                     </button>
                   </div>
-                </div>
-              </div>
-            </div>
+            </StyleCheckHubWhiteCard>
           )}
         </div>
       </div>

@@ -1,38 +1,22 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useState } from 'react';
+import OpeningSequence from '@/components/OpeningSequence';
 import { APP_PAGE_BACKGROUND } from '@/lib/app-theme';
+import {
+  NYWELE_INTRO_CROSSFADE_EVENT,
+  OPENING_CROSSFADE_SEC,
+} from '@/lib/intro-crossfade';
 
 /**
- * Bump when intro visuals change so devs / users see the new sequence once.
- * (Otherwise `sessionStorage` skips the overlay forever and edits look “unchanged”.)
+ * Bump when intro flow or visuals change so prod users see it once with the new behavior.
  */
-const SESSION_KEY = 'nywele-opening-sequence-done-v10';
-
-const OpeningSequence = dynamic(() => import('@/components/OpeningSequence'), {
-  ssr: false,
-  loading: () => (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 400_000,
-        background: APP_PAGE_BACKGROUND,
-      }}
-      aria-hidden
-    />
-  ),
-});
+const SESSION_KEY = 'nywele-opening-sequence-done-v11';
 
 /**
- * Root shell: WebGL opening, then `children`.
- * Production: skipped after first completion (sessionStorage). Development: runs every load so Three.js changes are visible.
- * Wired in `app/layout.tsx` around `{children}`.
- *
- * Children mount only after the intro completes (or session skip) so the route
- * tree (e.g. Chart.js on /dashboard) never competes with the intro for GPU /
- * WebGL while the intro canvas is active.
+ * Root shell: WebGL opening over `children`, then overlay unmounts.
+ * `children` stay mounted under the intro so the bust scan runs first, then routes can fade in
+ * (e.g. onboarding image) as the shell opacity fades out.
  */
 export default function RootAppWithIntro({ children }: { children: React.ReactNode }) {
   const [showIntro, setShowIntro] = useState(true);
@@ -49,8 +33,6 @@ export default function RootAppWithIntro({ children }: { children: React.ReactNo
         window.history.replaceState(null, '', next);
         return;
       }
-      // In development, always show the WebGL gate first so edits to OpeningSequence are visible.
-      // (In production, remember completion so return visits go straight to the app.)
       const skipWebGlIntro =
         process.env.NODE_ENV === 'production' &&
         sessionStorage.getItem(SESSION_KEY) === '1';
@@ -60,6 +42,14 @@ export default function RootAppWithIntro({ children }: { children: React.ReactNo
     } catch {
       /* private mode / no sessionStorage */
     }
+  }, []);
+
+  const emitCrossfade = useCallback(() => {
+    window.dispatchEvent(
+      new CustomEvent(NYWELE_INTRO_CROSSFADE_EVENT, {
+        detail: { durationSec: OPENING_CROSSFADE_SEC },
+      }),
+    );
   }, []);
 
   const handleIntroComplete = useCallback(() => {
@@ -75,13 +65,14 @@ export default function RootAppWithIntro({ children }: { children: React.ReactNo
 
   return (
     <>
+      {children}
       {showIntro && (
         <OpeningSequence
+          onFadeUiStart={emitCrossfade}
           onComplete={handleIntroComplete}
           backgroundColor={APP_PAGE_BACKGROUND}
         />
       )}
-      {!showIntro && children}
     </>
   );
 }

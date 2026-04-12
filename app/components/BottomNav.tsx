@@ -133,6 +133,7 @@ type NavItem = { name: string; href: string; Icon: FC<{ className?: string }> };
 const navItems: NavItem[] = [
   { name: 'home', href: '/dashboard', Icon: HomeNavIcon },
   { name: 'scan profile', href: '/hair-care', Icon: HairProfileNavIcon },
+  /** Hub is `/products` (list + search). Barcode lives at `/products/scan` like style detail under `/style-check`. */
   { name: 'product scan', href: '/products', Icon: ProductScanNavIcon },
   { name: 'style check', href: '/style-check', Icon: StyleCheckNavIcon },
 ];

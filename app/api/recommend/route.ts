@@ -40,19 +40,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Fetch relevant products from database
-    const { data: products, error: dbError } = await supabase
+    // Fetch relevant products (schema may use hair_types or compatible_hair_types)
+    let products: Product[] = [];
+    const byHairTypes = await supabase
       .from('products')
       .select('*')
-      .contains('compatible_hair_types', [hairType])
+      .contains('hair_types', [hairType])
       .limit(10);
-
-    if (dbError) {
-      console.error('Database error:', dbError);
-      return NextResponse.json(
-        { error: 'Failed to fetch products' },
-        { status: 500 }
-      );
+    if (!byHairTypes.error && byHairTypes.data?.length) {
+      products = byHairTypes.data as Product[];
+    } else {
+      const byCompat = await supabase
+        .from('products')
+        .select('*')
+        .contains('compatible_hair_types', [hairType])
+        .limit(10);
+      if (!byCompat.error && byCompat.data?.length) {
+        products = byCompat.data as Product[];
+      } else if (byCompat.error && byHairTypes.error) {
+        console.error('Database error:', byHairTypes.error, byCompat.error);
+        return NextResponse.json(
+          { error: 'Failed to fetch products' },
+          { status: 500 }
+        );
+      }
     }
 
     // Build porosity-specific guidance

@@ -1,16 +1,30 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Package, Sparkles, Loader, ChevronDown, ChevronUp, Clock, HelpCircle, ChevronRight } from 'lucide-react';
 import BottomNav from '@/app/components/BottomNav';
+import HairCareReferencePhoto from '@/app/components/HairCareReferencePhoto';
+import { explorerProductsToCarousel, type ExplorerCarouselProduct } from '@/lib/productExplorerCatalog';
 import { normalizeUserProfile, type UserProfile } from '@/types/userProfile';
-import { getProductsForHairTypeAsync } from '@/lib/products';
-import { getHealthTrendData, getProductSpendData, getGoalProgressData } from '@/lib/analyticsTransform';
+import {
+  getDashboardHairCareContext,
+  productsFromHairCareRecommendation,
+  routineCardsFromRecommendation,
+} from '@/lib/dashboardHairCare';
+import {
+  getHealthTrendData,
+  getProductSpendData,
+  getGoalProgressData,
+  getLatestHairHealthScore,
+} from '@/lib/analyticsTransform';
 import HealthTrendChart from '@/app/components/charts/HealthTrendChart';
 import ProductSpendDonut from '@/app/components/charts/ProductSpendDonut';
 import GoalProgressChart from '@/app/components/charts/GoalProgressChart';
+
+/** Same catalog as Product Compatibility (/products), default "Cleanse & Care" tab */
+const DASHBOARD_RECOMMENDED = explorerProductsToCarousel('care', 3);
 
 const ROUTINE_CARDS = [
   { id: '1', title: 'Refresh Your Style', schedule: 'Every Morning', tag: 'Daily', duration: '5-10 Mins', why: 'Keep Your Afro Looking Fresh Throughout The Day' },
@@ -23,7 +37,7 @@ export default function Dashboard() {
   const [userName, setUserName] = useState<string>('Layla');
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [activeTab, setActiveTab] = useState<'routine' | 'metrics'>('routine');
-  const [recommendedProducts, setRecommendedProducts] = useState<any[]>([]);
+  const [recommendedProducts, setRecommendedProducts] = useState<ExplorerCarouselProduct[]>(DASHBOARD_RECOMMENDED);
   const [aiRecommendation, setAiRecommendation] = useState<{ routine: any; products: any[]; stylistTip: string } | null>(null);
   const [loadingAiRecommendation, setLoadingAiRecommendation] = useState(false);
   const [showAiRecommendation, setShowAiRecommendation] = useState(false);
@@ -34,32 +48,41 @@ export default function Dashboard() {
       const parsed = normalizeUserProfile(JSON.parse(profile));
       setUserName(parsed.name || 'Layla');
       setUserProfile(parsed);
-      const savedProds = parsed.savedRoutines?.[0]?.routine?.productRecommendations?.essential;
-      if (savedProds && Array.isArray(savedProds) && savedProds.length > 0) {
-        setRecommendedProducts(savedProds.slice(0, 3));
-      } else {
-        getProductsForHairTypeAsync(parsed.hairType || '4c')
-          .then((prods) => {
-            const mapped = prods.slice(0, 3).map((p) => ({
-              brand: p.brand,
-              name: p.name,
-              purpose: p.description?.slice(0, 80) || '',
-              pricing: {
-                currency: p.pricing?.currency || 'KES',
-                amount: p.pricing?.estimatedPrice ?? p.pricing?.priceRange?.min ?? 0,
-              },
-            }));
-            setRecommendedProducts(mapped);
-          })
-          .catch(() => {
-            setRecommendedProducts([
-              { brand: 'Shea Moisture', name: 'Water Replenish Mist', purpose: 'Lightweight hydration', pricing: { currency: 'KES', amount: 1200 } },
-              { brand: 'Mielle', name: 'Oil & Shine', purpose: 'Nourishing oil blend', pricing: { currency: 'KES', amount: 900 } },
-            ]);
-          });
-      }
     }
+    setRecommendedProducts(explorerProductsToCarousel('care', 3));
   }, []);
+
+  useEffect(() => {
+    const refresh = () => {
+      const profile = localStorage.getItem('nywele-user-profile');
+      if (profile) {
+        const parsed = normalizeUserProfile(JSON.parse(profile));
+        setUserName(parsed.name || 'Layla');
+        setUserProfile(parsed);
+      }
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') refresh();
+    };
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, []);
+
+  const hairCareCtx = useMemo(() => getDashboardHairCareContext(userProfile), [userProfile]);
+
+  const routineCardsLive = useMemo(() => {
+    const fromRec = routineCardsFromRecommendation(hairCareCtx.recommendation);
+    return fromRec.length > 0 ? fromRec : ROUTINE_CARDS;
+  }, [hairCareCtx.recommendation]);
+
+  const productCarouselLive = useMemo(() => {
+    const fromHc = productsFromHairCareRecommendation(hairCareCtx.recommendation);
+    return fromHc.length > 0 ? fromHc : recommendedProducts;
+  }, [hairCareCtx.recommendation, recommendedProducts]);
 
   const handleGetAiRecommendations = async () => {
     if (!userProfile) return;
@@ -103,8 +126,8 @@ export default function Dashboard() {
       `}</style>
       <BottomNav />
 
-      <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col overflow-hidden px-4 pb-[max(6rem,calc(4.75rem+env(safe-area-inset-bottom,0px)))] pt-10 md:px-4 md:pb-8 md:pt-28">
-        <div className="mb-6 flex shrink-0 flex-row items-center justify-between gap-3">
+      <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col overflow-hidden px-4 pb-[max(6rem,calc(4.75rem+env(safe-area-inset-bottom,0px)))] pt-20 md:px-4 md:pb-8 md:pt-36">
+        <div className="mb-3 flex shrink-0 flex-row items-center justify-between gap-3 md:mb-4">
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
             <img
               src="/icons/coil.svg"
@@ -113,7 +136,7 @@ export default function Dashboard() {
             />
             <h1
               className="min-w-0 text-2xl font-bold sm:text-3xl md:text-4xl"
-              style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
+              style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
             >
               Hey {userName || 'Layla'},
             </h1>
@@ -134,7 +157,7 @@ export default function Dashboard() {
 
         {userProfile && (
         <div
-          className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl"
+          className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl max-h-[min(70dvh,calc(100dvh-10.5rem))] md:max-h-[min(74dvh,calc(100dvh-11rem))]"
           style={{ background: '#FFFFFF', border: '2px solid rgba(175, 85, 0, 0.25)' }}
         >
           {/* Segmented toggle — single track, sliding active thumb */}
@@ -198,15 +221,38 @@ export default function Dashboard() {
             className="space-y-8 p-6 md:p-8"
           >
             <div>
-              <h2
-                className="text-xl md:text-2xl font-bold mb-2"
-                style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
-              >
-                Your Current Routine
-              </h2>
-              <p className="text-base mb-4" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                Here is your regimented routine based on your most recent scan
-              </p>
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <h2
+                    className="text-xl md:text-2xl font-bold mb-2"
+                    style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                  >
+                    Your current routine
+                  </h2>
+                  <p className="text-base mb-1" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    {hairCareCtx.scannedAtLabel
+                      ? `From your latest Hair care scan · ${hairCareCtx.scannedAtLabel}`
+                      : 'Here is your regimented routine based on your most recent scan'}
+                  </p>
+                  {hairCareCtx.recommendation ? (
+                    <p className="text-xs opacity-80" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                      Daily steps from your personalised routine. Open Hair care for the full plan, products, and tips.
+                    </p>
+                  ) : null}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => router.push('/hair-care')}
+                  className="shrink-0 rounded-xl px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
+                  style={{
+                    background: '#603E12',
+                    color: '#FFFFFF',
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                  }}
+                >
+                  Open Hair care
+                </button>
+              </div>
               <div
                 className="rounded-xl p-4 md:p-5"
                 style={{
@@ -215,7 +261,7 @@ export default function Dashboard() {
                 }}
               >
                 <div className="overflow-x-auto pb-1 flex gap-4 scrollbar-hide">
-                {ROUTINE_CARDS.map((card) => (
+                {routineCardsLive.map((card) => (
                   <div
                     key={card.id}
                     className="flex-shrink-0 w-[320px] px-4 py-3 rounded-xl"
@@ -271,6 +317,53 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {userProfile?.hairCareHistory && userProfile.hairCareHistory.length > 0 ? (
+              <div
+                className="rounded-xl p-4 md:p-5"
+                style={{
+                  background: 'rgba(255, 254, 225, 0.35)',
+                  border: '1px solid rgba(175, 85, 0, 0.2)',
+                }}
+              >
+                <h3
+                  className="mb-2 text-base font-bold md:text-lg"
+                  style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                >
+                  Past hair scans
+                </h3>
+                <p className="mb-3 text-sm" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  Reopen any saved scan and routine in Hair care.
+                </p>
+                <ul className="max-h-40 space-y-2 overflow-y-auto pr-1 md:max-h-48">
+                  {userProfile.hairCareHistory.slice(0, 12).map((h) => (
+                    <li key={h.id}>
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/hair-care?scan=${encodeURIComponent(h.id)}`)}
+                        className="w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors hover:bg-white/80"
+                        style={{
+                          borderColor: 'rgba(175, 85, 0, 0.25)',
+                          color: '#3C270C',
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                        }}
+                      >
+                        <span className="font-medium text-[#603E12]">
+                          {new Date(h.scannedAt).toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </span>
+                        <span className="ml-2 opacity-90">
+                          {h.recommendation ? 'Routine + scan' : 'Scan only'}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -278,13 +371,24 @@ export default function Dashboard() {
                     className="text-xl md:text-2xl font-bold mb-2"
                     style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
                   >
-                    Your Recommended Products
+                    Your recommended products
                   </h2>
                   <p className="text-base" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                    Here is your regimented routine based on your most recent scan
+                    {hairCareCtx.recommendation &&
+                    productsFromHairCareRecommendation(hairCareCtx.recommendation).length > 0
+                      ? 'From your latest Hair care routine'
+                      : 'Suggested products from our catalog when you have not run Hair care yet'}
                   </p>
                 </div>
-                <ChevronRight className="w-6 h-6 flex-shrink-0" style={{ color: '#643100' }} />
+                <button
+                  type="button"
+                  onClick={() => router.push('/hair-care')}
+                  className="flex shrink-0 items-center justify-center rounded-lg p-2 transition-opacity hover:opacity-80"
+                  aria-label="Open Hair care"
+                  style={{ color: '#643100' }}
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </button>
               </div>
               <div
                 className="rounded-xl p-4 md:p-5"
@@ -294,23 +398,38 @@ export default function Dashboard() {
                 }}
               >
                 <div className="overflow-x-auto pb-1 flex gap-4 scrollbar-hide">
-                  {(recommendedProducts.length ? recommendedProducts : [
-                    { brand: 'Neat', name: 'Water Pomade Mini', purpose: 'Water-Based Pomade That Gives The Hair A Slicker, Shinier Appearance.', pricing: { currency: 'KES', amount: 1200 } },
-                    { brand: 'Curl', name: 'Curl & Shin', purpose: 'Defines curls and adds lasting shine.', pricing: { currency: 'KES', amount: 900 } },
-                  ]).map((product: any, i: number) => (
+                  {productCarouselLive.map(
+                    (product, i) => (
                     <div
-                      key={i}
-                      className="flex-shrink-0 w-[240px] p-4 rounded-xl flex flex-col"
+                      key={`${product.brand}-${product.name}-${i}`}
+                      className="flex w-[240px] shrink-0 flex-col rounded-xl p-4"
                       style={{ background: 'transparent' }}
                     >
                       <div
-                        className="w-full h-24 rounded-lg flex items-center justify-center flex-shrink-0 mb-3"
+                        className="mb-3 h-24 w-full shrink-0 overflow-hidden rounded-lg"
                         style={{ background: 'rgba(175, 85, 0, 0.06)' }}
                       >
-                        <Package className="w-10 h-10" style={{ color: '#3C270C' }} />
+                        {product.imageUrl ? (
+                          <img
+                            src={product.imageUrl}
+                            alt={`${product.brand} ${product.name}`}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center">
+                            <Package className="h-10 w-10" style={{ color: '#3C270C' }} />
+                          </div>
+                        )}
                       </div>
-                      <p className="font-bold text-sm" style={{ color: '#3C270C' }}>{product.name}</p>
-                      <p className="text-xs mt-1 line-clamp-3" style={{ color: '#3C270C' }}>{product.purpose || product.name || ''}</p>
+                      <p className="text-sm font-bold" style={{ color: '#3C270C' }}>{product.name}</p>
+                      {product.brand ? (
+                        <p className="text-[11px] font-semibold uppercase tracking-wide opacity-80" style={{ color: '#3C270C' }}>
+                          {product.brand}
+                        </p>
+                      ) : null}
+                      <p className="mt-1 line-clamp-3 text-xs" style={{ color: '#3C270C' }}>{product.purpose || ''}</p>
                     </div>
                   ))}
                 </div>
@@ -406,6 +525,84 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-8 p-6 md:p-8"
           >
+            {userProfile?.hairHealthSnapshot && (
+              <div
+                className="rounded-xl p-4 md:p-5"
+                style={{
+                  background: 'rgba(255, 254, 225, 0.43)',
+                  border: '2px solid rgba(175, 85, 0, 0.25)',
+                }}
+              >
+                <h2
+                  className="text-xl md:text-2xl font-bold mb-1"
+                  style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                >
+                  How healthy is your hair
+                </h2>
+                <p className="text-sm mb-4" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  From your latest scan in Hair care
+                  {userProfile.hairHealthSnapshot.analyzedAt
+                    ? ` · ${new Date(userProfile.hairHealthSnapshot.analyzedAt).toLocaleDateString(undefined, {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}`
+                    : ''}
+                </p>
+                <div className="mb-4">
+                  <HairCareReferencePhoto
+                    src={userProfile.hairHealthSnapshot.referenceImageDataUrl}
+                    compact
+                  />
+                </div>
+                <div className="flex flex-wrap items-end gap-6">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={{ color: '#3C270C' }}>
+                      Health score
+                    </p>
+                    <p
+                      className="text-4xl font-bold tabular-nums"
+                      style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                    >
+                      {getLatestHairHealthScore(userProfile) ?? userProfile.hairHealthSnapshot.healthScore}
+                      <span className="text-lg font-semibold opacity-80">/100</span>
+                    </p>
+                  </div>
+                  {userProfile.hairHealthSnapshot.hairTypeDetected && (
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={{ color: '#3C270C' }}>
+                        Type (detected)
+                      </p>
+                      <p className="text-lg font-bold" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                        {String(userProfile.hairHealthSnapshot.hairTypeDetected)}
+                      </p>
+                    </div>
+                  )}
+                  {userProfile.hairHealthSnapshot.damageSeverity &&
+                    userProfile.hairHealthSnapshot.damageSeverity !== 'none' && (
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={{ color: '#3C270C' }}>
+                          Damage
+                        </p>
+                        <p className="text-lg font-bold capitalize" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          {userProfile.hairHealthSnapshot.damageSeverity}
+                        </p>
+                      </div>
+                    )}
+                  {userProfile.hairHealthSnapshot.moistureLevel && (
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={{ color: '#3C270C' }}>
+                        Moisture
+                      </p>
+                      <p className="text-lg font-bold capitalize" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                        {userProfile.hairHealthSnapshot.moistureLevel.replace(/-/g, ' ')}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div>
               <h2
                 className="text-xl md:text-2xl font-bold mb-2"
@@ -414,7 +611,7 @@ export default function Dashboard() {
                 Your Daily Routine
               </h2>
               <p className="text-base mb-6" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                Here is your regimented routine based on your most recent scan
+                Health trend from saved routines and your latest hair scan
               </p>
               <HealthTrendChart {...getHealthTrendData(userProfile)} />
             </div>
@@ -454,7 +651,7 @@ export default function Dashboard() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-8 flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto overscroll-contain rounded-2xl p-8 text-center"
+            className="mt-8 flex min-h-0 w-full max-h-[min(70dvh,calc(100dvh-10.5rem))] flex-1 flex-col items-center justify-center overflow-y-auto overscroll-contain rounded-2xl p-8 text-center md:max-h-[min(74dvh,calc(100dvh-11rem))]"
             style={{ background: '#FFFEE1', border: '2px solid #914600' }}
           >
             <h3 className="text-2xl font-bold mb-2" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>

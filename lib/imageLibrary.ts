@@ -349,7 +349,7 @@ export const CURATED_STYLES: Record<string, StyleImageSet> = {
     costEstimate: { min: 140, max: 280 },
     images: [
       {
-        url: '/images/styles/passion-twists.jpg',
+        url: '/images/passion-twists.svg',
         source: 'local',
         hairTypes: ['4a', '4b', '4c'],
         length: 'long',

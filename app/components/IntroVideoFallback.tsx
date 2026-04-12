@@ -1,38 +1,24 @@
+import { APP_PAGE_BACKGROUND } from '@/lib/app-theme';
+
+/** Legacy asset path (e.g. tests / tools); home intro now uses WebGL `OpeningSequence` in layout. */
 export const INTRO_VIDEO_SRC = '/videos/final-nywele-video.mp4';
 
-/** Full-screen intro video — used for Suspense fallbacks and page load states (matches home intro). */
+/** Full-screen loading shell: matches opening plate + subtle grid hint (no video, no second intro). */
 export default function IntroVideoFallback() {
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
-      style={{ background: '#FFFEE1' }}
+      className="fixed inset-0 z-[9999] overflow-hidden"
+      style={{ background: APP_PAGE_BACKGROUND }}
+      role="progressbar"
+      aria-label="Loading"
     >
       <div
-        className="absolute overflow-hidden rounded-2xl"
+        className="pointer-events-none absolute inset-0 opacity-[0.07]"
         style={{
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '92%',
-          height: '92%',
-          maxWidth: 800,
-          maxHeight: 800,
-          minWidth: 280,
-          minHeight: 280,
-          background: '#FFFEE1',
+          backgroundImage:
+            'repeating-linear-gradient(0deg, transparent, transparent 2px, #c76f16 2px, #c76f16 3px)',
         }}
-      >
-        <video
-          className="absolute inset-0 h-full w-full object-cover"
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          style={{ backgroundColor: '#FFFEE1' }}
-        >
-          <source src={INTRO_VIDEO_SRC} type="video/mp4" />
-        </video>
-      </div>
+      />
     </div>
   );
 }

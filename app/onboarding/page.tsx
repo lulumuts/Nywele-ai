@@ -1,10 +1,17 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { gsap } from 'gsap';
+import {
+  NYWELE_INTRO_CROSSFADE_EVENT,
+  OPENING_CROSSFADE_SEC,
+  setIntroContentHoldPending,
+} from '@/lib/intro-crossfade';
+
+const ONBOARDING_HERO_SRC = '/images/intro-hey-there.png' as const;
 
 const LINE1 = "Hey there,";
 const LINE2 = "You don't have a profile set up yet.";
@@ -18,8 +25,24 @@ export default function OnboardingPrompt() {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const exploreRef = useRef<HTMLDivElement>(null);
 
+  useLayoutEffect(() => {
+    setIntroContentHoldPending(true);
+    return () => setIntroContentHoldPending(false);
+  }, []);
+
   useEffect(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+    const img = new Image();
+    const done = () => setIntroContentHoldPending(false);
+    img.onload = done;
+    img.onerror = done;
+    img.src = ONBOARDING_HERO_SRC;
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, []);
+
+  useEffect(() => {
     const img = imageRef.current;
     const heading = headingRef.current;
     const btn = buttonRef.current;
@@ -29,35 +52,71 @@ export default function OnboardingPrompt() {
 
     const proxy = { val: 0 };
 
-    // 1. Image fade in
-    tl.fromTo(img, { opacity: 0 }, { opacity: 1, duration: 0.6 })
-      // 2. Show heading container, then typewriter line1
-      .fromTo(heading, { opacity: 0 }, { opacity: 1, duration: 0.2 })
-      .to(proxy, {
-        val: 1,
-        duration: 0.8,
-        ease: 'none',
-        onUpdate: () => {
-          const n = Math.floor(proxy.val * LINE1.length);
-          setLine1Display(LINE1.slice(0, n));
+    const runAfterImage = () => {
+      const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+      tl.fromTo(heading, { opacity: 0 }, { opacity: 1, duration: 0.2 })
+        .to(proxy, {
+          val: 1,
+          duration: 0.8,
+          ease: 'none',
+          onUpdate: () => {
+            const n = Math.floor(proxy.val * LINE1.length);
+            setLine1Display(LINE1.slice(0, n));
+          },
+        })
+        .set(proxy, { val: 0 })
+        .to(proxy, {
+          val: 1,
+          duration: 1.2,
+          ease: 'none',
+          onUpdate: () => {
+            setLine1Display(LINE1);
+            const n = Math.floor(proxy.val * LINE2.length);
+            setLine2Display(LINE2.slice(0, n));
+          },
+        })
+        .fromTo(btn, { opacity: 0 }, { opacity: 1, duration: 0.5 }, '+=0.2')
+        .fromTo(explore, { opacity: 0 }, { opacity: 1, duration: 0.5 }, '+=0.2');
+    };
+
+    const startImageCrossfade = () => {
+      gsap.fromTo(
+        img,
+        { opacity: 0 },
+        {
+          opacity: 1,
+          duration: OPENING_CROSSFADE_SEC,
+          ease: 'power2.inOut',
+          onComplete: runAfterImage,
         },
-      })
-      // 3. Typewriter line2
-      .set(proxy, { val: 0 })
-      .to(proxy, {
-        val: 1,
-        duration: 1.2,
-        ease: 'none',
-        onUpdate: () => {
-          setLine1Display(LINE1);
-          const n = Math.floor(proxy.val * LINE2.length);
-          setLine2Display(LINE2.slice(0, n));
-        },
-      })
-      // 4. Button fade in
-      .fromTo(btn, { opacity: 0 }, { opacity: 1, duration: 0.5 }, '+=0.2')
-      // 5. Explore fade in
-      .fromTo(explore, { opacity: 0 }, { opacity: 1, duration: 0.5 }, '+=0.2');
+      );
+    };
+
+    let started = false;
+    const tryStart = () => {
+      if (started) return;
+      started = true;
+      startImageCrossfade();
+    };
+
+    const onCrossfade = () => tryStart();
+    window.addEventListener(NYWELE_INTRO_CROSSFADE_EVENT, onCrossfade as EventListener);
+
+    const t0 = window.setTimeout(() => {
+      if (!document.querySelector('[data-nywele-opening-sequence]')) {
+        tryStart();
+      }
+    }, 0);
+
+    const fallback = window.setTimeout(() => {
+      tryStart();
+    }, 8000);
+
+    return () => {
+      clearTimeout(t0);
+      clearTimeout(fallback);
+      window.removeEventListener(NYWELE_INTRO_CROSSFADE_EVENT, onCrossfade as EventListener);
+    };
   }, []);
 
   return (
@@ -108,7 +167,7 @@ export default function OnboardingPrompt() {
 
         <div ref={imageRef} className="mb-8 flex justify-center opacity-0">
           <img
-            src="/images/intro-hey-there.png"
+            src={ONBOARDING_HERO_SRC}
             alt="Woman with Bantu knots"
             className="w-72 h-80 md:w-80 md:h-96 object-contain rounded-2xl"
           />
@@ -140,7 +199,7 @@ export default function OnboardingPrompt() {
           <div ref={exploreRef} className="mt-6 text-base md:text-lg opacity-0 text-center" style={{ color: '#AF5500', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
             <p>Or</p>
             <Link
-              href="/onboarding/features"
+              href="/style-check"
               className="font-semibold underline hover:no-underline inline-block mt-1"
               style={{ color: '#AF5500' }}
             >

@@ -5,37 +5,17 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { trackProductClick, trackSalonView } from '@/lib/analytics';
 import { supabase } from '@/lib/supabase';
-import BottomNav from '@/app/components/BottomNav';
+import { BottomNavHubShell } from '@/app/components/BottomNavHubLayout';
+import { HairRoutineAnalysingLoader } from '@/components/HairRoutineAnalysingLoader';
 
-// Custom loader component
-const LoaderSVG = () => (
-  <div className="text-center animate-fade-in">
-    <svg 
-      width="150" 
-      height="150" 
-      viewBox="0 0 81 77" 
-      fill="none" 
-      xmlns="http://www.w3.org/2000/svg" 
-      preserveAspectRatio="xMidYMid meet"
-      className="block mx-auto mb-8"
-    >
-      <defs>
-        <linearGradient id="loaderGradientResults" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#643100" />
-          <stop offset="100%" stopColor="#AF5500" />
-        </linearGradient>
-      </defs>
-      <path 
-        className="animated-path" 
-        style={{ stroke: 'url(#loaderGradientResults)' }}
-        d="M26.4966 2.48801C26.3951 2.53364 19 5.49999 16.9876 6.83816C14.9751 8.17632 12.5 8.99998 11 10.5C9.5 12 8.99996 12.5 6.99998 15C4.99999 17.5 3.37849 22 2.49998 25C1.62146 28 1.4946 31.8377 1.62146 34C1.7588 36.3409 2.43922 39.7477 4.99999 44.5C6.82391 47.8848 11.324 50.4672 13.912 50.9836C16.5 51.5 18.739 52.5752 27.4314 52.3941C30.6672 52.3267 33.607 51.305 37.7457 49.8486C42.891 48.0379 45.9529 46.2163 46.875 45.6195C49.5 43.9205 50.7563 41.0973 51.4698 38.7876C52.0196 37.0077 51.259 35.1854 50.1632 33.8197C48.365 31.5788 43.594 30.5623 39 34.5C35.5 37.5 35.1779 38.9373 33.3263 43.0524C31.1063 47.986 30.7288 51.8903 30.6185 53.7675C30.4765 56.1835 30.886 58.0631 31.4959 59.8257C32.6579 63.1839 34.1784 65.9852 35.4366 67.8103C38.9107 72.8493 42.4709 74.0663 44.473 74.7322C47.2709 75.6628 52.7689 74.3876 57.9048 72.796C61.2178 71.7692 65.7232 69.5839 68.1525 68.3926C70.5817 67.2014 70.7364 66.8879 70.7973 66.5293C70.9233 65.7867 70.5795 64.9206 70.0774 64.14C69.8357 63.7643 69.3855 63.6101 69.026 63.5327C67.0206 63.1012 64.5379 65.1637 63.7591 66.2724C62.2038 68.4866 65.3164 71.8607 66.8905 73.2153C69.8084 74.7556 71.1363 74.9986 73.0121 75.015C74.2992 75.0036 76.2669 74.9524 78.6547 74.461"
-      />
-    </svg>
-    <h2 className="text-2xl font-normal" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-      Generating your style
-    </h2>
-  </div>
-);
+const hubCardStyle = {
+  background: '#FFFFFF',
+  border: '2px solid rgba(175, 85, 0, 0.25)',
+} as const;
+
+const titleColor = '#603E12';
+const bodyColor = '#3D2914';
+const mutedColor = '#6B5344';
 
 interface Step {
   stepNumber: number;
@@ -181,141 +161,62 @@ export default function Results() {
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#AF5500] mx-auto mb-4" style={{ borderColor: '#AF5500' }}></div>
-          <p style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Loading your personalized routine...</p>
+      <BottomNavHubShell>
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center py-16">
+          <HairRoutineAnalysingLoader />
         </div>
-      </div>
+      </BottomNavHubShell>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#FFFEE1' }}>
-      <BottomNav />
-      {/* Header */}
-      <header className="backdrop-blur-md border-b" style={{ borderColor: 'rgba(175, 85, 0, 0.2)' }}>
-        <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <svg version="1.1" viewBox="0 0 848 1008" className="w-8 h-10">
-              <defs>
-                <linearGradient id="navCoilGradientResults" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#643100" />
-                  <stop offset="100%" stopColor="#AF5500" />
-                </linearGradient>
-              </defs>
-              <path fill="url(#navCoilGradientResults)" opacity="1.000000" stroke="none" 
-                d="
-M418.117828,82.304749 
-	C404.651764,81.515762 394.465210,88.399132 383.992218,94.581772 
-	C359.878662,108.816994 338.972656,127.187943 318.192749,145.691010 
-	C302.386749,159.765137 286.923401,174.249374 272.343567,189.581802 
-	C246.035187,217.248169 223.680328,247.910080 206.158173,281.854980 
-	C198.114990,297.436646 194.355682,314.717285 189.169281,331.410522 
-	C182.785477,351.957855 180.235367,372.968597 179.913193,394.428802 
-	C179.690659,409.252350 179.618134,424.085541 179.184708,438.900909 
-	C178.281845,469.763153 186.642181,498.486420 198.455032,526.489929 
-	C206.883560,546.470642 218.715195,564.327942 232.702301,580.804565 
-	C234.367706,582.766418 235.674911,585.264648 238.476730,586.019226 
-	C240.384613,584.573792 239.688141,582.590942 239.688858,580.873413 
-	C239.698700,557.377991 239.947403,533.887573 240.881210,510.407990 
-	C242.309753,474.488831 252.971863,441.984192 274.675323,412.876129 
-	C295.616180,384.790833 319.419495,360.024811 349.261200,341.386047 
-	C365.827026,331.039154 384.501923,326.778473 403.240692,322.748199 
-	C427.770203,317.472443 452.575409,318.927429 477.379395,319.655701 
-	C507.850922,320.550385 538.198303,322.332764 568.317566,327.494446 
-	C582.934631,329.999481 593.243164,337.823273 600.820984,350.047424 
-	C611.572327,367.390900 617.071960,386.817322 623.227539,406.008240 
-	C631.604065,432.123657 629.974304,458.994843 629.717896,485.788696 
-	C629.537415,504.660980 627.961670,523.328613 623.602539,541.774902 
-	C617.798340,566.335815 608.503296,589.404175 594.938538,610.652039 
-	C578.891174,635.788757 555.139038,651.508850 528.426941,663.075439 
-	C503.086182,674.048218 476.224152,678.638550 448.784698,680.270569 
-	C428.789032,681.459778 408.809113,680.913818 388.893250,679.174377 
-	C364.149139,677.013245 339.782379,672.496704 315.823120,665.883850 
-	C314.554565,665.533691 313.345551,664.901672 311.303162,665.429993 
-	C312.162201,668.201172 313.001526,670.969116 313.877411,673.725403 
-	C325.634399,710.723450 346.172882,742.794434 370.867615,772.157532 
-	C386.789520,791.089294 407.589325,802.785522 432.628784,805.733826 
-	C451.362793,807.939758 470.226440,808.612793 489.003113,807.494446 
-	C505.027740,806.540161 520.104431,801.922424 531.853088,789.797913 
-	C536.765198,784.728577 540.126648,778.922546 541.317688,771.992249 
-	C542.163025,767.073975 545.570068,767.229797 549.215698,767.462219 
-	C553.671387,767.746216 553.542725,770.872375 553.154053,773.965637 
-	C550.737183,793.197693 538.778137,804.412292 521.606873,811.071533 
-	C510.917633,815.216919 499.593323,816.665039 488.301727,816.942627 
-	C461.333405,817.605530 434.335938,818.136719 407.499847,814.197388 
-	C375.967682,809.568787 346.379059,799.429199 323.749146,776.445740 
-	C296.003845,748.266846 273.125000,716.346619 259.508240,678.549988 
-	C255.212784,666.626892 250.879181,654.752014 247.934921,642.417236 
-	C247.369247,640.047424 246.505768,638.183167 244.254913,636.827881 
-	C215.599762,619.575317 192.255234,596.254517 171.097549,570.827393 
-	C145.984390,540.646606 130.934052,505.462006 123.311707,467.070862 
-	C121.652916,458.716095 121.786186,450.169952 121.756691,441.663971 
-	C121.665985,415.507629 121.288910,389.326569 124.729012,363.325684 
-	C127.589836,341.703125 135.684204,321.504883 142.505615,300.970306 
-	C150.082764,278.160736 163.581146,258.832031 177.570282,239.642654 
-	C215.386780,187.768494 262.744202,145.687057 313.580444,107.345352 
-	C333.028320,92.677368 354.748749,81.281487 378.705200,75.465942 
-	C396.491638,71.148209 414.672607,71.821228 432.836578,73.318634 
-	C456.962494,75.307526 479.785675,82.503700 502.552734,90.028885 
-	C504.379120,90.632561 506.564209,90.957016 507.099030,93.993576 
-	C501.213318,98.428444 494.401642,97.984306 487.840759,96.376236 
-	C474.267242,93.049362 460.975159,88.616318 447.283478,85.711258 
-	C437.821289,83.703598 428.273956,82.380119 418.117828,82.304749 
-M435.981049,329.291046 
-	C417.536926,332.752014 400.459503,339.300476 385.691376,351.233093 
-	C364.549896,368.315552 346.615936,388.176208 330.990906,410.498444 
-	C310.881897,439.226593 299.998108,470.542664 298.810730,505.582825 
-	C298.336609,519.573608 298.536560,533.573303 297.803375,547.548340 
-	C296.235901,577.427185 296.885406,607.156006 303.371002,636.528442 
-	C303.931793,639.068298 304.766449,641.157593 307.476776,642.294373 
-	C317.152008,646.352234 326.567627,651.103699 336.421295,654.647949 
-	C369.508575,666.549255 403.682037,672.033325 438.882568,670.895874 
-	C465.173218,670.046265 490.882324,666.636414 515.215881,655.702698 
-	C537.728333,645.587280 559.584717,634.321899 575.729675,615.147095 
-	C599.557922,586.847107 612.102173,553.326660 617.674805,517.128784 
-	C620.829041,496.640503 619.693176,475.895020 619.689331,455.246521 
-	C619.687012,442.908386 618.783630,430.654938 615.770996,418.586517 
-	C610.608765,397.906891 603.283936,378.114380 591.508850,360.269409 
-	C582.792969,347.060638 571.274475,336.434204 555.100037,334.426483 
-	C515.877502,329.557861 476.414825,328.336761 435.981049,329.291046 
-z"/>
-            </svg>
+    <BottomNavHubShell>
+      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pb-[max(6rem,calc(4.75rem+env(safe-area-inset-bottom,0px)))] pt-6 md:px-6 md:pb-10 md:pt-10">
+        <div className="mb-6 flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-3">
+            <img src="/icons/coil.svg" alt="" className="h-9 w-9 shrink-0" />
             <div>
-              <h1 className="text-3xl font-bold" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
-                Nywele.ai
+              <h1 className="text-2xl font-bold sm:text-3xl" style={{ color: titleColor, fontFamily: "Caprasimo, serif" }}>
+                Your results
               </h1>
-              <p style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Your Personalized Hair Care Plan</p>
+              <p className="text-sm sm:text-base" style={{ color: mutedColor, fontFamily: "Bricolage Grotesque, sans-serif" }}>
+                Routine and picks based on your profile
+              </p>
             </div>
           </div>
-          <div className="flex gap-6 items-center">
-            <Link 
+          <div className="flex shrink-0 flex-wrap items-center gap-4">
+            <Link
               href="/how-it-works"
-              className="font-semibold hover:opacity-80 transition-opacity"
-              style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+              className="text-sm font-semibold transition-opacity hover:opacity-80 sm:text-base"
+              style={{ color: titleColor, fontFamily: "Bricolage Grotesque, sans-serif" }}
             >
-              How It Works
+              How it works
             </Link>
             <button
-              onClick={() => router.push('/')}
-              className="font-semibold hover:opacity-80 transition-opacity"
-              style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+              type="button"
+              onClick={() => router.push("/")}
+              className="text-sm font-semibold transition-opacity hover:opacity-80 sm:text-base"
+              style={{ color: titleColor, fontFamily: "Bricolage Grotesque, sans-serif" }}
             >
-              Start Over
+              Start over
             </button>
           </div>
         </div>
-      </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-12 pb-24 md:pt-20 md:pb-12 flex-1">
+        <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto">
         {/* Stylist Tip */}
-        <div className="mb-8 rounded-3xl p-8 shadow-2xl" style={{ background: 'linear-gradient(135deg, #643100 0%, #AF5500 100%)' }}>
+        <div className="rounded-2xl p-6 md:p-8" style={hubCardStyle}>
           <div className="flex items-start gap-4">
-            <div className="text-4xl">💡</div>
+            <div className="text-3xl" aria-hidden>
+              💡
+            </div>
             <div>
-              <h3 className="text-2xl font-bold mb-2">Expert Tip</h3>
-              <p className="text-lg opacity-95">{data.stylistTip}</p>
+              <h3 className="mb-2 text-xl font-bold md:text-2xl" style={{ color: titleColor, fontFamily: 'Caprasimo, serif' }}>
+                Expert tip
+              </h3>
+              <p className="text-base leading-relaxed md:text-lg" style={{ color: bodyColor, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                {data.stylistTip}
+              </p>
             </div>
           </div>
         </div>
@@ -324,17 +225,20 @@ z"/>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Style Inspiration Section - AI-Generated (LEFT COLUMN) */}
           {loadingImage && (
-            <div className="rounded-3xl shadow-2xl p-8 flex items-center justify-center" style={{ minHeight: '700px', background: 'rgba(255,255,255,0.8)', border: '2px solid rgba(175, 85, 0, 0.2)' }}>
-              <LoaderSVG />
+            <div
+              className="flex min-h-[28rem] items-center justify-center rounded-2xl p-8 md:min-h-[700px]"
+              style={hubCardStyle}
+            >
+              <HairRoutineAnalysingLoader title="Generating your style…" showChecklist={false} />
             </div>
           )}
 
           {styleImage && !loadingImage && (
-            <div className="rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto" style={{ background: 'rgba(255,255,255,0.8)', border: '2px solid rgba(175, 85, 0, 0.2)' }}>
+            <div className="max-h-[85vh] overflow-y-auto rounded-2xl p-6 md:p-8" style={hubCardStyle}>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-3xl font-bold" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>Style Inspiration</h2>
+                <h2 className="text-2xl font-bold md:text-3xl" style={{ color: titleColor, fontFamily: 'Caprasimo, serif' }}>Style inspiration</h2>
                 <div className="px-4 py-2 rounded-full" style={{ background: 'rgba(206, 147, 95, 0.2)' }}>
-                  <span className="text-sm font-semibold" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>✨ AI-Powered by Gemini</span>
+                  <span className="text-sm font-semibold" style={{ color: titleColor, fontFamily: 'Bricolage Grotesque, sans-serif' }}>✨ AI-Powered by Gemini</span>
                 </div>
               </div>
               <div className="relative">
@@ -350,34 +254,34 @@ z"/>
                 </div>
               </div>
               <div className="mt-4 p-4 rounded-xl" style={{ background: 'rgba(206, 147, 95, 0.1)', border: '1px solid rgba(175, 85, 0, 0.2)' }}>
-                <p className="text-center" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                <p className="text-center" style={{ color: titleColor, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   <span className="font-semibold">Style:</span> {sessionStorage.getItem('currentStyle') || 'Natural'}
                 </p>
               </div>
               
               {/* AI Prompt Details - Shows advanced prompt engineering to judges */}
               <details className="mt-6">
-                <summary className="cursor-pointer font-semibold flex items-center justify-center gap-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                <summary className="cursor-pointer font-semibold flex items-center justify-center gap-2" style={{ color: titleColor, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   🤖 View AI Prompt Engineering Details
                 </summary>
                 <div className="mt-4 p-6 rounded-xl" style={{ background: 'rgba(206, 147, 95, 0.1)', border: '2px solid rgba(175, 85, 0, 0.2)' }}>
-                  <h4 className="font-bold mb-3" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>Advanced Prompt Engineering:</h4>
-                  <p className="text-sm leading-relaxed mb-4" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                    This image was generated using a highly-detailed, bias-countering prompt specifically designed for authentic African hair representation. Our system uses explicit ethnicity markers and detailed texture descriptions to counter AI biases and ensure culturally accurate results.
+                  <h4 className="font-bold mb-3" style={{ color: titleColor, fontFamily: 'Caprasimo, serif' }}>Advanced Prompt Engineering:</h4>
+                  <p className="text-sm leading-relaxed mb-4" style={{ color: bodyColor, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    This image was generated with a detailed prompt tailored to your selections (style, length, and vibe).
                   </p>
                   <div className="p-4 rounded-lg" style={{ background: '#FFFEE1', border: '1px solid rgba(175, 85, 0, 0.2)' }}>
-                    <p className="text-xs font-mono" style={{ color: '#DD8106' }}>
+                    <p className="text-xs font-mono" style={{ color: titleColor }}>
                       {sessionStorage.getItem('aiPrompt') || 'Detailed prompt used for AI generation'}
                     </p>
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                     <div className="p-3 rounded-lg" style={{ background: '#FFFEE1' }}>
-                      <div className="font-semibold" style={{ color: '#DD8106' }}>Hair Type</div>
-                      <div style={{ color: '#DD8106' }}>{sessionStorage.getItem('hairType')}</div>
+                      <div className="font-semibold" style={{ color: titleColor }}>Hair Type</div>
+                      <div style={{ color: titleColor }}>{sessionStorage.getItem('hairType')}</div>
                     </div>
                     <div className="p-3 rounded-lg" style={{ background: '#FFFEE1' }}>
-                      <div className="font-semibold" style={{ color: '#DD8106' }}>Vibe</div>
-                      <div style={{ color: '#DD8106' }}>{sessionStorage.getItem('vibe')}</div>
+                      <div className="font-semibold" style={{ color: titleColor }}>Vibe</div>
+                      <div style={{ color: titleColor }}>{sessionStorage.getItem('vibe')}</div>
                     </div>
                   </div>
                 </div>
@@ -386,13 +290,13 @@ z"/>
           )}
 
           {/* Routine Section (RIGHT COLUMN) */}
-          <div className="rounded-3xl shadow-2xl p-8 max-h-[85vh] overflow-y-auto" style={{ background: 'rgba(255,255,255,0.8)', border: '2px solid rgba(175, 85, 0, 0.2)' }}>
+          <div className="max-h-[85vh] overflow-y-auto rounded-2xl p-6 md:p-8" style={hubCardStyle}>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>Your Hair Care Routine</h2>
+            <h2 className="text-2xl font-bold md:text-3xl" style={{ color: titleColor, fontFamily: 'Caprasimo, serif' }}>Your routine</h2>
             <div className="text-right">
-              <div className="text-sm" style={{ color: '#DD8106' }}>Total Time</div>
-              <div className="text-2xl font-bold" style={{ color: '#DD8106' }}>{data.routine.totalTime}</div>
-              <div className="text-sm" style={{ color: '#DD8106' }}>{data.routine.frequency}</div>
+              <div className="text-sm" style={{ color: titleColor }}>Total Time</div>
+              <div className="text-2xl font-bold" style={{ color: titleColor }}>{data.routine.totalTime}</div>
+              <div className="text-sm" style={{ color: titleColor }}>{data.routine.frequency}</div>
             </div>
           </div>
 
@@ -400,16 +304,16 @@ z"/>
             {data.routine.steps.map((step, index) => (
               <div key={index} className="relative flex gap-4 p-6 rounded-2xl" style={{ border: '2px solid rgba(175, 85, 0, 0.3)', background: 'rgba(206, 147, 95, 0.1)' }}>
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm" style={{ border: '2px solid #AF5500', color: '#DD8106', background: '#FFFEE1' }}>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm" style={{ border: '2px solid #AF5500', color: titleColor, background: '#FFFEE1' }}>
                     {step.stepNumber}
                   </div>
                 </div>
                 <div className="flex-grow">
-                  <h3 className="text-xl font-bold mb-2 pr-20" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>{step.action}</h3>
-                  <p className="mb-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{step.instructions}</p>
+                  <h3 className="text-xl font-bold mb-2 pr-20" style={{ color: titleColor, fontFamily: 'Caprasimo, serif' }}>{step.action}</h3>
+                  <p className="mb-2" style={{ color: bodyColor, fontFamily: 'Bricolage Grotesque, sans-serif' }}>{step.instructions}</p>
                   {step.productName && (
                     <div className="text-sm">
-                      <span style={{ color: '#DD8106' }}>🧴 {step.productName}</span>
+                      <span style={{ color: titleColor }}>🧴 {step.productName}</span>
                     </div>
                   )}
                 </div>
@@ -424,8 +328,8 @@ z"/>
         {/* End Two Column Layout */}
 
         {/* Products */}
-        <div className="rounded-3xl shadow-2xl p-8 max-h-[80vh] overflow-y-auto" style={{ background: 'rgba(255,255,255,0.8)', border: '2px solid rgba(175, 85, 0, 0.2)' }}>
-          <h2 className="text-3xl font-bold mb-6" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>Recommended Products</h2>
+        <div className="max-h-[80vh] overflow-y-auto rounded-2xl p-6 md:p-8" style={hubCardStyle}>
+          <h2 className="mb-6 text-2xl font-bold md:text-3xl" style={{ color: titleColor, fontFamily: 'Caprasimo, serif' }}>Recommended products</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {data.products.map((product, index) => (
               <div key={index} className="rounded-2xl p-6 transition-all hover:shadow-lg" style={{ border: '2px solid rgba(175, 85, 0, 0.3)', background: 'rgba(253, 244, 232, 0.5)' }}>
@@ -436,12 +340,12 @@ z"/>
                     className="w-full h-48 object-cover rounded-xl mb-4"
                   />
                 )}
-                <div className="text-sm font-semibold mb-1" style={{ color: '#DD8106' }}>{product.brand}</div>
-                <h3 className="text-lg font-bold mb-2" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>{product.name}</h3>
-                <p className="text-sm mb-4" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>{product.reason}</p>
+                <div className="text-sm font-semibold mb-1" style={{ color: titleColor }}>{product.brand}</div>
+                <h3 className="text-lg font-bold mb-2" style={{ color: titleColor, fontFamily: 'Caprasimo, serif' }}>{product.name}</h3>
+                <p className="text-sm mb-4" style={{ color: bodyColor, fontFamily: 'Bricolage Grotesque, sans-serif' }}>{product.reason}</p>
                 <div className="flex items-center justify-between">
                   {product.price && (
-                    <span className="text-2xl font-bold" style={{ color: '#DD8106' }}>${product.price}</span>
+                    <span className="text-2xl font-bold" style={{ color: titleColor }}>${product.price}</span>
                   )}
                   <a
                     href={product.affiliateLink || '#'}
@@ -467,13 +371,12 @@ z"/>
         </div>
 
         {/* Salons Who Can Do It */}
-        <div className="mt-12 rounded-3xl shadow-2xl p-8 max-h-[80vh] overflow-y-auto" style={{ background: 'rgba(255,255,255,0.8)', border: '2px solid rgba(175, 85, 0, 0.2)' }}>
-          <h2 className="text-3xl font-bold mb-6" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>Salons Who Can Do This Style</h2>
+        <div className="mt-8 max-h-[80vh] overflow-y-auto rounded-2xl p-6 md:p-8 md:mt-12" style={hubCardStyle}>
+          <h2 className="mb-6 text-2xl font-bold md:text-3xl" style={{ color: titleColor, fontFamily: 'Caprasimo, serif' }}>Salons for this style</h2>
 
           {loadingSalons ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: '#AF5500' }}></div>
-              <p style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Finding salons near you...</p>
+            <div className="flex justify-center py-10">
+              <HairRoutineAnalysingLoader title="Finding salons…" showChecklist={false} />
             </div>
           ) : salons.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -485,14 +388,14 @@ z"/>
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="text-xl font-bold" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>{salon.name}</h3>
-                      <div className="flex items-center text-sm mt-1" style={{ color: '#DD8106' }}>
+                      <h3 className="text-xl font-bold" style={{ color: titleColor, fontFamily: 'Caprasimo, serif' }}>{salon.name}</h3>
+                      <div className="flex items-center text-sm mt-1" style={{ color: titleColor }}>
                         <span className="mr-1">📍</span>
                         <span>{salon.area}</span>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                      <span className="px-2 py-1 rounded-full text-xs font-bold" style={{ background: 'rgba(206, 147, 95, 0.3)', color: '#DD8106' }}>
+                      <span className="px-2 py-1 rounded-full text-xs font-bold" style={{ background: 'rgba(206, 147, 95, 0.3)', color: titleColor }}>
                         ⭐ {salon.rating.toFixed(1)}
                       </span>
                       <span className="font-semibold text-sm" style={{ color: '#AF5500' }}>
@@ -501,7 +404,7 @@ z"/>
                     </div>
                   </div>
 
-                  <p className="text-sm mb-4 line-clamp-2" style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  <p className="text-sm mb-4 line-clamp-2" style={{ color: bodyColor, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                     {salon.description}
                   </p>
 
@@ -544,7 +447,7 @@ z"/>
           ) : (
             <div className="text-center py-12 rounded-xl" style={{ background: 'rgba(206, 147, 95, 0.1)' }}>
               <div className="text-5xl mb-4">💈</div>
-              <p style={{ color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              <p style={{ color: titleColor, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 Salon recommendations will appear here after you complete the form
               </p>
             </div>
@@ -559,7 +462,7 @@ z"/>
                 window.print();
               }}
               className="px-8 py-4 rounded-xl font-bold text-lg transition-all"
-              style={{ background: '#FFFEE1', border: '2px solid #914600', color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+              style={{ background: '#FFFEE1', border: '2px solid #914600', color: titleColor, fontFamily: 'Bricolage Grotesque, sans-serif' }}
             >
               📄 Save as PDF
             </button>
@@ -579,7 +482,8 @@ z"/>
             </button>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </BottomNavHubShell>
   );
 }
