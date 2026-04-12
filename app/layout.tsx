@@ -13,11 +13,21 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  themeColor: "#FFFEE1",
 };
 
 export const metadata: Metadata = {
   title: "Nywele.ai - AI-Powered African Hair Care",
   description: "Personalized hair care routines, styling recommendations, and product suggestions for African hair",
+  applicationName: "Nywele.ai",
+  appleWebApp: {
+    capable: true,
+    title: "Nywele.ai",
+    statusBarStyle: "default",
+  },
+  formatDetection: {
+    telephone: false,
+  },
   icons: {
     icon: [
       { url: "/coil.svg", type: "image/svg+xml" }

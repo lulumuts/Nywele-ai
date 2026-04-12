@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import withPWA from "@ducanh2912/next-pwa";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["*"],
@@ -18,4 +19,16 @@ const nextConfig: NextConfig = {
   transpilePackages: ["three"],
 };
 
-export default nextConfig;
+const withPWAWrap = withPWA({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+  register: true,
+  scope: "/",
+  sw: "sw.js",
+  cacheOnFrontEndNav: true,
+  fallbacks: {
+    document: "/offline",
+  },
+});
+
+export default withPWAWrap(nextConfig);
