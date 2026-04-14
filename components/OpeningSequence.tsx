@@ -1012,7 +1012,7 @@ export default function OpeningSequence({
             }}
             aria-live="polite"
           >
-            Loading
+            AI powered African hair care
           </div>
         ) : null}
       </div>
