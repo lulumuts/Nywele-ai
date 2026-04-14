@@ -98,30 +98,32 @@ export default function StyleCheckPage() {
       >
         <div className="mx-auto w-full max-w-6xl flex flex-col px-3 pb-4 sm:px-4 md:px-6 lg:px-8">
           {showGrid ? (
-            <div className="mb-6 flex flex-col md:mb-8">
-              <div className="mt-10 flex justify-end md:mt-12">
-                <button
-                  type="button"
-                  onClick={() => setShowGrid(false)}
-                  className="inline-flex shrink-0 items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:text-base"
+            <div className="mb-6 flex flex-col md:mb-8 md:pt-10">
+              <div className="flex flex-col md:mt-12 md:pt-10 md:flex-row md:items-start md:justify-between md:gap-6">
+                <h1
+                  className="order-2 mt-10 min-w-0 text-3xl font-bold md:order-1 md:mt-0 md:flex-1 md:text-4xl"
                   style={{
                     color: '#C17208',
-                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                    fontFamily: 'Caprasimo, serif',
                   }}
                 >
-                  <Camera className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#C17208' }} />
-                  Scan a style
-                </button>
+                  Style Check
+                </h1>
+                <div className="order-1 mt-10 flex justify-end md:order-2 md:mt-0 md:shrink-0 md:justify-end md:pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowGrid(false)}
+                    className="inline-flex shrink-0 items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:text-base"
+                    style={{
+                      color: '#C17208',
+                      fontFamily: 'Bricolage Grotesque, sans-serif',
+                    }}
+                  >
+                    <Camera className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#C17208' }} />
+                    Scan a style
+                  </button>
+                </div>
               </div>
-              <h1
-                className="mt-10 min-w-0 text-3xl font-bold md:mt-12 md:text-4xl"
-                style={{
-                  color: '#C17208',
-                  fontFamily: 'Caprasimo, serif',
-                }}
-              >
-                Style Check
-              </h1>
             </div>
           ) : (
             <div className="mb-2 flex items-start justify-between gap-4">
@@ -137,7 +139,7 @@ export default function StyleCheckPage() {
             </div>
           )}
           <p
-            className={`text-base md:mb-6 ${showGrid ? 'mb-5 mt-3 md:mb-6 md:mt-4' : 'mb-2'}`}
+            className={`text-base md:mb-6 ${showGrid ? 'mb-5 mt-1.5 pb-6 md:mb-4 md:mt-2 md:pb-3' : 'mb-2'}`}
             style={{
               color: '#C17208',
               fontFamily: 'Bricolage Grotesque, sans-serif',
@@ -145,37 +147,37 @@ export default function StyleCheckPage() {
           >
             {showGrid
               ? healthScore !== null
-                ? 'Select a style for your next look. The percentage on each card is your compatibility score — aligned with your dashboard metrics (latest Hair care scan).'
+                ? 'Select a style for your next look. The percentage on each card is your compatibility score, aligned with your dashboard metrics (latest Hair care scan).'
                 : 'Select a style to explore details. Complete a Hair care scan to see your compatibility score here; it matches your dashboard once you have a scan.'
               : 'Upload your image below for a compatibility and maintenance check.'}
           </p>
 
           {showGrid ? (
             <div
-              className="mt-5 px-6 pb-6 pt-6 md:mt-7 md:px-8 md:pb-8 md:pt-8 lg:mt-8"
+              className="mt-5 px-6 pb-6 pt-6 md:mt-2 md:px-8 md:pb-8 md:pt-3 lg:mt-2"
               style={{
                 background: 'transparent',
                 color: '#C17208',
               }}
             >
-              <div className="grid w-full auto-rows-min grid-cols-2 gap-4 md:gap-6 lg:flex lg:min-h-0 lg:flex-nowrap lg:items-start lg:gap-6 lg:overflow-x-auto lg:overflow-y-visible lg:pb-2">
+              <div className="grid w-full auto-rows-min grid-cols-2 gap-4 md:gap-6 lg:flex lg:min-h-0 lg:flex-nowrap lg:items-start lg:gap-4 lg:overflow-x-auto lg:overflow-y-visible lg:pb-2">
                 {styles.map((style) => (
                     <button
                       key={style.slug}
                       type="button"
                       onClick={() => router.push(`/style-check/${style.slug}`)}
-                      className="flex min-h-0 flex-col overflow-hidden rounded-[32px] border-2 border-solid border-[rgba(193,114,8,0.35)] bg-transparent text-left shadow-none transition-[border-width,border-color,background-color] duration-200 hover:border-[3px] hover:border-[#C17208] hover:bg-[rgba(193,114,8,0.2)] active:border-[3px] active:border-[#C17208] active:bg-[rgba(193,114,8,0.2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C17208] focus-visible:ring-offset-2 lg:shrink-0 lg:basis-[calc((100%-1.5rem)/2-3.625rem)]"
+                      className="flex min-h-0 flex-col overflow-hidden rounded-[32px] border-2 border-solid border-[rgba(193,114,8,0.35)] bg-transparent text-left shadow-none transition-[border-width,border-color,background-color] duration-200 hover:border-[3px] hover:border-[#C17208] hover:bg-[rgba(193,114,8,0.2)] active:border-[3px] active:border-[#C17208] active:bg-[rgba(193,114,8,0.2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C17208] focus-visible:ring-offset-2 lg:shrink-0 lg:basis-[11.75rem] xl:basis-[12.5rem]"
                     >
-                      <div className="px-4 pt-5 text-center md:px-5 md:pt-6 lg:pt-6">
+                      <div className="px-4 pt-5 text-center md:px-5 md:pt-6 lg:px-3 lg:pt-4">
                         <h3
-                          className="text-xl font-normal not-italic leading-tight tracking-wide md:text-2xl md:tracking-wider"
+                          className="text-xl font-normal not-italic leading-tight tracking-wide md:text-2xl md:tracking-wider lg:text-[1.125rem] lg:tracking-wide xl:text-xl"
                           style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
                         >
                           {style.name}
                         </h3>
                       </div>
                       <div
-                        className="flex aspect-[3/4] w-full min-h-0 items-center justify-center px-5 py-4 lg:aspect-[6/7] lg:px-5 lg:py-2"
+                        className="flex aspect-[3/4] w-full min-h-0 items-center justify-center px-5 py-4 lg:aspect-[5/4] lg:px-3 lg:py-1.5"
                         style={{ background: 'transparent' }}
                       >
                         {STYLE_CARD_IMAGE_BY_SLUG[style.slug] ? (
@@ -184,8 +186,8 @@ export default function StyleCheckPage() {
                             alt={style.name}
                             className={
                               style.slug === 'sister-locs'
-                                ? 'mx-auto block h-80 w-80 max-h-full max-w-full shrink-0 object-contain object-center sm:h-[22rem] sm:w-[22rem] md:h-[28rem] md:w-[28rem] lg:h-[30rem] lg:w-[30rem]'
-                                : 'mx-auto block h-72 w-72 max-h-full max-w-full shrink-0 object-contain object-center sm:h-80 sm:w-80 md:h-96 md:w-96'
+                                ? 'mx-auto block h-80 w-80 max-h-full max-w-full shrink-0 object-contain object-center sm:h-[22rem] sm:w-[22rem] md:h-[28rem] md:w-[28rem] lg:h-[11.5rem] lg:w-[11.5rem] xl:h-52 xl:w-52'
+                                : 'mx-auto block h-72 w-72 max-h-full max-w-full shrink-0 object-contain object-center sm:h-80 sm:w-80 md:h-96 md:w-96 lg:h-52 lg:w-52 xl:h-56 xl:w-56'
                             }
                           />
                         ) : (
@@ -205,7 +207,7 @@ export default function StyleCheckPage() {
                           </svg>
                         )}
                       </div>
-                      <div className="space-y-1 px-4 pb-3 text-right md:px-5 md:pb-4 lg:pt-1 lg:pb-4">
+                      <div className="space-y-1 px-4 pb-3 text-right md:px-5 md:pb-4 lg:px-3 lg:pt-0 lg:pb-3">
                         <div className="flex justify-end">
                           <div
                             className="inline-block rounded-full px-3 py-1 text-sm font-bold tabular-nums"

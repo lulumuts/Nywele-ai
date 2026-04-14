@@ -160,32 +160,34 @@ export default function Dashboard() {
         }
       `}</style>
       <BottomNavHubShell mainAreaClassName={bottomNavHubMainDashboardClass}>
-        <div className="mb-2 shrink-0 md:mb-3">
-          <div className="mt-5 flex justify-end md:mt-6">
-            <button
-              type="button"
-              onClick={() => router.push('/profile')}
-              className="inline-flex min-h-[44px] shrink-0 items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:text-base"
-              style={{
-                color: '#B26805',
-                fontFamily: 'Bricolage Grotesque, sans-serif',
-              }}
+        <div className="mb-2 shrink-0 md:mb-3 md:pt-10">
+          <div className="flex flex-col md:mt-12 md:pt-10 md:flex-row md:items-start md:justify-between md:gap-6">
+            <h1
+              className="order-2 mt-5 min-w-0 text-3xl font-bold md:order-1 md:mt-0 md:flex-1 md:text-4xl"
+              style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
             >
-              <User className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#B26805' }} />
-              View Profile
-            </button>
+              Hey {userName || 'Layla'},
+            </h1>
+            <div className="order-1 mt-5 flex justify-end md:order-2 md:mt-0 md:shrink-0 md:justify-end md:pt-1">
+              <button
+                type="button"
+                onClick={() => router.push('/profile')}
+                className="inline-flex min-h-[44px] shrink-0 items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:text-base"
+                style={{
+                  color: '#B26805',
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                }}
+              >
+                <User className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#B26805' }} />
+                View Profile
+              </button>
+            </div>
           </div>
-          <h1
-            className="mt-5 min-w-0 text-3xl font-bold md:mt-6 md:text-4xl"
-            style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
-          >
-            Hey {userName || 'Layla'},
-          </h1>
         </div>
 
         {userProfile && (
         <div
-          className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl max-h-[min(70dvh,calc(100dvh-10.5rem))] md:max-h-[min(74dvh,calc(100dvh-11rem))]"
+          className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl max-h-[min(70dvh,calc(100dvh-10.5rem))] md:mt-2 md:max-h-[min(74dvh,calc(100dvh-11rem))]"
           style={{ background: '#FFFFFF', border: '2px solid rgba(175, 85, 0, 0.25)' }}
         >
           {/* Segmented toggle — single track, sliding active thumb */}
@@ -675,7 +677,7 @@ export default function Dashboard() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-5 flex min-h-0 w-full max-h-[min(70dvh,calc(100dvh-10.5rem))] flex-1 flex-col items-center justify-center overflow-y-auto overscroll-contain rounded-2xl p-8 text-center md:mt-6 md:max-h-[min(74dvh,calc(100dvh-11rem))]"
+            className="mt-5 flex min-h-0 w-full max-h-[min(70dvh,calc(100dvh-10.5rem))] flex-1 flex-col items-center justify-center overflow-y-auto overscroll-contain rounded-2xl p-8 text-center md:mt-2 md:max-h-[min(74dvh,calc(100dvh-11rem))]"
             style={{ background: '#FFFEE1', border: '2px solid #914600' }}
           >
             <h3 className="text-2xl font-bold mb-2" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>

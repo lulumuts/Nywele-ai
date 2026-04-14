@@ -24,7 +24,7 @@ import {
 const PRODUCT_COMPAT_CARD_SHELL_CLASS =
   'max-md:[max-height:min(62dvh,calc(100dvh-13.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))] md:max-h-[min(68dvh,calc(100dvh-14rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))]';
 
-/** Nudges the card up toward the hero copy; merges with shared hub outer. */
+/** Desktop: tuck white panel under hero copy; mobile keeps a light upward nudge. */
 const PRODUCT_COMPAT_CARD_OUTER_CLASS = `${styleCheckHubWhiteCardOuterStartClass} -mt-1 pt-1 md:-mt-2 md:pt-0`;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -283,25 +283,27 @@ function ProductExplorer({ hairTypeLabel }: { hairTypeLabel: string }) {
 
 function ProductsCompatibilityHeader() {
   return (
-    <div className="mb-2 flex shrink-0 flex-col md:mb-3">
-      <div className="mt-3 flex justify-end md:mt-4">
-        <Link
-          href="/products/scan"
-          className="inline-flex min-h-[44px] shrink-0 items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:text-base"
-          style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+    <div className="mb-2 flex shrink-0 flex-col md:mb-3 md:pt-10">
+      <div className="flex flex-col md:mt-12 md:pt-10 md:flex-row md:items-start md:justify-between md:gap-6">
+        <h1
+          className="order-2 mt-10 min-w-0 text-3xl font-bold md:order-1 md:mt-0 md:flex-1 md:text-4xl"
+          style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
         >
-          <ScanBarcode className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#C17208' }} />
-          Scan barcode
-        </Link>
+          Product Compatibility
+        </h1>
+        <div className="order-1 mt-3 flex justify-end md:order-2 md:mt-0 md:shrink-0 md:justify-end md:pt-1">
+          <Link
+            href="/products/scan"
+            className="inline-flex min-h-[44px] shrink-0 items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:text-base"
+            style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+          >
+            <ScanBarcode className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#C17208' }} />
+            Scan barcode
+          </Link>
+        </div>
       </div>
-      <h1
-        className="mt-10 min-w-0 text-3xl font-bold md:mt-12 md:text-4xl"
-        style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
-      >
-        Product Compatibility
-      </h1>
       <p
-        className="mb-0 mt-3 max-w-2xl pb-4 text-base md:mt-4 md:pb-5 md:text-lg"
+        className="mb-0 mt-1.5 max-w-2xl pb-6 text-base md:mt-2 md:pb-8 md:text-lg"
         style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
       >
         Scan or search products to see if they work with your hair profile
