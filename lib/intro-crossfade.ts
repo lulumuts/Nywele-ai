@@ -42,7 +42,7 @@ if (typeof window !== 'undefined') {
   });
 }
 
-export const OPENING_CROSSFADE_SEC = 0.4 as const;
+export const OPENING_CROSSFADE_SEC = 0.48 as const;
 
 export const NYWELE_INTRO_CROSSFADE_EVENT = 'nywele-intro-crossfade' as const;
 

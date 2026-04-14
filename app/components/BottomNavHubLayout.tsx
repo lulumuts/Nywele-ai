@@ -11,6 +11,16 @@ export const bottomNavHubMainClass =
 export const bottomNavHubMainTightClass =
   'bottom-nav-hub-main flex min-h-0 flex-1 flex-col px-7 pt-[calc(4.25rem+env(safe-area-inset-top,0px))] sm:px-8 md:px-14 md:pt-[calc(5.25rem+env(safe-area-inset-top,0px))] lg:px-16';
 
+/** Same top rhythm as Style Check grid hub (`mt-10` scan row + title under compact safe-area padding). */
+export const bottomNavHubMainStyleCheckGridClass =
+  'bottom-nav-hub-main flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-7 pt-[calc(0.35rem+env(safe-area-inset-top,0px))] sm:px-8 md:px-14 md:pt-[calc(0.5rem+env(safe-area-inset-top,0px))] lg:px-16';
+
+/**
+ * Like `bottomNavHubMainStyleCheckGridClass` but no extra top inset beyond safe-area (dashboard sits higher).
+ */
+export const bottomNavHubMainDashboardClass =
+  'bottom-nav-hub-main flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-7 pt-[env(safe-area-inset-top,0px)] sm:px-8 md:px-14 lg:px-16';
+
 /**
  * Identical to the inner column on `app/style-check/page.tsx`.
  */
@@ -30,6 +40,12 @@ export const styleCheckHubWhiteCardStyle: CSSProperties = {
  */
 export const styleCheckHubWhiteCardOuterClass =
   'flex min-h-0 flex-1 flex-col justify-end pt-2 md:flex-none md:justify-start md:pt-0';
+
+/**
+ * Mobile: white panel sits directly under the hero (no `justify-end` gap). Desktop matches the default outer.
+ */
+export const styleCheckHubWhiteCardOuterStartClass =
+  'flex min-h-0 flex-1 flex-col justify-start pt-2 md:flex-none md:justify-start md:pt-0';
 
 /**
  * Mobile: max height reserves top + **floating nav** band so the card ends visibly above the pill.

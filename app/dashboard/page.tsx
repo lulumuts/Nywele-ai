@@ -3,8 +3,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Package, Sparkles, Loader, ChevronDown, ChevronUp, Clock, HelpCircle } from 'lucide-react';
-import BottomNav from '@/app/components/BottomNav';
+import { Package, Sparkles, Loader, ChevronDown, ChevronUp, Clock, HelpCircle, User } from 'lucide-react';
+import {
+  BottomNavHubShell,
+  bottomNavHubMainDashboardClass,
+} from '@/app/components/BottomNavHubLayout';
 import HairCareReferencePhoto from '@/app/components/HairCareReferencePhoto';
 import { explorerProductsToCarousel, type ExplorerCarouselProduct } from '@/lib/productExplorerCatalog';
 import { normalizeUserProfile, type UserProfile } from '@/types/userProfile';
@@ -138,9 +141,8 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden bg-transparent">
+    <>
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         @keyframes dashboardTabPanelFromBottom {
@@ -157,30 +159,28 @@ export default function Dashboard() {
           animation: dashboardTabPanelFromBottom 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
       `}</style>
-      <BottomNav />
-
-      <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col overflow-hidden px-4 pb-[max(6rem,calc(4.75rem+env(safe-area-inset-bottom,0px)))] pt-20 md:px-4 md:pb-8 md:pt-36">
-        <div className="mb-3 flex shrink-0 flex-row items-center justify-between gap-3 md:mb-4">
-          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-            <h1
-              className="min-w-0 text-2xl font-bold sm:text-3xl md:text-4xl"
-              style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
+      <BottomNavHubShell mainAreaClassName={bottomNavHubMainDashboardClass}>
+        <div className="mb-2 shrink-0 md:mb-3">
+          <div className="mt-5 flex justify-end md:mt-6">
+            <button
+              type="button"
+              onClick={() => router.push('/profile')}
+              className="inline-flex min-h-[44px] shrink-0 items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:text-base"
+              style={{
+                color: '#B26805',
+                fontFamily: 'Bricolage Grotesque, sans-serif',
+              }}
             >
-              Hey {userName || 'Layla'},
-            </h1>
+              <User className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#B26805' }} />
+              View Profile
+            </button>
           </div>
-          <button
-            onClick={() => router.push('/profile')}
-            className="w-fit shrink-0 rounded-xl px-6 py-3 text-sm font-semibold transition-all hover:shadow-lg"
-            style={{
-              background: '#FFFEE1',
-              color: '#B26805',
-              border: 'none',
-              fontFamily: 'Bricolage Grotesque, sans-serif',
-            }}
+          <h1
+            className="mt-5 min-w-0 text-3xl font-bold md:mt-6 md:text-4xl"
+            style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
           >
-            View Profile
-          </button>
+            Hey {userName || 'Layla'},
+          </h1>
         </div>
 
         {userProfile && (
@@ -675,7 +675,7 @@ export default function Dashboard() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-8 flex min-h-0 w-full max-h-[min(70dvh,calc(100dvh-10.5rem))] flex-1 flex-col items-center justify-center overflow-y-auto overscroll-contain rounded-2xl p-8 text-center md:max-h-[min(74dvh,calc(100dvh-11rem))]"
+            className="mt-5 flex min-h-0 w-full max-h-[min(70dvh,calc(100dvh-10.5rem))] flex-1 flex-col items-center justify-center overflow-y-auto overscroll-contain rounded-2xl p-8 text-center md:mt-6 md:max-h-[min(74dvh,calc(100dvh-11rem))]"
             style={{ background: '#FFFEE1', border: '2px solid #914600' }}
           >
             <h3 className="text-2xl font-bold mb-2" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
@@ -693,7 +693,7 @@ export default function Dashboard() {
             </button>
           </motion.div>
         )}
-      </div>
-    </div>
+      </BottomNavHubShell>
+    </>
   );
 }

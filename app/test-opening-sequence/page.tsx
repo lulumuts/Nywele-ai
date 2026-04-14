@@ -26,6 +26,7 @@ export default function TestOpeningSequencePage() {
       {showOpening && (
         <OpeningSequence
           key={runs}
+          enableIntroTagline
           onComplete={() => setShowOpening(false)}
           backgroundColor={APP_PAGE_BACKGROUND}
         />

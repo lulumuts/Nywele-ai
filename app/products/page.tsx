@@ -8,8 +8,8 @@ import { Search, ArrowRight, User, ScanBarcode } from 'lucide-react';
 import {
   BottomNavHubShell,
   StyleCheckHubWhiteCard,
-  bottomNavHubMainTightClass,
-  styleCheckHubWhiteCardOuterClass,
+  bottomNavHubMainStyleCheckGridClass,
+  styleCheckHubWhiteCardOuterStartClass,
 } from '@/app/components/BottomNavHubLayout';
 import { normalizeUserProfile, type UserProfile } from '@/types/userProfile';
 import {
@@ -20,9 +20,12 @@ import {
   type IngredientStatus,
 } from '@/lib/productExplorerCatalog';
 
-/** Slightly shorter than global hub shell; outer uses default `justify-end` so the card hugs just above the bottom nav */
+/** White panel max-height: capped so cream stays visible above the floating nav; nudged taller than before. */
 const PRODUCT_COMPAT_CARD_SHELL_CLASS =
-  'max-md:[max-height:min(64dvh,calc(100dvh-12.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))]';
+  'max-md:[max-height:min(62dvh,calc(100dvh-13.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))] md:max-h-[min(68dvh,calc(100dvh-14rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))]';
+
+/** Nudges the card up toward the hero copy; merges with shared hub outer. */
+const PRODUCT_COMPAT_CARD_OUTER_CLASS = `${styleCheckHubWhiteCardOuterStartClass} -mt-1 pt-1 md:-mt-2 md:pt-0`;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -256,7 +259,7 @@ function ProductExplorer({ hairTypeLabel }: { hairTypeLabel: string }) {
 
       <div
         ref={listScrollRef}
-        className="flex min-h-[min(40dvh,24rem)] max-h-[min(40dvh,24rem)] flex-col gap-3 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] pr-1"
+        className="flex min-h-[min(34dvh,20rem)] max-h-[min(34dvh,20rem)] flex-col gap-3 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] pr-1"
       >
         {products.length > 0 ? (
           products.map((p, i) => <ProductCard key={`${activeTab}-${p.brand}-${p.name}-${i}`} product={p} />)
@@ -280,26 +283,26 @@ function ProductExplorer({ hairTypeLabel }: { hairTypeLabel: string }) {
 
 function ProductsCompatibilityHeader() {
   return (
-    <div className="shrink-0 -mt-1 md:-mt-0.5">
-      <div className="mb-2 flex justify-end">
+    <div className="mb-2 flex shrink-0 flex-col md:mb-3">
+      <div className="mt-3 flex justify-end md:mt-4">
         <Link
           href="/products/scan"
-          className="inline-flex min-h-[44px] items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:text-base"
-          style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+          className="inline-flex min-h-[44px] shrink-0 items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:text-base"
+          style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
         >
-          <ScanBarcode className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#B26805' }} />
+          <ScanBarcode className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#C17208' }} />
           Scan barcode
         </Link>
       </div>
       <h1
-        className="mb-1.5 min-w-0 text-3xl font-bold md:mb-2 md:text-4xl"
-        style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
+        className="mt-10 min-w-0 text-3xl font-bold md:mt-12 md:text-4xl"
+        style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
       >
         Product Compatibility
       </h1>
       <p
-        className="mb-1 max-w-2xl text-base md:mb-4 md:text-lg"
-        style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+        className="mb-0 mt-3 max-w-2xl pb-4 text-base md:mt-4 md:pb-5 md:text-lg"
+        style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
       >
         Scan or search products to see if they work with your hair profile
       </p>
@@ -329,7 +332,7 @@ export default function Products() {
 
   if (loading) {
     return (
-      <BottomNavHubShell mainAreaClassName={bottomNavHubMainTightClass}>
+      <BottomNavHubShell mainAreaClassName={bottomNavHubMainStyleCheckGridClass}>
         <div className="flex min-h-0 flex-1 items-center justify-center">
           <div className="text-center">
             <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-b-4 border-[#B26805]" />
@@ -342,10 +345,10 @@ export default function Products() {
 
   if (!profile) {
     return (
-      <BottomNavHubShell mainAreaClassName={bottomNavHubMainTightClass}>
+      <BottomNavHubShell mainAreaClassName={bottomNavHubMainStyleCheckGridClass}>
         <ProductsCompatibilityHeader />
         <StyleCheckHubWhiteCard
-          outerClassName={styleCheckHubWhiteCardOuterClass}
+          outerClassName={PRODUCT_COMPAT_CARD_OUTER_CLASS}
           shellClassName={PRODUCT_COMPAT_CARD_SHELL_CLASS}
         >
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="text-center">
@@ -386,10 +389,10 @@ export default function Products() {
   }
 
   return (
-    <BottomNavHubShell mainAreaClassName={bottomNavHubMainTightClass}>
+    <BottomNavHubShell mainAreaClassName={bottomNavHubMainStyleCheckGridClass}>
       <ProductsCompatibilityHeader />
       <StyleCheckHubWhiteCard
-        outerClassName={styleCheckHubWhiteCardOuterClass}
+        outerClassName={PRODUCT_COMPAT_CARD_OUTER_CLASS}
         shellClassName={PRODUCT_COMPAT_CARD_SHELL_CLASS}
       >
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>

@@ -68,6 +68,7 @@ export default function RootAppWithIntro({ children }: { children: React.ReactNo
       {children}
       {showIntro && (
         <OpeningSequence
+          enableIntroTagline
           onFadeUiStart={emitCrossfade}
           onComplete={handleIntroComplete}
           backgroundColor={APP_PAGE_BACKGROUND}

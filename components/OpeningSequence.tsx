@@ -10,7 +10,13 @@
  * Grid overlay: triplanar mesh + light “HUD” read (drift, dual sweep, cyan-tinted rim), warm orange base; post CA / scan / vignette / grain.
  */
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import * as THREE from 'three';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -44,6 +50,16 @@ const WIRE_SHELL_SCALE = 1.001;
 const BUST_BOTTOM_TRIM_RATIO = 0.14;
 /** Camera look-at Y (world). Lower values move the bust toward the top of the viewport. */
 const OPENING_LOOK_AT_Y = 0.38;
+/**
+ * Extra bust scale for `phasePreset === 'full'` only (root intro + `/test-opening-sequence`).
+ * `route` (profile, hair-care loaders) keeps the original `0.85` normalization.
+ */
+const FULL_INTRO_BUST_SCALE_MUL = 1.22 as const;
+/** Nudge camera back when the full-intro bust is scaled up so framing stays balanced. */
+const FULL_INTRO_CAMERA_PULLBACK = 1.06 as const;
+/** Typed on the root intro after the bust reveal only (`phasePreset === 'full'`). */
+const INTRO_TAGLINE = 'AI POWERED HAIR CARE' as const;
+const INTRO_TAGLINE_TYPE_MS = 62 as const;
 
 const DRACO_DECODER_PATH = 'https://www.gstatic.com/draco/versioned/decoders/1.5.7/';
 
@@ -163,8 +179,13 @@ export type OpeningSequenceProps = {
   onFadeUiStart?: () => void;
   /** Shell uses shared `.nywele-cream-grid-surface` (cream + grid); kept for API compatibility. */
   backgroundColor?: string;
-  /** Shorter reveal/hold/hide for in-app route transitions (still shows bust + tagline). */
+  /** Longer phases for root splash; `route` is shorter in-app loaders. */
   phasePreset?: 'full' | 'route';
+  /**
+   * Root splash only: type out `INTRO_TAGLINE` after reveal. Omit elsewhere — footer shows "Loading"
+   * until the bust sequence advances (no stray tagline on profile / hair-care loaders).
+   */
+  enableIntroTagline?: boolean;
   /**
    * After reveal, stay in the hold phase (bust visible + tagline) until this component unmounts.
    * Use for long async work (e.g. hair analysis) so the sequence does not fade out early.
@@ -180,6 +201,7 @@ export default function OpeningSequence({
   onComplete,
   onFadeUiStart,
   phasePreset = 'full',
+  enableIntroTagline = false,
   holdUntilUnmount = false,
   holdStatusContent,
 }: OpeningSequenceProps) {
@@ -187,6 +209,12 @@ export default function OpeningSequence({
   const shellRef = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(true);
   const [openingAssetLoading, setOpeningAssetLoading] = useState(true);
+  /** Full intro: set when WebGL hold begins (after reveal); triggers typewriter. */
+  const [introTaglineStarted, setIntroTaglineStarted] = useState(false);
+  const [introTypedTagline, setIntroTypedTagline] = useState('');
+  const introTaglineDoneRef = useRef(
+    !(enableIntroTagline && phasePreset === 'full'),
+  );
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
   const onFadeUiStartRef = useRef(onFadeUiStart);
@@ -196,6 +224,29 @@ export default function OpeningSequence({
     setVisible(false);
     onCompleteRef.current?.();
   }, []);
+
+  useEffect(() => {
+    if (
+      !enableIntroTagline ||
+      phasePreset !== 'full' ||
+      !introTaglineStarted
+    ) {
+      return;
+    }
+    introTaglineDoneRef.current = false;
+    setIntroTypedTagline('');
+    const full = INTRO_TAGLINE;
+    let i = 0;
+    const id = window.setInterval(() => {
+      i += 1;
+      setIntroTypedTagline(full.slice(0, i));
+      if (i >= full.length) {
+        window.clearInterval(id);
+        introTaglineDoneRef.current = true;
+      }
+    }, INTRO_TAGLINE_TYPE_MS);
+    return () => window.clearInterval(id);
+  }, [enableIntroTagline, phasePreset, introTaglineStarted]);
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -214,9 +265,9 @@ export default function OpeningSequence({
     /** Cap frame delta so a long main-thread hitch (loader, tab switch) cannot finish the whole reveal in one frame. */
     const DELTA_CAP = 1 / 24;
     /** Tuned for snappy first paint; bust motion still reads clearly. */
-    const REVEAL_SEC = phasePreset === 'route' ? 0.62 : 1.12;
-    const HOLD_SEC = phasePreset === 'route' ? 0.18 : 0.38;
-    const HIDE_SEC = phasePreset === 'route' ? 0.32 : 0.95;
+    const REVEAL_SEC = phasePreset === 'route' ? 0.75 : 1.35;
+    const HOLD_SEC = phasePreset === 'route' ? 0.22 : 0.45;
+    const HIDE_SEC = phasePreset === 'route' ? 0.38 : 1.1;
     /** Fade the fixed shell (and CRT pass) before unmount so the app does not pop in. */
     const UI_FADE_OUT_SEC = OPENING_CROSSFADE_SEC;
     const SCAN_EDGE_SMOOTH_RATE = 9;
@@ -572,7 +623,12 @@ export default function OpeningSequence({
 
         const targetHeight = 1.5;
         const normalizedScale = targetHeight / Math.max(bboxSize.y, 1e-6);
-        const groupScale = normalizedScale * 0.85;
+        const routeScaleMul = 0.85;
+        const groupScale =
+          normalizedScale *
+          (phasePreset === 'full'
+            ? routeScaleMul * FULL_INTRO_BUST_SCALE_MUL
+            : routeScaleMul);
 
         try {
           applyWireframeOnly(root);
@@ -590,6 +646,10 @@ export default function OpeningSequence({
         );
         group.position.y += 0.3;
         scene.add(group);
+        if (phasePreset === 'full') {
+          camera.position.multiplyScalar(FULL_INTRO_CAMERA_PULLBACK);
+          camera.lookAt(0, OPENING_LOOK_AT_Y, 0);
+        }
         renderer.setClearColor(0x000000, 0);
 
         const nuclearRemove: THREE.Object3D[] = [];
@@ -771,10 +831,19 @@ export default function OpeningSequence({
             m._mat.uniforms.uClipY.value = clipY;
           });
 
-          if (progress >= REVEAL_SEC) {
-            phase = 'hold';
-            progress = 0;
-          }
+            if (progress >= REVEAL_SEC) {
+              phase = 'hold';
+              progress = 0;
+              if (
+                enableIntroTagline &&
+                phasePreset === 'full' &&
+                !disposed
+              ) {
+                queueMicrotask(() => {
+                  if (!disposed) setIntroTaglineStarted(true);
+                });
+              }
+            }
         } else if (phase === 'hold') {
           const waitingForContent =
             phasePreset !== 'route' && getIntroContentHoldPending();
@@ -787,7 +856,15 @@ export default function OpeningSequence({
           const minHoldDone = progress >= HOLD_SEC;
           const contentOk =
             phasePreset === 'route' || !getIntroContentHoldPending();
-          if (minHoldDone && contentOk && !holdUntilUnmount) {
+          const taglineOk =
+            !(enableIntroTagline && phasePreset === 'full') ||
+            introTaglineDoneRef.current;
+          if (
+            minHoldDone &&
+            contentOk &&
+            taglineOk &&
+            !holdUntilUnmount
+          ) {
             phase = 'hide';
             progress = 0;
           }
@@ -908,7 +985,7 @@ export default function OpeningSequence({
         }
       });
     };
-  }, [phasePreset, triggerDone, holdUntilUnmount]);
+  }, [enableIntroTagline, phasePreset, triggerDone, holdUntilUnmount]);
 
   if (!visible) return null;
 
@@ -990,30 +1067,59 @@ export default function OpeningSequence({
           </div>
         ) : null}
         {openingAssetLoading && !useHoldStatusLayout ? (
-          <div
-            style={{
-              position: 'absolute',
-              top: '80%',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              zIndex: 2,
-              pointerEvents: 'none',
-              textAlign: 'center',
-              color: '#DD8106',
-              textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-              fontSize: '0.9375rem',
-              fontWeight: 600,
-              maxWidth: 'min(22rem, 90vw)',
-              lineHeight: 1.35,
-              paddingLeft: '1rem',
-              paddingRight: '1rem',
-            }}
-            aria-live="polite"
-          >
-            AI powered African hair care
-          </div>
+          enableIntroTagline &&
+          phasePreset === 'full' &&
+          introTaglineStarted ? (
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                bottom: 'max(8%, calc(0.5rem + env(safe-area-inset-bottom, 0px)))',
+                transform: 'translateX(-50%)',
+                zIndex: 2,
+                pointerEvents: 'none',
+                textAlign: 'center',
+                color: '#DD8106',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+                fontSize: '0.9375rem',
+                fontWeight: 600,
+                maxWidth: 'min(22rem, 90vw)',
+                lineHeight: 1.35,
+                paddingLeft: '1rem',
+                paddingRight: '1rem',
+              }}
+              aria-live="polite"
+            >
+              {introTypedTagline}
+            </div>
+          ) : (
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                bottom: 'max(10%, calc(0.75rem + env(safe-area-inset-bottom, 0px)))',
+                transform: 'translateX(-50%)',
+                zIndex: 2,
+                pointerEvents: 'none',
+                textAlign: 'center',
+                color: '#DD8106',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+                fontSize: '0.9375rem',
+                fontWeight: 600,
+                maxWidth: 'min(22rem, 90vw)',
+                lineHeight: 1.35,
+                paddingLeft: '1rem',
+                paddingRight: '1rem',
+              }}
+              aria-live="polite"
+            >
+              Loading
+            </div>
+          )
         ) : null}
       </div>
     </div>
