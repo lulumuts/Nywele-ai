@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Circle, Globe, Cloud } from 'lucide-react';
+import { ArrowRight, Circle, Globe, Cloud } from 'lucide-react';
 import FormCard from '@/app/components/FormCard';
 import { normalizeUserProfile, PROFILE_VERSION, type UserProfile } from '@/types/userProfile';
 
@@ -109,16 +108,7 @@ export default function OnboardingProfile() {
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
       `}</style>
 
-      <Link
-        href="/onboarding"
-        className="inline-flex shrink-0 items-center gap-2 py-8 pb-4 hover:opacity-80 transition-opacity md:pt-12 md:pb-4"
-        style={{ color: '#573203', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-      >
-        <ArrowLeft className="w-5 h-5" />
-        <span className="text-sm font-medium">Back</span>
-      </Link>
-
-      <div className="flex min-h-0 flex-1 flex-col pb-8 md:pb-12">
+      <div className="flex min-h-0 flex-1 flex-col pb-8 md:pb-12 pt-8 md:pt-12">
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           <div className="flex min-h-full flex-col justify-center py-2">
             <div className="mx-auto flex w-full max-w-[428px] flex-col">

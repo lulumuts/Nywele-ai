@@ -50,6 +50,7 @@ next-env.d.ts
 .netlify
 gen-lang-client-0862951522-fde1ac7d48d5.json
 *.json
+!tokens.json
 .env.local
 .env.local.bak
 
