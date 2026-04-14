@@ -4,6 +4,8 @@
  */
 
 import type { UserProfile, SavedRoutine } from '@/types/userProfile';
+import { getLatestScanWithRoutine } from '@/lib/hair-care-history';
+import { parseHairCareRecommendation } from '@/lib/hair-care-session';
 
 export type DamageSeverity = 'none' | 'mild' | 'moderate' | 'severe';
 
@@ -178,12 +180,67 @@ export function getGoalProgressData(profile: UserProfile | null): {
   };
 }
 
-const PRODUCT_CATEGORIES = ['Products', 'Salon Visits', 'Tools & Equipment', 'Maintenance'];
+function productAmountFromUnknown(p: unknown): number {
+  if (!p || typeof p !== 'object') return 0;
+  const pr = (p as { pricing?: Record<string, unknown> }).pricing;
+  if (!pr || typeof pr !== 'object') return 0;
+  const amount = Number(pr.amount);
+  if (Number.isFinite(amount) && amount > 0) return amount;
+  const ep = Number((pr as { estimatedPrice?: unknown }).estimatedPrice);
+  if (Number.isFinite(ep) && ep > 0) return ep;
+  const rng = (pr as { priceRange?: { min?: unknown } }).priceRange;
+  const mn = Number(rng?.min);
+  if (Number.isFinite(mn) && mn > 0) return mn;
+  return 0;
+}
+
+function productLabelFromUnknown(p: unknown): string {
+  if (!p || typeof p !== 'object') return 'Product';
+  const o = p as { name?: unknown; brand?: unknown };
+  const name = typeof o.name === 'string' && o.name.trim() ? o.name.trim() : 'Product';
+  const brand = typeof o.brand === 'string' && o.brand.trim() ? o.brand.trim() : '';
+  return brand ? `${brand} · ${name}` : name;
+}
+
+/** Up to three picks from latest Hair care scan, else saved routines (deduped). */
+function collectTopThreeProducts(profile: UserProfile | null): { labels: string[]; values: number[] } | null {
+  const scan = profile ? getLatestScanWithRoutine(profile) : undefined;
+  if (scan?.recommendation) {
+    const rec = parseHairCareRecommendation(scan.recommendation);
+    const essential = rec?.productRecommendations?.essential;
+    if (Array.isArray(essential) && essential.length > 0) {
+      const picked = essential.slice(0, 3);
+      return {
+        labels: picked.map(productLabelFromUnknown),
+        values: picked.map(productAmountFromUnknown),
+      };
+    }
+  }
+
+  const routines = profile?.savedRoutines ?? [];
+  const seen = new Set<string>();
+  const out: { label: string; value: number }[] = [];
+  for (const r of routines) {
+    const pr = r.routine?.productRecommendations;
+    if (!pr) continue;
+    const list = [...(pr.essential ?? []), ...(pr.optional ?? [])];
+    for (const raw of list) {
+      const label = productLabelFromUnknown(raw);
+      const key = label.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({ label, value: productAmountFromUnknown(raw) });
+      if (out.length >= 3) {
+        return { labels: out.map((x) => x.label), values: out.map((x) => x.value) };
+      }
+    }
+  }
+  if (out.length === 0) return null;
+  return { labels: out.map((x) => x.label), values: out.map((x) => x.value) };
+}
 
 /**
- * Get product spend data for donut chart.
- * Uses cost-tracker localStorage (nywele-expenses) when available,
- * otherwise derives from routine product recommendations or mock data.
+ * Donut data for “Your Best Products”: up to three recommended products and share of spend (or equal split if no prices).
  */
 export function getProductSpendData(profile: UserProfile | null): {
   labels: string[];
@@ -191,78 +248,29 @@ export function getProductSpendData(profile: UserProfile | null): {
   total: number;
 } {
   if (typeof window === 'undefined') {
+    return { labels: [], values: [], total: 0 };
+  }
+
+  const trio = collectTopThreeProducts(profile);
+  if (trio && trio.labels.length > 0) {
+    const moneyTotal = trio.values.reduce((a, b) => a + b, 0);
+    let values = trio.values;
+    if (moneyTotal <= 0) {
+      const n = trio.labels.length;
+      const base = Math.floor(100 / n);
+      const rem = 100 - base * n;
+      values = trio.labels.map((_, i) => (i < n ? base + (i < rem ? 1 : 0) : 0));
+    }
     return {
-      labels: PRODUCT_CATEGORIES,
-      values: [0, 0, 0, 0],
-      total: 0,
+      labels: trio.labels,
+      values,
+      total: moneyTotal,
     };
   }
 
-  const stored = localStorage.getItem('nywele-expenses');
-  if (stored) {
-    try {
-      const expenses: { date?: string; category?: string; amount?: number }[] = JSON.parse(stored);
-      const currentMonth = new Date().toISOString().slice(0, 7);
-      const monthExpenses = expenses.filter(
-        (e) => (e.date || '').toString().slice(0, 7) === currentMonth
-      );
-
-      const categoryMap: Record<string, number> = {
-        product: 0,
-        salon: 0,
-        tools: 0,
-        maintenance: 0,
-      };
-
-      for (const e of monthExpenses) {
-        const cat = (e.category || 'product').toLowerCase();
-        if (cat in categoryMap) {
-          categoryMap[cat] += Number(e.amount) || 0;
-        }
-      }
-
-      const values = [
-        categoryMap.product,
-        categoryMap.salon,
-        categoryMap.tools,
-        categoryMap.maintenance,
-      ];
-      const total = values.reduce((a, b) => a + b, 0);
-
-      return {
-        labels: PRODUCT_CATEGORIES,
-        values,
-        total,
-      };
-    } catch {
-      // Fall through to fallback
-    }
-  }
-
-  // Fallback: derive from routine product recommendations
-  const routines = profile?.savedRoutines ?? [];
-  let productTotal = 0;
-  for (const r of routines) {
-    const essential = r.routine?.productRecommendations?.essential ?? [];
-    const optional = r.routine?.productRecommendations?.optional ?? [];
-    for (const p of [...essential, ...optional]) {
-      const amt = p.pricing?.amount ?? p.pricing?.estimatedPrice ?? p.pricing?.priceRange?.min ?? 0;
-      productTotal += Number(amt) || 0;
-    }
-  }
-
-  if (productTotal > 0) {
-    return {
-      labels: ['Products', 'Salon Visits', 'Tools & Equipment', 'Maintenance'],
-      values: [productTotal, 0, 0, 0],
-      total: productTotal,
-    };
-  }
-
-  // Mock fallback for empty state (matches dashboard design)
   return {
-    labels: PRODUCT_CATEGORIES,
-    values: [704, 533, 367, 0],
+    labels: ['Hydrating cleanser', 'Leave-in conditioner', 'Sealant oil'],
+    values: [704, 533, 367],
     total: 1604,
   };
 }

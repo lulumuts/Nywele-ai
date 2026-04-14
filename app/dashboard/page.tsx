@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Package, Sparkles, Loader, ChevronDown, ChevronUp, Clock, HelpCircle, ChevronRight } from 'lucide-react';
+import { Package, Sparkles, Loader, ChevronDown, ChevronUp, Clock, HelpCircle } from 'lucide-react';
 import BottomNav from '@/app/components/BottomNav';
 import HairCareReferencePhoto from '@/app/components/HairCareReferencePhoto';
 import { explorerProductsToCarousel, type ExplorerCarouselProduct } from '@/lib/productExplorerCatalog';
@@ -17,7 +17,6 @@ import {
   getHealthTrendData,
   getProductSpendData,
   getGoalProgressData,
-  getLatestHairHealthScore,
 } from '@/lib/analyticsTransform';
 import HealthTrendChart from '@/app/components/charts/HealthTrendChart';
 import ProductSpendDonut from '@/app/components/charts/ProductSpendDonut';
@@ -29,8 +28,32 @@ const DASHBOARD_RECOMMENDED = explorerProductsToCarousel('care', 3);
 const ROUTINE_CARDS = [
   { id: '1', title: 'Refresh Your Style', schedule: 'Every Morning', tag: 'Daily', duration: '5-10 Mins', why: 'Keep Your Afro Looking Fresh Throughout The Day' },
   { id: '2', title: 'Deep Condition', schedule: '2x Weekly', tag: 'Weekly', duration: '15-20 Mins', why: 'Restore moisture and strengthen your hair' },
-  { id: '3', title: 'Oil & Shine', schedule: 'As Needed', tag: 'Daily', duration: '2-3 Mins', why: 'Seal in moisture and add shine' },
+  { id: '3', title: 'Oil & Shine', schedule: 'Once a month', tag: 'Monthly', duration: '2-3 Mins', why: 'Seal in moisture and add shine' },
 ];
+
+/** Aligns with Hair care step importance when showing scan-based cards. */
+function routineCardTagLabel(tag: string): string {
+  const t = tag.toLowerCase();
+  const map: Record<string, string> = {
+    essential: 'Daily',
+    recommended: 'Weekly',
+    optional: 'Monthly',
+    daily: 'Daily',
+    weekly: 'Weekly',
+    monthly: 'Monthly',
+  };
+  if (map[t]) return map[t];
+  return tag ? tag.charAt(0).toUpperCase() + tag.slice(1).toLowerCase() : '';
+}
+
+/** #B26805 fill strength by cadence / importance (Monthly strongest → Daily lightest). */
+function routineCardSurfaceOpacity(tag: string): number {
+  const t = tag.toLowerCase();
+  if (t === 'daily' || t === 'essential') return 0.16;
+  if (t === 'weekly' || t === 'recommended') return 0.34;
+  if (t === 'monthly' || t === 'optional') return 0.48;
+  return 0.36;
+}
 
 export default function Dashboard() {
   const router = useRouter();
@@ -115,28 +138,33 @@ export default function Dashboard() {
   };
 
   return (
-    <div
-      className="flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden"
-      style={{ background: '#FFFEE1' }}
-    >
+    <div className="flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden bg-transparent">
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes dashboardTabPanelFromBottom {
+          from {
+            opacity: 0;
+            transform: translate3d(0, 1.75rem, 0);
+          }
+          to {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+          }
+        }
+        .dashboard-tab-panel-enter {
+          animation: dashboardTabPanelFromBottom 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
       `}</style>
       <BottomNav />
 
       <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col overflow-hidden px-4 pb-[max(6rem,calc(4.75rem+env(safe-area-inset-bottom,0px)))] pt-20 md:px-4 md:pb-8 md:pt-36">
         <div className="mb-3 flex shrink-0 flex-row items-center justify-between gap-3 md:mb-4">
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-            <img
-              src="/icons/coil.svg"
-              alt=""
-              className="h-8 w-8 shrink-0 md:hidden"
-            />
             <h1
               className="min-w-0 text-2xl font-bold sm:text-3xl md:text-4xl"
-              style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+              style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
             >
               Hey {userName || 'Layla'},
             </h1>
@@ -146,7 +174,7 @@ export default function Dashboard() {
             className="w-fit shrink-0 rounded-xl px-6 py-3 text-sm font-semibold transition-all hover:shadow-lg"
             style={{
               background: '#FFFEE1',
-              color: '#3C270C',
+              color: '#B26805',
               border: 'none',
               fontFamily: 'Bricolage Grotesque, sans-serif',
             }}
@@ -165,11 +193,11 @@ export default function Dashboard() {
             <div
               role="tablist"
               aria-label="Dashboard view"
-              className="relative flex h-9 w-full overflow-hidden rounded-full border-2 border-[#603E12] bg-white sm:h-10"
+              className="relative flex h-9 w-full overflow-hidden rounded-full border-2 border-[#B26805] bg-white sm:h-10"
             >
               <motion.div
                 aria-hidden
-                className="absolute inset-y-0 rounded-full bg-[#603E12]"
+                className="absolute inset-y-0 rounded-full bg-[#B26805]"
                 initial={false}
                 animate={{
                   left: activeTab === 'routine' ? '0%' : '50%',
@@ -185,7 +213,7 @@ export default function Dashboard() {
                 onClick={() => setActiveTab('routine')}
                 className="relative z-10 flex flex-1 items-center justify-center px-1 py-0 text-xs font-semibold leading-tight transition-colors sm:px-2 sm:text-sm"
                 style={{
-                  color: activeTab === 'routine' ? '#FFFFFF' : '#603E12',
+                  color: activeTab === 'routine' ? '#FFFFFF' : '#B26805',
                   fontFamily: 'Bricolage Grotesque, sans-serif',
                   background: 'transparent',
                 }}
@@ -200,7 +228,7 @@ export default function Dashboard() {
                 onClick={() => setActiveTab('metrics')}
                 className="relative z-10 flex flex-1 items-center justify-center px-1 py-0 text-xs font-semibold leading-tight transition-colors sm:px-2 sm:text-sm"
                 style={{
-                  color: activeTab === 'metrics' ? '#FFFFFF' : '#603E12',
+                  color: activeTab === 'metrics' ? '#FFFFFF' : '#B26805',
                   fontFamily: 'Bricolage Grotesque, sans-serif',
                   background: 'transparent',
                 }}
@@ -212,46 +240,30 @@ export default function Dashboard() {
 
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {activeTab === 'routine' && (
-          <motion.div
+          <div
             role="tabpanel"
             id="dashboard-panel-routine"
             aria-labelledby="dashboard-tab-routine"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-8 p-6 md:p-8"
+            className="dashboard-tab-panel-enter space-y-8 p-6 md:p-8"
           >
             <div>
-              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <h2
-                    className="text-xl md:text-2xl font-bold mb-2"
-                    style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
-                  >
-                    Your current routine
-                  </h2>
-                  <p className="text-base mb-1" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                    {hairCareCtx.scannedAtLabel
-                      ? `From your latest Hair care scan · ${hairCareCtx.scannedAtLabel}`
-                      : 'Here is your regimented routine based on your most recent scan'}
-                  </p>
-                  {hairCareCtx.recommendation ? (
-                    <p className="text-xs opacity-80" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                      Daily steps from your personalised routine. Open Hair care for the full plan, products, and tips.
-                    </p>
-                  ) : null}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => router.push('/hair-care')}
-                  className="shrink-0 rounded-xl px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
-                  style={{
-                    background: '#603E12',
-                    color: '#FFFFFF',
-                    fontFamily: 'Bricolage Grotesque, sans-serif',
-                  }}
+              <div className="mb-4">
+                <h2
+                  className="text-xl md:text-2xl font-bold mb-2"
+                  style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
                 >
-                  Open Hair care
-                </button>
+                  Your current routine
+                </h2>
+                <p className="text-base mb-1" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  {hairCareCtx.scannedAtLabel
+                    ? `From your latest Hair care scan · ${hairCareCtx.scannedAtLabel}`
+                    : 'Here is your regimented routine based on your most recent scan'}
+                </p>
+                {hairCareCtx.recommendation ? (
+                  <p className="text-xs opacity-80" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    Daily steps from your personalised routine. Full plan, products, and tips stay in Hair care.
+                  </p>
+                ) : null}
               </div>
               <div
                 className="rounded-xl p-4 md:p-5"
@@ -264,13 +276,16 @@ export default function Dashboard() {
                 {routineCardsLive.map((card) => (
                   <div
                     key={card.id}
-                    className="flex-shrink-0 w-[320px] px-4 py-3 rounded-xl"
-                    style={{ background: '#FFFFFF', border: '1px solid rgba(175, 85, 0, 0.2)' }}
+                    className="flex-shrink-0 w-[320px] px-6 py-5 md:w-[360px] md:px-8 md:py-7 rounded-xl"
+                    style={{
+                      background: `rgba(178, 104, 5, ${routineCardSurfaceOpacity(card.tag)})`,
+                      border: '2px solid #DD8106',
+                    }}
                   >
                     <div className="flex items-start justify-between gap-2 mb-0">
                       <span
-                        className="text-lg font-semibold leading-tight"
-                        style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                        className="text-base font-semibold leading-tight"
+                        style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                       >
                         {card.title}
                       </span>
@@ -278,35 +293,35 @@ export default function Dashboard() {
                         className="px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
                         style={{ background: '#374151', color: '#FFFFFF' }}
                       >
-                        {card.tag}
+                        {routineCardTagLabel(card.tag)}
                       </span>
                     </div>
                     <p
                       className="text-sm mb-2 mt-0 leading-tight"
-                      style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                      style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                     >
                       {card.schedule}
                     </p>
                     <div className="mb-2">
                       <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#3C270C' }} />
-                        <span className="text-xs font-medium" style={{ color: '#3C270C' }}>Duration</span>
+                        <Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#B26805' }} />
+                        <span className="text-xs font-medium" style={{ color: '#B26805' }}>Duration</span>
                       </div>
                       <p
                         className="text-xs leading-snug mt-0.5 pl-[calc(0.875rem+0.375rem)]"
-                        style={{ color: '#3C270C' }}
+                        style={{ color: '#B26805' }}
                       >
                         {card.duration}
                       </p>
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <HelpCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#3C270C' }} />
-                        <span className="text-xs font-medium" style={{ color: '#3C270C' }}>Why:</span>
+                        <HelpCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#B26805' }} />
+                        <span className="text-xs font-medium" style={{ color: '#B26805' }}>Why:</span>
                       </div>
                       <p
                         className="text-xs leading-snug mt-0.5 pl-[calc(0.875rem+0.375rem)]"
-                        style={{ color: '#3C270C' }}
+                        style={{ color: '#B26805' }}
                       >
                         {card.why}
                       </p>
@@ -327,11 +342,11 @@ export default function Dashboard() {
               >
                 <h3
                   className="mb-2 text-base font-bold md:text-lg"
-                  style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                  style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
                 >
                   Past hair scans
                 </h3>
-                <p className="mb-3 text-sm" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                <p className="mb-3 text-sm" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   Reopen any saved scan and routine in Hair care.
                 </p>
                 <ul className="max-h-40 space-y-2 overflow-y-auto pr-1 md:max-h-48">
@@ -343,11 +358,11 @@ export default function Dashboard() {
                         className="w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors hover:bg-white/80"
                         style={{
                           borderColor: 'rgba(175, 85, 0, 0.25)',
-                          color: '#3C270C',
+                          color: '#B26805',
                           fontFamily: 'Bricolage Grotesque, sans-serif',
                         }}
                       >
-                        <span className="font-medium text-[#603E12]">
+                        <span className="font-medium text-[#B26805]">
                           {new Date(h.scannedAt).toLocaleDateString(undefined, {
                             month: 'short',
                             day: 'numeric',
@@ -365,30 +380,19 @@ export default function Dashboard() {
             ) : null}
 
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2
-                    className="text-xl md:text-2xl font-bold mb-2"
-                    style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
-                  >
-                    Your recommended products
-                  </h2>
-                  <p className="text-base" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                    {hairCareCtx.recommendation &&
-                    productsFromHairCareRecommendation(hairCareCtx.recommendation).length > 0
-                      ? 'From your latest Hair care routine'
-                      : 'Suggested products from our catalog when you have not run Hair care yet'}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => router.push('/hair-care')}
-                  className="flex shrink-0 items-center justify-center rounded-lg p-2 transition-opacity hover:opacity-80"
-                  aria-label="Open Hair care"
-                  style={{ color: '#643100' }}
+              <div className="mb-4">
+                <h2
+                  className="text-xl md:text-2xl font-bold mb-2"
+                  style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
                 >
-                  <ChevronRight className="h-6 w-6" />
-                </button>
+                  Your recommended products
+                </h2>
+                <p className="text-base" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  {hairCareCtx.recommendation &&
+                  productsFromHairCareRecommendation(hairCareCtx.recommendation).length > 0
+                    ? 'From your latest Hair care routine'
+                    : 'Suggested products from our catalog when you have not run Hair care yet'}
+                </p>
               </div>
               <div
                 className="rounded-xl p-4 md:p-5"
@@ -419,17 +423,17 @@ export default function Dashboard() {
                           />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center">
-                            <Package className="h-10 w-10" style={{ color: '#3C270C' }} />
+                            <Package className="h-10 w-10" style={{ color: '#B26805' }} />
                           </div>
                         )}
                       </div>
-                      <p className="text-sm font-bold" style={{ color: '#3C270C' }}>{product.name}</p>
+                      <p className="text-sm font-bold" style={{ color: '#B26805' }}>{product.name}</p>
                       {product.brand ? (
-                        <p className="text-[11px] font-semibold uppercase tracking-wide opacity-80" style={{ color: '#3C270C' }}>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide opacity-80" style={{ color: '#B26805' }}>
                           {product.brand}
                         </p>
                       ) : null}
-                      <p className="mt-1 line-clamp-3 text-xs" style={{ color: '#3C270C' }}>{product.purpose || ''}</p>
+                      <p className="mt-1 line-clamp-3 text-xs" style={{ color: '#B26805' }}>{product.purpose || ''}</p>
                     </div>
                   ))}
                 </div>
@@ -440,11 +444,11 @@ export default function Dashboard() {
               <div>
                 <h2
                   className="text-xl md:text-2xl font-bold mb-2"
-                  style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                  style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
                 >
                   AI-Powered Recommendations
                 </h2>
-                <p className="text-sm mb-4" style={{ color: '#3C270C' }}>
+                <p className="text-sm mb-4" style={{ color: '#B26805' }}>
                   Get a personalized routine and product suggestions from our AI specialist
                 </p>
                 {!aiRecommendation ? (
@@ -452,7 +456,7 @@ export default function Dashboard() {
                     onClick={handleGetAiRecommendations}
                     disabled={loadingAiRecommendation}
                     className="w-full py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-70"
-                    style={{ background: 'rgba(175, 85, 0, 0.2)', color: '#DD8106', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    style={{ background: 'rgba(175, 85, 0, 0.2)', color: '#B26805', border: '2px solid #914600', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
                     {loadingAiRecommendation ? (
                       <>
@@ -471,7 +475,7 @@ export default function Dashboard() {
                     <button
                       onClick={() => setShowAiRecommendation(!showAiRecommendation)}
                       className="w-full flex items-center justify-between py-3 px-4 rounded-xl"
-                      style={{ background: 'rgba(206, 147, 95, 0.15)', color: '#DD8106', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                      style={{ background: 'rgba(206, 147, 95, 0.15)', color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                     >
                       <span className="font-semibold">{showAiRecommendation ? 'Hide' : 'Show'} AI routine</span>
                       {showAiRecommendation ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
@@ -479,29 +483,29 @@ export default function Dashboard() {
                     {showAiRecommendation && (
                       <>
                         {aiRecommendation.stylistTip && (
-                          <p className="text-sm p-3 rounded-xl" style={{ background: 'rgba(206, 147, 95, 0.1)', color: '#3C270C' }}>
+                          <p className="text-sm p-3 rounded-xl" style={{ background: 'rgba(206, 147, 95, 0.1)', color: '#B26805' }}>
                             <strong>Expert tip:</strong> {aiRecommendation.stylistTip}
                           </p>
                         )}
                         {aiRecommendation.routine?.steps?.length > 0 && (
-                          <ul className="list-decimal list-inside space-y-2" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          <ul className="list-decimal list-inside space-y-2" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             {aiRecommendation.routine.steps.map((s: any, i: number) => (
                               <li key={i}>
                                 {s.action}: {s.instructions}
-                                {s.productName && <span className="block text-sm" style={{ color: '#3C270C' }}>→ {s.productName}</span>}
+                                {s.productName && <span className="block text-sm" style={{ color: '#B26805' }}>→ {s.productName}</span>}
                               </li>
                             ))}
                           </ul>
                         )}
                         {aiRecommendation.products?.length > 0 && (
                           <div className="space-y-2">
-                            <p className="font-semibold" style={{ color: '#3C270C' }}>Recommended products:</p>
+                            <p className="font-semibold" style={{ color: '#B26805' }}>Recommended products:</p>
                             {aiRecommendation.products.map((p: any, i: number) => (
                               <div key={i} className="flex gap-3 p-3 rounded-xl" style={{ background: 'rgba(206, 147, 95, 0.1)' }}>
-                                <Package className="w-5 h-5 flex-shrink-0" style={{ color: '#3C270C' }} />
+                                <Package className="w-5 h-5 flex-shrink-0" style={{ color: '#B26805' }} />
                                 <div>
-                                  <p className="font-medium" style={{ color: '#3C270C' }}>{p.brand} {p.name}</p>
-                                  <p className="text-xs" style={{ color: '#3C270C' }}>{p.reason}</p>
+                                  <p className="font-medium" style={{ color: '#B26805' }}>{p.brand} {p.name}</p>
+                                  <p className="text-xs" style={{ color: '#B26805' }}>{p.reason}</p>
                                 </div>
                               </div>
                             ))}
@@ -513,17 +517,15 @@ export default function Dashboard() {
                 )}
               </div>
             )}
-          </motion.div>
+          </div>
         )}
 
         {activeTab === 'metrics' && (
-          <motion.div
+          <div
             role="tabpanel"
             id="dashboard-panel-metrics"
             aria-labelledby="dashboard-tab-metrics"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-8 p-6 md:p-8"
+            className="dashboard-tab-panel-enter space-y-8 p-6 md:p-8"
           >
             {userProfile?.hairHealthSnapshot && (
               <div
@@ -535,11 +537,11 @@ export default function Dashboard() {
               >
                 <h2
                   className="text-xl md:text-2xl font-bold mb-1"
-                  style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                  style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
                 >
                   How healthy is your hair
                 </h2>
-                <p className="text-sm mb-4" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                <p className="text-sm mb-4" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   From your latest scan in Hair care
                   {userProfile.hairHealthSnapshot.analyzedAt
                     ? ` · ${new Date(userProfile.hairHealthSnapshot.analyzedAt).toLocaleDateString(undefined, {
@@ -553,27 +555,37 @@ export default function Dashboard() {
                   <HairCareReferencePhoto
                     src={userProfile.hairHealthSnapshot.referenceImageDataUrl}
                     compact
+                    headingColor="#B26805"
+                    bodyColor="#B26805"
                   />
                 </div>
                 <div className="flex flex-wrap items-end gap-6">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={{ color: '#3C270C' }}>
+                    <p
+                      className="text-xs font-semibold uppercase tracking-wide opacity-80"
+                      style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    >
                       Health score
                     </p>
                     <p
-                      className="text-4xl font-bold tabular-nums"
-                      style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                      className="text-2xl font-bold tabular-nums leading-tight md:text-3xl"
+                      style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                     >
-                      {getLatestHairHealthScore(userProfile) ?? userProfile.hairHealthSnapshot.healthScore}
-                      <span className="text-lg font-semibold opacity-80">/100</span>
+                      85<span className="text-base font-semibold opacity-80 md:text-lg">%</span>
                     </p>
                   </div>
                   {userProfile.hairHealthSnapshot.hairTypeDetected && (
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={{ color: '#3C270C' }}>
+                      <p
+                        className="text-xs font-semibold uppercase tracking-wide opacity-80"
+                        style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                      >
                         Type (detected)
                       </p>
-                      <p className="text-lg font-bold" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                      <p
+                        className="text-2xl font-bold capitalize leading-tight md:text-3xl"
+                        style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                      >
                         {String(userProfile.hairHealthSnapshot.hairTypeDetected)}
                       </p>
                     </div>
@@ -581,20 +593,32 @@ export default function Dashboard() {
                   {userProfile.hairHealthSnapshot.damageSeverity &&
                     userProfile.hairHealthSnapshot.damageSeverity !== 'none' && (
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={{ color: '#3C270C' }}>
+                        <p
+                          className="text-xs font-semibold uppercase tracking-wide opacity-80"
+                          style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                        >
                           Damage
                         </p>
-                        <p className="text-lg font-bold capitalize" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                        <p
+                          className="text-2xl font-bold capitalize leading-tight md:text-3xl"
+                          style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                        >
                           {userProfile.hairHealthSnapshot.damageSeverity}
                         </p>
                       </div>
                     )}
                   {userProfile.hairHealthSnapshot.moistureLevel && (
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={{ color: '#3C270C' }}>
+                      <p
+                        className="text-xs font-semibold uppercase tracking-wide opacity-80"
+                        style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                      >
                         Moisture
                       </p>
-                      <p className="text-lg font-bold capitalize" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                      <p
+                        className="text-2xl font-bold capitalize leading-tight md:text-3xl"
+                        style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                      >
                         {userProfile.hairHealthSnapshot.moistureLevel.replace(/-/g, ' ')}
                       </p>
                     </div>
@@ -606,11 +630,11 @@ export default function Dashboard() {
             <div>
               <h2
                 className="text-xl md:text-2xl font-bold mb-2"
-                style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
               >
                 Your Daily Routine
               </h2>
-              <p className="text-base mb-6" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              <p className="text-base mb-6" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 Health trend from saved routines and your latest hair scan
               </p>
               <HealthTrendChart {...getHealthTrendData(userProfile)} />
@@ -619,12 +643,12 @@ export default function Dashboard() {
             <div>
               <h2
                 className="text-xl md:text-2xl font-bold mb-2"
-                style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
               >
                 Your Best Products
               </h2>
-              <p className="text-base mb-6" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                Here is your regimented routine based on your most recent scan
+              <p className="text-base mb-6" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                Your top three recommended products from Hair care (slice sizes follow price when available)
               </p>
               <ProductSpendDonut {...getProductSpendData(userProfile)} />
             </div>
@@ -632,16 +656,16 @@ export default function Dashboard() {
             <div>
               <h2
                 className="text-xl md:text-2xl font-bold mb-2"
-                style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
               >
                 Goal Progress
               </h2>
-              <p className="text-sm mb-6" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              <p className="text-sm mb-6" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 How your metrics align with your hair goals
               </p>
               <GoalProgressChart {...getGoalProgressData(userProfile)} />
             </div>
-          </motion.div>
+          </div>
         )}
         </div>
         </div>
@@ -654,16 +678,16 @@ export default function Dashboard() {
             className="mt-8 flex min-h-0 w-full max-h-[min(70dvh,calc(100dvh-10.5rem))] flex-1 flex-col items-center justify-center overflow-y-auto overscroll-contain rounded-2xl p-8 text-center md:max-h-[min(74dvh,calc(100dvh-11rem))]"
             style={{ background: '#FFFEE1', border: '2px solid #914600' }}
           >
-            <h3 className="text-2xl font-bold mb-2" style={{ color: '#DD8106', fontFamily: 'Caprasimo, serif' }}>
+            <h3 className="text-2xl font-bold mb-2" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
               Create Your Profile
             </h3>
-            <p className="mb-6" style={{ color: '#3C270C' }}>
+            <p className="mb-6" style={{ color: '#B26805' }}>
               Get personalized hair care recommendations and product suggestions
             </p>
             <button
               onClick={() => router.push('/onboarding')}
-              className="px-8 py-4 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
-              style={{ background: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+              className="px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+              style={{ background: '#643100', color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
             >
               Get Started
             </button>

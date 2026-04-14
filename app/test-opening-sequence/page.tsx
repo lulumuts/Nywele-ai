@@ -18,9 +18,8 @@ export default function TestOpeningSequencePage() {
 
   return (
     <div
-      className="flex min-h-screen flex-col items-center justify-center gap-4 p-8"
+      className="flex min-h-screen flex-col items-center justify-center gap-4 bg-transparent p-8"
       style={{
-        background: APP_PAGE_BACKGROUND,
         fontFamily: 'Bricolage Grotesque, sans-serif',
       }}
     >
@@ -34,10 +33,10 @@ export default function TestOpeningSequencePage() {
 
       {!showOpening && (
         <div className="max-w-md text-center">
-          <p className="mb-2 text-lg font-semibold" style={{ color: '#603E12' }}>
+          <p className="mb-2 text-lg font-semibold" style={{ color: '#B26805' }}>
             Opening sequence finished
           </p>
-          <p className="mb-6 text-sm" style={{ color: '#C17208' }}>
+          <p className="mb-6 text-sm" style={{ color: '#B26805' }}>
             The reveal sequence completed and the overlay unmounted. Use replay to test again.
           </p>
           <button

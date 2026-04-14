@@ -19,16 +19,19 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { APP_PAGE_BACKGROUND } from '@/lib/app-theme';
 import {
   getIntroContentHoldPending,
   INTRO_HOLD_CONTENT_MAX_SEC,
   OPENING_CROSSFADE_SEC,
+  prefetchOpeningGlb,
   setIntroContentHoldPending,
 } from '@/lib/intro-crossfade';
 
-/** Cache-bust so browser picks up replaced `public/Final-nywele.glb`. Bump when asset changes. */
-const BUST_GLB_PATH = '/Final-nywele.glb?v=4';
+if (typeof window !== 'undefined') {
+  queueMicrotask(() => {
+    void MeshoptDecoder.ready;
+  });
+}
 const OVERLAY_Z = 400_000;
 const WIRE_OVERLAY_NAME = '__wireframe_overlay__';
 /** Grid line base — deep saturated orange for cream plate contrast. */
@@ -158,6 +161,7 @@ export type OpeningSequenceProps = {
   onComplete?: () => void;
   /** Fired once when the bust hide finishes and the shell/canvas fade-out begins (pair with page content fade-in). */
   onFadeUiStart?: () => void;
+  /** Shell uses shared `.nywele-cream-grid-surface` (cream + grid); kept for API compatibility. */
   backgroundColor?: string;
   /** Shorter reveal/hold/hide for in-app route transitions (still shows bust + tagline). */
   phasePreset?: 'full' | 'route';
@@ -175,7 +179,6 @@ export type OpeningSequenceProps = {
 export default function OpeningSequence({
   onComplete,
   onFadeUiStart,
-  backgroundColor = APP_PAGE_BACKGROUND,
   phasePreset = 'full',
   holdUntilUnmount = false,
   holdStatusContent,
@@ -210,9 +213,10 @@ export default function OpeningSequence({
 
     /** Cap frame delta so a long main-thread hitch (loader, tab switch) cannot finish the whole reveal in one frame. */
     const DELTA_CAP = 1 / 24;
-    const REVEAL_SEC = phasePreset === 'route' ? 1.05 : 2.2;
-    const HOLD_SEC = phasePreset === 'route' ? 0.28 : 0.8;
-    const HIDE_SEC = phasePreset === 'route' ? 0.52 : 1.8;
+    /** Tuned for snappy first paint; bust motion still reads clearly. */
+    const REVEAL_SEC = phasePreset === 'route' ? 0.62 : 1.12;
+    const HOLD_SEC = phasePreset === 'route' ? 0.18 : 0.38;
+    const HIDE_SEC = phasePreset === 'route' ? 0.32 : 0.95;
     /** Fade the fixed shell (and CRT pass) before unmount so the app does not pop in. */
     const UI_FADE_OUT_SEC = OPENING_CROSSFADE_SEC;
     const SCAN_EDGE_SMOOTH_RATE = 9;
@@ -249,7 +253,11 @@ export default function OpeningSequence({
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setSize(iw, ih);
-    renderer.setClearColor(0x000000, 0);
+    /**
+     * Opaque cream while the GLB loads so post passes (scan / vignette) are visible — transparent
+     * clear makes an empty scene invisible and reads as “text-only” loading.
+     */
+    renderer.setClearColor(0xFFFEE1, 1);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     /** Balanced so orange stays saturated; nudged up for more “lit” mesh vs cream plate. */
@@ -262,6 +270,7 @@ export default function OpeningSequence({
       width: '100%',
       height: '100%',
       background: 'transparent',
+      zIndex: '1',
     });
 
     if (!renderer.getContext()) {
@@ -279,8 +288,8 @@ export default function OpeningSequence({
     pmremGenerator.compileEquirectangularShader();
 
     /* Equirectangular DataTexture IBL — warm top → neutral bottom (no RoomEnvironment). */
-    const envW = 512;
-    const envH = 256;
+    const envW = 256;
+    const envH = 128;
     const envData = new Uint8Array(envW * envH * 4);
     const warmTop = new THREE.Color(0xfff0e0);
     const neutralBottom = new THREE.Color(0xd8d2c8);
@@ -371,6 +380,8 @@ export default function OpeningSequence({
             uOpacity: { value: WIRE_PEAK_OPACITY },
             uGridSize: { value: 102.0 },
             uColor: { value: new THREE.Color(WIRE_FRAME_COLOR) },
+            /** Fixed lower bound (bust trim); same cut as the original single-plane reveal end state. */
+            uClipFloor: { value: bottomY },
             uClipY: { value: bottomY },
             uScanStrength: { value: 0 },
             uTime: { value: 0 },
@@ -391,6 +402,7 @@ export default function OpeningSequence({
             uniform float uOpacity;
             uniform float uGridSize;
             uniform vec3 uColor;
+            uniform float uClipFloor;
             uniform float uClipY;
             uniform float uScanStrength;
             uniform float uTime;
@@ -400,7 +412,9 @@ export default function OpeningSequence({
             varying vec3 vWorldNormal;
 
             void main() {
-              if (vWorldPos.y < uClipY) discard;
+              /* Band [uClipFloor, uClipY]: fixed floor matches original clip end; uClipY sweeps up on reveal. */
+              if (vWorldPos.y < uClipFloor) discard;
+              if (vWorldPos.y > uClipY) discard;
 
               vec3 wob = vec3(
                 sin(uTime * 1.15 + vWorldPos.y * 2.4 + vWorldPos.x * 0.6),
@@ -441,7 +455,7 @@ export default function OpeningSequence({
               float holo = pow(1.0 - ndv, 2.35);
               vec3 holoCol = mix(uColor, vec3(1.0, 0.97, 0.93), 0.4);
 
-              float d = vWorldPos.y - uClipY;
+              float d = uClipY - vWorldPos.y;
               float scanLine = exp(-d * 120.0) * uScanStrength;
               float scanEdge = exp(-d * 220.0) * uScanStrength;
 
@@ -525,7 +539,21 @@ export default function OpeningSequence({
     ro.observe(mount);
 
     const boot = async () => {
-      await MeshoptDecoder.ready;
+      let buffer: ArrayBuffer;
+      try {
+        const [b] = await Promise.all([
+          prefetchOpeningGlb(),
+          MeshoptDecoder.ready,
+        ]);
+        buffer = b;
+      } catch (e) {
+        console.error('OpeningSequence: GLB fetch failed', e);
+        if (!disposed) {
+          setOpeningAssetLoading(false);
+          completeOnce();
+        }
+        return;
+      }
       if (disposed) return;
 
       const loader = new GLTFLoader();
@@ -534,56 +562,158 @@ export default function OpeningSequence({
       loader.setDRACOLoader(draco);
       loader.setMeshoptDecoder(MeshoptDecoder);
 
-      loader.load(
-        BUST_GLB_PATH,
-        (gltf) => {
-          if (disposed) return;
-          const root = gltf.scene.clone(true);
+      const onLoad = (gltf: { scene: THREE.Object3D }) => {
+        if (disposed) return;
+        const root = gltf.scene.clone(true);
 
-          const box = new THREE.Box3().setFromObject(root);
-          const bboxSize = box.getSize(new THREE.Vector3());
-          const center = box.getCenter(new THREE.Vector3());
+        const box = new THREE.Box3().setFromObject(root);
+        const bboxSize = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
 
-          const targetHeight = 1.5;
-          const normalizedScale = targetHeight / Math.max(bboxSize.y, 1e-6);
-          const groupScale = normalizedScale * 0.85;
+        const targetHeight = 1.5;
+        const normalizedScale = targetHeight / Math.max(bboxSize.y, 1e-6);
+        const groupScale = normalizedScale * 0.85;
 
-          try {
-            applyWireframeOnly(root);
-          } catch (e) {
-            console.error('OpeningSequence: applyWireframeOnly failed', e);
+        try {
+          applyWireframeOnly(root);
+        } catch (e) {
+          console.error('OpeningSequence: applyWireframeOnly failed', e);
+        }
+
+        const group = new THREE.Group();
+        group.add(root);
+        group.scale.setScalar(groupScale);
+        group.position.set(
+          -center.x * groupScale,
+          -center.y * groupScale,
+          -center.z * groupScale,
+        );
+        group.position.y += 0.3;
+        scene.add(group);
+        renderer.setClearColor(0x000000, 0);
+
+        const nuclearRemove: THREE.Object3D[] = [];
+        scene.traverse((obj) => {
+          const n = obj.name.toLowerCase();
+          if (n.includes('plane') || n.includes('cube')) {
+            nuclearRemove.push(obj);
+            return;
+          }
+          if (
+            obj instanceof THREE.LineSegments &&
+            obj.name !== WIRE_OVERLAY_NAME
+          ) {
+            nuclearRemove.push(obj);
+            return;
+          }
+          if (obj instanceof THREE.Mesh && n === 'main-wireframe') {
+            nuclearRemove.push(obj);
+          }
+        });
+        for (const o of nuclearRemove) {
+          if (o instanceof THREE.Mesh) {
+            o.geometry?.dispose();
+            const hm = o.material;
+            if (Array.isArray(hm)) hm.forEach((x) => x.dispose());
+            else hm?.dispose?.();
+          } else if (o instanceof THREE.LineSegments) {
+            o.geometry?.dispose();
+            const lm = o.material;
+            if (Array.isArray(lm)) lm.forEach((x) => x.dispose());
+            else (lm as THREE.Material | undefined)?.dispose?.();
+          }
+          o.removeFromParent();
+        }
+
+        const toRemove = new Set<THREE.Object3D>();
+        scene.traverse((obj) => {
+          const n = obj.name.toLowerCase();
+
+          if (n.includes('plane') || n.includes('cube')) {
+            toRemove.add(obj);
+            return;
           }
 
-          const group = new THREE.Group();
-          group.add(root);
-          group.scale.setScalar(groupScale);
-          group.position.set(
-            -center.x * groupScale,
-            -center.y * groupScale,
-            -center.z * groupScale,
-          );
-          group.position.y += 0.3;
-          scene.add(group);
+          if (
+            obj instanceof THREE.LineSegments &&
+            obj.name !== WIRE_OVERLAY_NAME
+          ) {
+            toRemove.add(obj);
+            return;
+          }
 
-          const nuclearRemove: THREE.Object3D[] = [];
-          scene.traverse((obj) => {
-            const n = obj.name.toLowerCase();
-            if (n.includes('plane') || n.includes('cube')) {
-              nuclearRemove.push(obj);
-              return;
+          if (obj instanceof THREE.Mesh) {
+            const meshName = obj.name.toLowerCase();
+            if (meshName !== 'base-model' && meshName !== 'main-wireframe') {
+              const box = new THREE.Box3().setFromObject(obj);
+              const size = box.getSize(new THREE.Vector3());
+              if (size.y < 0.01) toRemove.add(obj);
             }
+          }
+        });
+        for (const obj of toRemove) {
+          if (obj instanceof THREE.Mesh) {
+            obj.geometry?.dispose();
+            const hm = obj.material;
+            if (Array.isArray(hm)) hm.forEach((x) => x.dispose());
+            else hm?.dispose?.();
+          } else if (
+            obj instanceof THREE.LineSegments ||
+            obj instanceof THREE.Line
+          ) {
+            obj.geometry?.dispose();
+            const lm = obj.material;
+            if (Array.isArray(lm)) lm.forEach((x) => x.dispose());
+            else (lm as THREE.Material | undefined)?.dispose?.();
+          }
+          obj.removeFromParent();
+        }
+
+        scene.traverse((obj) => {
+          if (obj instanceof THREE.Mesh) {
+            const n = obj.name.toLowerCase();
+            if (n.includes('plane')) {
+              obj.visible = false;
+              obj.geometry?.dispose();
+              const hm = obj.material;
+              if (Array.isArray(hm)) hm.forEach((x) => x.dispose());
+              else hm?.dispose?.();
+              obj.removeFromParent();
+            }
+          }
+        });
+
+        group.updateMatrixWorld(true);
+        const clipBox = new THREE.Box3().setFromObject(group);
+        const rawBottom = clipBox.min.y;
+        const rawTop = clipBox.max.y;
+        const clipSpan = Math.max(rawTop - rawBottom, 1e-6);
+        const clipPad = Math.max(0.03 * clipSpan, 0.02);
+        bottomY = rawBottom + clipSpan * BUST_BOTTOM_TRIM_RATIO;
+        topY = rawTop + clipPad;
+        wireOverlays.forEach((m) => {
+          m._mat.uniforms.uClipFloor.value = bottomY;
+          m._mat.uniforms.uClipY.value = bottomY;
+          m._mat.uniforms.uScanStrength.value = 0;
+        });
+
+        deferredCleanupId = setTimeout(() => {
+          deferredCleanupId = undefined;
+          if (disposed) return;
+          const toKill = new Set<THREE.Object3D>();
+          scene.traverse((obj) => {
             if (
               obj instanceof THREE.LineSegments &&
               obj.name !== WIRE_OVERLAY_NAME
             ) {
-              nuclearRemove.push(obj);
-              return;
+              toKill.add(obj);
             }
-            if (obj instanceof THREE.Mesh && n === 'main-wireframe') {
-              nuclearRemove.push(obj);
+            if (obj instanceof THREE.Mesh) {
+              const n = obj.name.toLowerCase();
+              if (n.includes('plane') || n.includes('cube')) toKill.add(obj);
             }
           });
-          for (const o of nuclearRemove) {
+          for (const o of toKill) {
             if (o instanceof THREE.Mesh) {
               o.geometry?.dispose();
               const hm = o.material;
@@ -597,123 +727,27 @@ export default function OpeningSequence({
             }
             o.removeFromParent();
           }
+        }, 0);
 
-          const toRemove = new Set<THREE.Object3D>();
-          scene.traverse((obj) => {
-            const n = obj.name.toLowerCase();
+        timer.reset();
+        modelReady = true;
+        phase = 'reveal';
+        progress = 0;
+      };
 
-            if (n.includes('plane') || n.includes('cube')) {
-              toRemove.add(obj);
-              return;
-            }
+      const onError = () => {
+        if (!disposed) {
+          setOpeningAssetLoading(false);
+          completeOnce();
+        }
+      };
 
-            if (
-              obj instanceof THREE.LineSegments &&
-              obj.name !== WIRE_OVERLAY_NAME
-            ) {
-              toRemove.add(obj);
-              return;
-            }
-
-            if (obj instanceof THREE.Mesh) {
-              const meshName = obj.name.toLowerCase();
-              if (meshName !== 'base-model' && meshName !== 'main-wireframe') {
-                const box = new THREE.Box3().setFromObject(obj);
-                const size = box.getSize(new THREE.Vector3());
-                if (size.y < 0.01) toRemove.add(obj);
-              }
-            }
-          });
-          for (const obj of toRemove) {
-            if (obj instanceof THREE.Mesh) {
-              obj.geometry?.dispose();
-              const hm = obj.material;
-              if (Array.isArray(hm)) hm.forEach((x) => x.dispose());
-              else hm?.dispose?.();
-            } else if (
-              obj instanceof THREE.LineSegments ||
-              obj instanceof THREE.Line
-            ) {
-              obj.geometry?.dispose();
-              const lm = obj.material;
-              if (Array.isArray(lm)) lm.forEach((x) => x.dispose());
-              else (lm as THREE.Material | undefined)?.dispose?.();
-            }
-            obj.removeFromParent();
-          }
-
-          scene.traverse((obj) => {
-            if (obj instanceof THREE.Mesh) {
-              const n = obj.name.toLowerCase();
-              if (n.includes('plane')) {
-                obj.visible = false;
-                obj.geometry?.dispose();
-                const hm = obj.material;
-                if (Array.isArray(hm)) hm.forEach((x) => x.dispose());
-                else hm?.dispose?.();
-                obj.removeFromParent();
-              }
-            }
-          });
-
-          group.updateMatrixWorld(true);
-          const clipBox = new THREE.Box3().setFromObject(group);
-          const rawBottom = clipBox.min.y;
-          const rawTop = clipBox.max.y;
-          const clipSpan = Math.max(rawTop - rawBottom, 1e-6);
-          const clipPad = Math.max(0.03 * clipSpan, 0.02);
-          bottomY = rawBottom + clipSpan * BUST_BOTTOM_TRIM_RATIO;
-          topY = rawTop + clipPad;
-          wireOverlays.forEach((m) => {
-            m._mat.uniforms.uClipY.value = topY;
-            m._mat.uniforms.uScanStrength.value = 0;
-          });
-
-          deferredCleanupId = setTimeout(() => {
-            deferredCleanupId = undefined;
-            if (disposed) return;
-            const toKill = new Set<THREE.Object3D>();
-            scene.traverse((obj) => {
-              if (
-                obj instanceof THREE.LineSegments &&
-                obj.name !== WIRE_OVERLAY_NAME
-              ) {
-                toKill.add(obj);
-              }
-              if (obj instanceof THREE.Mesh) {
-                const n = obj.name.toLowerCase();
-                if (n.includes('plane') || n.includes('cube')) toKill.add(obj);
-              }
-            });
-            for (const o of toKill) {
-              if (o instanceof THREE.Mesh) {
-                o.geometry?.dispose();
-                const hm = o.material;
-                if (Array.isArray(hm)) hm.forEach((x) => x.dispose());
-                else hm?.dispose?.();
-              } else if (o instanceof THREE.LineSegments) {
-                o.geometry?.dispose();
-                const lm = o.material;
-                if (Array.isArray(lm)) lm.forEach((x) => x.dispose());
-                else (lm as THREE.Material | undefined)?.dispose?.();
-              }
-              o.removeFromParent();
-            }
-          }, 0);
-
-          timer.reset();
-          modelReady = true;
-          phase = 'reveal';
-          progress = 0;
-        },
-        undefined,
-        () => {
-          if (!disposed) {
-            setOpeningAssetLoading(false);
-            completeOnce();
-          }
-        },
-      );
+      try {
+        loader.parse(buffer, '', onLoad, onError);
+      } catch (e) {
+        console.error('OpeningSequence: GLB parse failed', e);
+        onError();
+      }
     };
 
     void boot();
@@ -732,7 +766,7 @@ export default function OpeningSequence({
         progress += delta;
         if (phase === 'reveal') {
           const t = easeInOutQuint(Math.min(progress / REVEAL_SEC, 1));
-          const clipY = THREE.MathUtils.lerp(topY, bottomY, t);
+          const clipY = THREE.MathUtils.lerp(bottomY, topY, t);
           wireOverlays.forEach((m) => {
             m._mat.uniforms.uClipY.value = clipY;
           });
@@ -759,7 +793,7 @@ export default function OpeningSequence({
           }
         } else if (phase === 'hide') {
           const t = easeInOutQuint(Math.min(progress / HIDE_SEC, 1));
-          const clipY = THREE.MathUtils.lerp(bottomY, topY, t);
+          const clipY = THREE.MathUtils.lerp(topY, bottomY, t);
           wireOverlays.forEach((m) => {
             m._mat.uniforms.uClipY.value = clipY;
           });
@@ -810,7 +844,21 @@ export default function OpeningSequence({
         });
       }
 
-      composer.render();
+      /**
+       * Pre-GLB: skip composer. Tone mapping + scan/RGB passes turn a flat cream clear into a dull grey.
+       * Direct render keeps #FFFEE1 matching the shell; bust phase uses the full CRT stack.
+       */
+      if (!modelReady) {
+        const prevTone = renderer.toneMapping;
+        const prevExp = renderer.toneMappingExposure;
+        renderer.toneMapping = THREE.NoToneMapping;
+        renderer.toneMappingExposure = 1;
+        renderer.render(scene, camera);
+        renderer.toneMapping = prevTone;
+        renderer.toneMappingExposure = prevExp;
+      } else {
+        composer.render();
+      }
 
       if (phase === 'done' && !done) {
         completeOnce();
@@ -860,7 +908,7 @@ export default function OpeningSequence({
         }
       });
     };
-  }, [backgroundColor, phasePreset, triggerDone, holdUntilUnmount]);
+  }, [phasePreset, triggerDone, holdUntilUnmount]);
 
   if (!visible) return null;
 
@@ -873,6 +921,7 @@ export default function OpeningSequence({
     <div
       ref={shellRef}
       data-nywele-opening-sequence=""
+      className="nywele-cream-grid-surface"
       style={{
         position: 'fixed',
         inset: 0,
@@ -880,13 +929,8 @@ export default function OpeningSequence({
         isolation: 'isolate',
         opacity: 1,
         minHeight: '100dvh',
-        background:
-          typeof document !== 'undefined'
-            ? getComputedStyle(document.documentElement)
-                .getPropertyValue('--background')
-                .trim() || backgroundColor
-            : backgroundColor,
       }}
+      aria-busy={openingAssetLoading}
     >
       <div
         style={{
@@ -909,12 +953,14 @@ export default function OpeningSequence({
                   width: '100%',
                   height: 'min(48vh, 500px)',
                   transform: 'translateY(-2vh)',
+                  zIndex: 1,
                 }
               : {
                   position: 'absolute',
                   inset: 0,
                   width: '100%',
                   height: '100%',
+                  zIndex: 1,
                 }
           }
         />
@@ -950,10 +996,12 @@ export default function OpeningSequence({
               top: '80%',
               left: '50%',
               transform: 'translateX(-50%)',
-              zIndex: 1,
+              zIndex: 2,
               pointerEvents: 'none',
               textAlign: 'center',
-              color: '#AF5500',
+              color: '#DD8106',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
               fontFamily: 'ui-sans-serif, system-ui, sans-serif',
               fontSize: '0.9375rem',
               fontWeight: 600,
@@ -963,9 +1011,8 @@ export default function OpeningSequence({
               paddingRight: '1rem',
             }}
             aria-live="polite"
-            aria-busy="true"
           >
-            AI-powered African hair care
+            Loading
           </div>
         ) : null}
       </div>

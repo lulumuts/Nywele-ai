@@ -33,10 +33,7 @@ export default function OnboardingFeatures() {
   };
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center px-4 md:px-8 py-12"
-      style={{ background: '#FFFEE1' }}
-    >
+    <div className="flex min-h-screen flex-col items-center justify-center bg-transparent px-4 py-12 md:px-8">
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
       `}</style>
@@ -57,13 +54,13 @@ export default function OnboardingFeatures() {
                 <div>
                   <h3
                     className="text-xl md:text-2xl font-bold mb-2"
-                    style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
+                    style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
                   >
                     {item.title}
                   </h3>
                   <p
                     className="text-base md:text-lg leading-relaxed"
-                    style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
                     {item.description}
                   </p>
@@ -76,14 +73,14 @@ export default function OnboardingFeatures() {
           <button
             onClick={handleSkip}
             className="text-base md:text-lg font-bold"
-            style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+            style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
           >
             Skip
           </button>
           <button
             onClick={handleNext}
             className="flex items-center gap-2 text-base md:text-lg font-bold"
-            style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+            style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
           >
             Next <ArrowRight className="w-5 h-5" />
           </button>

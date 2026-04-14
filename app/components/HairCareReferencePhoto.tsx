@@ -15,10 +15,14 @@ export function isDisplayableHairReference(src: string | null | undefined): src 
 export default function HairCareReferencePhoto({
   src,
   compact,
+  headingColor = '#B26805',
+  bodyColor = '#B26805',
 }: {
   src: string | null | undefined;
   /** Tighter layout for dashboard / profile cards */
   compact?: boolean;
+  headingColor?: string;
+  bodyColor?: string;
 }) {
   if (!isDisplayableHairReference(src)) return null;
   return (
@@ -31,12 +35,15 @@ export default function HairCareReferencePhoto({
         />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+        <p
+          className="text-sm font-semibold uppercase tracking-wide"
+          style={{ color: headingColor, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+        >
           Photo used for this analysis
         </p>
         <p
           className={`mt-2 leading-snug ${compact ? 'text-xs' : 'text-xs sm:text-sm'}`}
-          style={{ color: '#6B5344', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+          style={{ color: bodyColor, fontFamily: 'Bricolage Grotesque, sans-serif' }}
         >
           This is the image we analysed to produce the scores and recommendations below.
         </p>

@@ -177,7 +177,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-peach">
+    <div className="min-h-screen bg-transparent">
       {/* Header */}
       <div className="bg-transparent backdrop-blur-sm border-b border-transparent">
         <div className="max-w-7xl mx-auto px-4 py-4">

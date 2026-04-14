@@ -13,9 +13,9 @@ const hubCardStyle = {
   border: '2px solid rgba(175, 85, 0, 0.25)',
 } as const;
 
-const titleColor = '#603E12';
-const bodyColor = '#3D2914';
-const mutedColor = '#6B5344';
+const titleColor = '#B26805';
+const bodyColor = '#B26805';
+const mutedColor = '#B26805';
 
 interface Step {
   stepNumber: number;

@@ -8,6 +8,7 @@ import BottomNav from '@/app/components/BottomNav';
 import { getStyleByName, getProductsForStyle, getAllStyles } from '@/lib/supabase-styles';
 import { findStyleImage } from '@/lib/imageLibrary';
 import { STYLE_CARD_IMAGE_BY_SLUG } from '@/lib/style-check-card-images';
+import { readHairHealthScoreFromLocalProfile } from '@/lib/style-check-health-score';
 
 function slugFromName(name: string): string {
   return name.toLowerCase().replace(/\s+/g, '-');
@@ -20,10 +21,12 @@ function nameFromSlug(slug: string): string {
     .join(' ');
 }
 
-const STYLE_DATA: Record<string, { name: string; score: number; thingsToKnow: string[]; whyWorks: string[]; careInstructions: string; productDetails: string }> = {
+const STYLE_DATA: Record<
+  string,
+  { name: string; thingsToKnow: string[]; whyWorks: string[]; careInstructions: string; productDetails: string }
+> = {
   'short-afro': {
     name: 'Short Afro',
-    score: 82,
     thingsToKnow: ['Low-maintenance length', 'Maintenance: Weekly moisture + shape-up as needed', 'Cost estimate: 800-2500 KES'],
     whyWorks: ['Lightweight daily routine', 'Easy wash days', 'Works well with coils and sponges'],
     careInstructions:
@@ -32,7 +35,6 @@ const STYLE_DATA: Record<string, { name: string; score: number; thingsToKnow: st
   },
   'bantu-knots': {
     name: 'Bantu Knots',
-    score: 82,
     thingsToKnow: ['Wear: 3-10 days typical', 'Maintenance: Moisturise scalp lightly', 'Cost estimate: DIY or 1500-4000 KES'],
     whyWorks: ['Heat-free definition', 'Protective mini sections', 'Unravels to curls or waves'],
     careInstructions:
@@ -41,7 +43,6 @@ const STYLE_DATA: Record<string, { name: string; score: number; thingsToKnow: st
   },
   'natural-afro': {
     name: 'Natural Afro',
-    score: 6,
     thingsToKnow: ['Duration: 6-8 weeks', 'Maintenance: Weekly moisture', 'Cost estimate: 1500 KES'],
     whyWorks: ['Good for 4c hair type', 'Low tension (protects edges)', 'Works with high porosity'],
     careInstructions: 'Moisturise daily with a lightweight leave-in. Protect at night with a satin bonnet. Deep condition weekly. Avoid over-manipulation.',
@@ -49,7 +50,6 @@ const STYLE_DATA: Record<string, { name: string; score: number; thingsToKnow: st
   },
   'lines': {
     name: 'Lines',
-    score: 96,
     thingsToKnow: ['Duration: 6-8 weeks', 'Maintenance: Weekly moisture', 'Cost estimate: 1500 KES'],
     whyWorks: ['Good for 4c hair type', 'Low tension (protects edges)', 'Works with high porosity'],
     careInstructions: 'Moisturise your scalp and braids weekly. Apply oil to your edges. Wash every 2 weeks. Sleep in a satin bonnet.',
@@ -57,7 +57,6 @@ const STYLE_DATA: Record<string, { name: string; score: number; thingsToKnow: st
   },
   'box-braids': {
     name: 'Box Braids',
-    score: 82,
     thingsToKnow: ['Duration: 6-8 weeks', 'Maintenance: Scalp oiling', 'Cost estimate: 3000-5000 KES'],
     whyWorks: ['Protective style', 'Reduces breakage', 'Low manipulation'],
     careInstructions: 'Keep scalp moisturised. Avoid heavy product build-up. Wash every 2-3 weeks. Do not leave in longer than 8 weeks.',
@@ -65,7 +64,6 @@ const STYLE_DATA: Record<string, { name: string; score: number; thingsToKnow: st
   },
   'passion-twists': {
     name: 'Passion Twists',
-    score: 82,
     thingsToKnow: ['Duration: 4-8 weeks typical', 'Maintenance: Scalp care + light misting', 'Cost estimate: 4000-9000 KES'],
     whyWorks: ['Lightweight compared to some twists', 'Protective install', 'Natural, textured finish'],
     careInstructions:
@@ -74,7 +72,6 @@ const STYLE_DATA: Record<string, { name: string; score: number; thingsToKnow: st
   },
   'natural-locs': {
     name: 'Natural Locs',
-    score: 82,
     thingsToKnow: ['Permanent style', 'Maintenance: Retwist every 4-8 weeks', 'Cost estimate: 2000 KES per retwist'],
     whyWorks: ['Low manipulation', 'Protects ends', 'Suitable for most hair types'],
     careInstructions: 'Retwist regularly. Keep scalp clean. Use lightweight oils. Avoid heavy products that cause build-up.',
@@ -82,7 +79,6 @@ const STYLE_DATA: Record<string, { name: string; score: number; thingsToKnow: st
   },
   'sister-locs': {
     name: 'Sister Locs',
-    score: 82,
     thingsToKnow: ['Long-term install', 'Maintenance: Retighten every 4-6 weeks', 'Cost estimate: 3500-8000 KES'],
     whyWorks: ['Uniform small locs', 'Low day-to-day styling', 'Versatile updos'],
     careInstructions:
@@ -91,7 +87,6 @@ const STYLE_DATA: Record<string, { name: string; score: number; thingsToKnow: st
   },
   'permed-hair': {
     name: 'Permed Hair',
-    score: 82,
     thingsToKnow: ['Chemically relaxed or texturised', 'Maintenance: Regular deep conditioning', 'Cost estimate: 2500-6000 KES per touch-up'],
     whyWorks: ['Easier detangling and styling', 'Defined length and swing', 'Pairs well with heat-free sets'],
     careInstructions:
@@ -100,7 +95,6 @@ const STYLE_DATA: Record<string, { name: string; score: number; thingsToKnow: st
   },
   'lace-front-wig': {
     name: 'Lace Front Wig',
-    score: 82,
     thingsToKnow: ['Install: glue, tape, or glueless', 'Wear: weeks to months with care', 'Cost estimate: 8000-40000+ KES unit + install'],
     whyWorks: ['Natural-looking hairline', 'Versatile parting and updos', 'Protective when braided down underneath'],
     careInstructions:
@@ -117,15 +111,27 @@ export default function StyleDetailPage() {
 
   const [styleData, setStyleData] = useState<{
     name: string;
-    score: number;
+    score: number | null;
     thingsToKnow: string[];
     whyWorks: string[];
     careInstructions: string;
     productDetails: string | React.ReactNode;
-  }>(fallback);
+  }>(() => ({
+    ...fallback,
+    score: typeof window !== 'undefined' ? readHairHealthScoreFromLocalProfile() : null,
+  }));
 
   const [styleInspirationImage, setStyleInspirationImage] = useState<string | null>(null);
   const [loadingStyleInspiration, setLoadingStyleInspiration] = useState(false);
+
+  useEffect(() => {
+    const fb = STYLE_DATA[slug] || STYLE_DATA['lines'];
+    setStyleData({
+      ...fb,
+      score: readHairHealthScoreFromLocalProfile(),
+      productDetails: fb.productDetails,
+    });
+  }, [slug]);
 
   const handleGenerateStyleInspiration = async () => {
     setLoadingStyleInspiration(true);
@@ -208,7 +214,7 @@ export default function StyleDetailPage() {
 
         setStyleData({
           name: style?.name ?? fallback.name,
-          score: fallback.score,
+          score: readHairHealthScoreFromLocalProfile(),
           thingsToKnow: thingsToKnow.length ? thingsToKnow : fallback.thingsToKnow,
           whyWorks: fallback.whyWorks,
           careInstructions: fallback.careInstructions,
@@ -219,10 +225,18 @@ export default function StyleDetailPage() {
     return () => { cancelled = true; };
   }, [styleName, slug]);
 
+  useEffect(() => {
+    const refreshScore = () =>
+      setStyleData((prev) => ({ ...prev, score: readHairHealthScoreFromLocalProfile() }));
+    refreshScore();
+    window.addEventListener('focus', refreshScore);
+    return () => window.removeEventListener('focus', refreshScore);
+  }, []);
+
   const style = styleData;
 
   return (
-    <div className="flex min-h-screen flex-col" style={{ background: '#FFFEE1' }}>
+    <div className="flex min-h-screen flex-col bg-transparent">
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
       `}</style>
@@ -280,10 +294,17 @@ export default function StyleDetailPage() {
                   {style.name}
                 </h1>
                 <p
-                  className="mb-1 text-6xl font-bold leading-none sm:text-7xl md:text-8xl xl:text-9xl"
+                  className="mb-1 text-6xl font-bold leading-none tabular-nums sm:text-7xl md:text-8xl xl:text-9xl"
                   style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
-                  {style.score}%
+                  {style.score !== null ? (
+                    <>
+                      {style.score}
+                      <span className="text-2xl font-semibold opacity-80 md:text-3xl">%</span>
+                    </>
+                  ) : (
+                    <span className="text-4xl md:text-5xl xl:text-6xl">—</span>
+                  )}
                 </p>
                 <p
                   className="text-sm"
@@ -291,6 +312,14 @@ export default function StyleDetailPage() {
                 >
                   Compatibility score
                 </p>
+                {style.score === null ? (
+                  <p
+                    className="mt-2 max-w-md text-xs leading-snug opacity-90"
+                    style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  >
+                    Complete a Hair care scan to see your compatibility percentage — it aligns with your dashboard metrics.
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>

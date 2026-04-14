@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import RootAppWithIntro from "@/components/RootAppWithIntro";
+import { OPENING_GLB_URL } from "@/lib/intro-crossfade";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({ 
@@ -47,9 +48,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full bg-cream">
-      <body className={`${bricolage.className} min-h-full bg-cream antialiased`}>
-        <RootAppWithIntro>{children}</RootAppWithIntro>
+    <html lang="en" className="h-full">
+      <head>
+        <link
+          rel="preload"
+          href={OPENING_GLB_URL}
+          as="fetch"
+          crossOrigin="anonymous"
+          fetchPriority="high"
+        />
+      </head>
+      <body
+        className={`${bricolage.className} min-h-full bg-transparent antialiased`}
+      >
+        <div className="nywele-cream-grid-surface nywele-grid-backdrop" aria-hidden />
+        <div className="nywele-app-content">
+          <RootAppWithIntro>{children}</RootAppWithIntro>
+        </div>
       </body>
     </html>
   );

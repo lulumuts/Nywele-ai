@@ -20,8 +20,8 @@ export const bottomNavHubInnerClass =
 /** Same inline styles as the white card on `app/style-check/page.tsx` (hub upload / library flow). */
 export const styleCheckHubWhiteCardStyle: CSSProperties = {
   background: '#FFFFFF',
-  border: '2px solid rgba(193, 114, 8, 0.25)',
-  color: '#C17208',
+  border: '2px solid rgba(178, 104, 5, 0.25)',
+  color: '#B26805',
 };
 
 /**
@@ -47,6 +47,7 @@ export function StyleCheckHubWhiteCard({
   surfaceStyle,
   outerClassName,
   shellClassName,
+  scrollClassName,
 }: {
   children: ReactNode;
   /** Merged over default hub card (e.g. products page dark-brown theme). */
@@ -55,6 +56,8 @@ export function StyleCheckHubWhiteCard({
   outerClassName?: string;
   /** Appended to the white shell (e.g. min-height on md). */
   shellClassName?: string;
+  /** Appended to inner scroll column (e.g. tighter gap between stacked sections). */
+  scrollClassName?: string;
 }) {
   return (
     <div className={outerClassName ?? styleCheckHubWhiteCardOuterClass}>
@@ -62,7 +65,11 @@ export function StyleCheckHubWhiteCard({
         className={[styleCheckHubWhiteCardShellClass, shellClassName].filter(Boolean).join(' ')}
         style={{ ...styleCheckHubWhiteCardStyle, ...surfaceStyle }}
       >
-        <div className={styleCheckHubWhiteCardScrollClass}>{children}</div>
+        <div
+          className={[styleCheckHubWhiteCardScrollClass, scrollClassName].filter(Boolean).join(' ')}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -79,7 +86,7 @@ export function CaprasimoBricolageFonts() {
 /** Same outer shell as `app/style-check/page.tsx`. */
 export function BottomNavHubShell({
   children,
-  background = '#FFFEE1',
+  background = 'transparent',
   mainAreaClassName,
 }: {
   children: ReactNode;

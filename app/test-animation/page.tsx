@@ -32,9 +32,9 @@ const StrokeAnimatedLoader = () => (
 
 export default function TestAnimation() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cream p-8">
+    <div className="flex min-h-screen items-center justify-center bg-transparent p-8">
       <div>
-        <h1 className="text-3xl font-bold mb-8 text-center" style={{ color: '#C17208' }}>
+        <h1 className="text-3xl font-bold mb-8 text-center" style={{ color: '#B26805' }}>
           Your Custom Loader Animation
         </h1>
         

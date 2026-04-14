@@ -1,8 +1,9 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useLayoutEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import IntroVideoFallback from '@/app/components/IntroVideoFallback';
+import { setIntroContentHoldPending } from '@/lib/intro-crossfade';
 
 /**
  * `/` — WebGL opening runs once in `RootAppWithIntro`. This route only steers
@@ -10,6 +11,11 @@ import IntroVideoFallback from '@/app/components/IntroVideoFallback';
  */
 function HomeContent() {
   const router = useRouter();
+
+  useLayoutEffect(() => {
+    setIntroContentHoldPending(true);
+    return () => setIntroContentHoldPending(false);
+  }, []);
 
   useEffect(() => {
     const hasProfile = localStorage.getItem('nywele-user-profile');

@@ -104,10 +104,7 @@ export default function OnboardingProfile() {
   };
 
   return (
-    <div
-      className="flex min-h-dvh flex-col px-4 md:px-8"
-      style={{ background: '#FFFEE1' }}
-    >
+    <div className="flex min-h-dvh flex-col bg-transparent px-4 md:px-8">
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
       `}</style>
@@ -127,11 +124,11 @@ export default function OnboardingProfile() {
             <div className="mx-auto flex w-full max-w-[428px] flex-col">
               <h1
                 className="mb-2 text-3xl font-bold md:text-4xl"
-                style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
+                style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
               >
                 Set up Your Profile
               </h1>
-              <p className="mb-6" style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              <p className="mb-6" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                 Fill in the short form below to get the best out of our service!
               </p>
 

@@ -115,9 +115,9 @@ function buildProfileFromStorage(): UserProfile | null {
   }
 }
 
-/** Match page title “Your Profile”: Caprasimo + deep brown */
-const titleSerif = { fontFamily: 'Caprasimo, serif', color: '#603E12' } as const;
-const bodySans = { fontFamily: 'Bricolage Grotesque, sans-serif', color: '#603E12' } as const;
+/** Match page title “Your Profile”: Caprasimo + brand brown */
+const titleSerif = { fontFamily: 'Caprasimo, serif', color: '#B26805' } as const;
+const bodySans = { fontFamily: 'Bricolage Grotesque, sans-serif', color: '#B26805' } as const;
 
 export default function Profile() {
   const router = useRouter();
@@ -279,6 +279,7 @@ export default function Profile() {
       <OpeningSequence
         phasePreset="route"
         backgroundColor={APP_PAGE_BACKGROUND}
+        holdUntilUnmount
       />
     );
   }
@@ -297,14 +298,11 @@ export default function Profile() {
   const subCardClass = 'rounded-2xl p-4 md:p-5';
   const subCardStyle = {
     background: '#FFFCF3',
-    border: '1px solid rgba(193, 114, 8, 0.25)',
+    border: '1px solid rgba(178, 104, 5, 0.25)',
   } as const;
 
   return (
-    <div
-      className="flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden"
-      style={{ background: '#FFFEE1' }}
-    >
+    <div className="flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden bg-transparent">
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
       `}</style>
@@ -316,13 +314,13 @@ export default function Profile() {
             onClick={() => router.back()}
             className="-ml-2 shrink-0 rounded-full p-2 transition-opacity hover:opacity-70 md:-ml-1"
             aria-label="Go back"
-            style={{ color: '#603E12' }}
+            style={{ color: '#B26805' }}
           >
             <ChevronLeft className="h-8 w-8 md:h-9 md:w-9" strokeWidth={2.25} />
           </button>
           <h1
             className="min-w-0 flex-1 text-right text-3xl font-bold md:text-4xl"
-            style={{ fontFamily: 'Caprasimo, serif', color: '#603E12' }}
+            style={{ fontFamily: 'Caprasimo, serif', color: '#B26805' }}
           >
             Your Profile
           </h1>
@@ -339,7 +337,7 @@ export default function Profile() {
         >
           <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
             {/* Personal info */}
-            <div className="relative border-b border-[rgba(96,62,18,0.1)] pb-5">
+            <div className="relative border-b border-[rgba(178, 104, 5,0.1)] pb-5">
               <div className="absolute right-0 top-0 flex items-center gap-1">
                 {editingSection === 'personal' ? (
                   <>
@@ -347,7 +345,7 @@ export default function Profile() {
                       type="button"
                       onClick={saveProfile}
                       className="rounded-lg p-2"
-                      style={{ color: '#603E12' }}
+                      style={{ color: '#B26805' }}
                       aria-label="Save"
                     >
                       <Save className="h-5 w-5" />
@@ -356,7 +354,7 @@ export default function Profile() {
                       type="button"
                       onClick={cancelEdit}
                       className="rounded-lg p-2"
-                      style={{ color: '#603E12' }}
+                      style={{ color: '#B26805' }}
                       aria-label="Cancel"
                     >
                       <X className="h-5 w-5" />
@@ -367,7 +365,7 @@ export default function Profile() {
                     type="button"
                     onClick={() => startEdit('personal')}
                     className="rounded-lg p-2 transition-opacity hover:opacity-70 disabled:opacity-40"
-                    style={{ color: '#603E12' }}
+                    style={{ color: '#B26805' }}
                     disabled={editingSection !== null}
                     aria-label="Edit personal information"
                   >
@@ -398,7 +396,7 @@ export default function Profile() {
                         value={ep.name}
                         onChange={(e) => updateEditedProfile({ name: e.target.value })}
                         className="w-full rounded-xl border px-3 py-2 text-sm"
-                        style={{ borderColor: 'rgba(96, 62, 18, 0.25)', ...bodySans }}
+                        style={{ borderColor: 'rgba(178, 104, 5, 0.25)', ...bodySans }}
                         placeholder="Name"
                       />
                       <input
@@ -406,7 +404,7 @@ export default function Profile() {
                         value={ep.email}
                         onChange={(e) => updateEditedProfile({ email: e.target.value })}
                         className="w-full rounded-xl border px-3 py-2 text-sm"
-                        style={{ borderColor: 'rgba(96, 62, 18, 0.25)', ...bodySans }}
+                        style={{ borderColor: 'rgba(178, 104, 5, 0.25)', ...bodySans }}
                         placeholder="Email"
                       />
                       <input
@@ -420,14 +418,14 @@ export default function Profile() {
                           })
                         }
                         className="w-full rounded-xl border px-3 py-2 text-sm"
-                        style={{ borderColor: 'rgba(96, 62, 18, 0.25)', ...bodySans }}
+                        style={{ borderColor: 'rgba(178, 104, 5, 0.25)', ...bodySans }}
                         placeholder="Age"
                       />
                       <select
                         value={ep.location || ''}
                         onChange={(e) => updateEditedProfile({ location: e.target.value || undefined })}
                         className="w-full rounded-xl border px-3 py-2 text-sm"
-                        style={{ borderColor: 'rgba(96, 62, 18, 0.25)', ...bodySans }}
+                        style={{ borderColor: 'rgba(178, 104, 5, 0.25)', ...bodySans }}
                       >
                         <option value="">Location</option>
                         {LOCATIONS.map((loc) => (
@@ -453,10 +451,10 @@ export default function Profile() {
               <div className="absolute right-3 top-3 flex items-center gap-1 md:right-4 md:top-4">
                 {editingSection === 'hair' ? (
                   <>
-                    <button type="button" onClick={saveProfile} className="rounded-lg p-2" style={{ color: '#603E12' }} aria-label="Save">
+                    <button type="button" onClick={saveProfile} className="rounded-lg p-2" style={{ color: '#B26805' }} aria-label="Save">
                       <Save className="h-5 w-5" />
                     </button>
-                    <button type="button" onClick={cancelEdit} className="rounded-lg p-2" style={{ color: '#603E12' }} aria-label="Cancel">
+                    <button type="button" onClick={cancelEdit} className="rounded-lg p-2" style={{ color: '#B26805' }} aria-label="Cancel">
                       <X className="h-5 w-5" />
                     </button>
                   </>
@@ -465,7 +463,7 @@ export default function Profile() {
                     type="button"
                     onClick={() => startEdit('hair')}
                     className="rounded-lg p-2 hover:opacity-70 disabled:opacity-40"
-                    style={{ color: '#603E12' }}
+                    style={{ color: '#B26805' }}
                     disabled={editingSection !== null}
                     aria-label="Edit hair profile"
                   >
@@ -491,8 +489,8 @@ export default function Profile() {
                           onClick={() => updateEditedProfile({ hairType: t.id })}
                           className="rounded-full border-2 px-3 py-1.5 text-sm font-semibold"
                           style={{
-                            borderColor: ep.hairType === t.id ? '#603E12' : 'rgba(96,62,18,0.2)',
-                            background: ep.hairType === t.id ? 'rgba(96,62,18,0.08)' : 'transparent',
+                            borderColor: ep.hairType === t.id ? '#B26805' : 'rgba(178, 104, 5,0.2)',
+                            background: ep.hairType === t.id ? 'rgba(178, 104, 5,0.08)' : 'transparent',
                             ...bodySans,
                           }}
                         >
@@ -513,8 +511,8 @@ export default function Profile() {
                           onClick={() => updateEditedProfile({ hairPorosity: t.id })}
                           className="rounded-full border-2 px-3 py-1.5 text-sm font-semibold"
                           style={{
-                            borderColor: ep.hairPorosity === t.id ? '#603E12' : 'rgba(96,62,18,0.2)',
-                            background: ep.hairPorosity === t.id ? 'rgba(96,62,18,0.08)' : 'transparent',
+                            borderColor: ep.hairPorosity === t.id ? '#B26805' : 'rgba(178, 104, 5,0.2)',
+                            background: ep.hairPorosity === t.id ? 'rgba(178, 104, 5,0.08)' : 'transparent',
                             ...bodySans,
                           }}
                         >
@@ -535,8 +533,8 @@ export default function Profile() {
                           onClick={() => updateEditedProfile({ hairLength: t.id })}
                           className="rounded-full border-2 px-3 py-1.5 text-sm font-semibold"
                           style={{
-                            borderColor: ep.hairLength === t.id ? '#603E12' : 'rgba(96,62,18,0.2)',
-                            background: ep.hairLength === t.id ? 'rgba(96,62,18,0.08)' : 'transparent',
+                            borderColor: ep.hairLength === t.id ? '#B26805' : 'rgba(178, 104, 5,0.2)',
+                            background: ep.hairLength === t.id ? 'rgba(178, 104, 5,0.08)' : 'transparent',
                             ...bodySans,
                           }}
                         >
@@ -557,8 +555,8 @@ export default function Profile() {
                           onClick={() => updateEditedProfile({ hairDensity: t.id })}
                           className="rounded-full border-2 px-3 py-1.5 text-sm font-semibold"
                           style={{
-                            borderColor: ep.hairDensity === t.id ? '#603E12' : 'rgba(96,62,18,0.2)',
-                            background: ep.hairDensity === t.id ? 'rgba(96,62,18,0.08)' : 'transparent',
+                            borderColor: ep.hairDensity === t.id ? '#B26805' : 'rgba(178, 104, 5,0.2)',
+                            background: ep.hairDensity === t.id ? 'rgba(178, 104, 5,0.08)' : 'transparent',
                             ...bodySans,
                           }}
                         >
@@ -575,7 +573,7 @@ export default function Profile() {
                       value={ep.location || ''}
                       onChange={(e) => updateEditedProfile({ location: e.target.value || undefined })}
                       className="w-full rounded-xl border px-3 py-2 text-sm"
-                      style={{ borderColor: 'rgba(96, 62, 18, 0.25)', ...bodySans }}
+                      style={{ borderColor: 'rgba(178, 104, 5, 0.25)', ...bodySans }}
                     >
                       <option value="">Select</option>
                       {LOCATIONS.map((loc) => (
@@ -597,8 +595,8 @@ export default function Profile() {
                           onClick={() => updateEditedProfile({ climate: t.id })}
                           className="rounded-full border-2 px-3 py-1.5 text-sm font-semibold"
                           style={{
-                            borderColor: ep.climate === t.id ? '#603E12' : 'rgba(96,62,18,0.2)',
-                            background: ep.climate === t.id ? 'rgba(96,62,18,0.08)' : 'transparent',
+                            borderColor: ep.climate === t.id ? '#B26805' : 'rgba(178, 104, 5,0.2)',
+                            background: ep.climate === t.id ? 'rgba(178, 104, 5,0.08)' : 'transparent',
                             ...bodySans,
                           }}
                         >
@@ -637,7 +635,12 @@ export default function Profile() {
                     : ''}
                 </p>
                 <div className="mb-4">
-                  <HairCareReferencePhoto src={p.hairHealthSnapshot.referenceImageDataUrl} compact />
+                  <HairCareReferencePhoto
+                    src={p.hairHealthSnapshot.referenceImageDataUrl}
+                    compact
+                    headingColor="#B26805"
+                    bodyColor="#B26805"
+                  />
                 </div>
                 <div className="space-y-2">
                   {row('Health score', `${p.hairHealthSnapshot.healthScore}/100`)}
@@ -662,8 +665,8 @@ export default function Profile() {
                   onClick={() => router.push('/hair-care')}
                   className="mt-4 w-full rounded-xl py-3 text-sm font-semibold"
                   style={{
-                    background: 'rgba(96,62,18,0.1)',
-                    color: '#603E12',
+                    background: 'rgba(178, 104, 5,0.1)',
+                    color: '#B26805',
                     fontFamily: 'Bricolage Grotesque, sans-serif',
                   }}
                 >
@@ -689,12 +692,12 @@ export default function Profile() {
                         onClick={() => router.push(`/hair-care?scan=${encodeURIComponent(h.id)}`)}
                         className="w-full rounded-xl border px-3 py-2.5 text-left text-sm transition-colors hover:opacity-90"
                         style={{
-                          borderColor: 'rgba(96,62,18,0.2)',
-                          background: 'rgba(96,62,18,0.04)',
+                          borderColor: 'rgba(178, 104, 5,0.2)',
+                          background: 'rgba(178, 104, 5,0.04)',
                           ...bodySans,
                         }}
                       >
-                        <span className="font-semibold" style={{ color: '#603E12' }}>
+                        <span className="font-semibold" style={{ color: '#B26805' }}>
                           {new Date(h.scannedAt).toLocaleDateString(undefined, {
                             month: 'short',
                             day: 'numeric',
@@ -716,10 +719,10 @@ export default function Profile() {
               <div className="absolute right-3 top-3 flex items-center gap-1 md:right-4 md:top-4">
                 {editingSection === 'goals' ? (
                   <>
-                    <button type="button" onClick={saveProfile} className="rounded-lg p-2" style={{ color: '#603E12' }} aria-label="Save">
+                    <button type="button" onClick={saveProfile} className="rounded-lg p-2" style={{ color: '#B26805' }} aria-label="Save">
                       <Save className="h-5 w-5" />
                     </button>
-                    <button type="button" onClick={cancelEdit} className="rounded-lg p-2" style={{ color: '#603E12' }} aria-label="Cancel">
+                    <button type="button" onClick={cancelEdit} className="rounded-lg p-2" style={{ color: '#B26805' }} aria-label="Cancel">
                       <X className="h-5 w-5" />
                     </button>
                   </>
@@ -728,7 +731,7 @@ export default function Profile() {
                     type="button"
                     onClick={() => startEdit('goals')}
                     className="rounded-lg p-2 hover:opacity-70 disabled:opacity-40"
-                    style={{ color: '#603E12' }}
+                    style={{ color: '#B26805' }}
                     disabled={editingSection !== null}
                     aria-label="Edit goals"
                   >
@@ -749,8 +752,8 @@ export default function Profile() {
                       onClick={() => toggleGoal(goal.id)}
                       className="flex items-center gap-2 rounded-xl border-2 px-3 py-2.5 text-left text-sm transition-colors"
                       style={{
-                        borderColor: ep.hairGoals.includes(goal.id) ? '#603E12' : 'rgba(96,62,18,0.2)',
-                        background: ep.hairGoals.includes(goal.id) ? 'rgba(96,62,18,0.06)' : 'transparent',
+                        borderColor: ep.hairGoals.includes(goal.id) ? '#B26805' : 'rgba(178, 104, 5,0.2)',
+                        background: ep.hairGoals.includes(goal.id) ? 'rgba(178, 104, 5,0.06)' : 'transparent',
                         ...bodySans,
                       }}
                     >
@@ -777,7 +780,7 @@ export default function Profile() {
             </div>
 
             {p.lastBooking && (
-              <div className="mt-6 border-t border-[rgba(96,62,18,0.1)] pt-6">
+              <div className="mt-6 border-t border-[rgba(178, 104, 5,0.1)] pt-6">
                 <h3 className="mb-3 flex items-center gap-2 text-base font-bold" style={titleSerif}>
                   <Calendar className="h-5 w-5 shrink-0" />
                   Latest booking
@@ -805,7 +808,7 @@ export default function Profile() {
               </div>
             )}
 
-            <div className="mt-6 border-t border-[rgba(96,62,18,0.1)] pt-6">
+            <div className="mt-6 border-t border-[rgba(178, 104, 5,0.1)] pt-6">
               <div className="mb-3 flex items-center justify-between gap-2">
                 <h3 className="flex items-center gap-2 text-base font-bold" style={titleSerif}>
                   <FileText className="h-5 w-5 shrink-0" />
@@ -815,7 +818,7 @@ export default function Profile() {
                   type="button"
                   onClick={() => router.push('/hair-care')}
                   className="flex shrink-0 items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold"
-                  style={{ background: 'rgba(96,62,18,0.1)', color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ background: 'rgba(178, 104, 5,0.1)', color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   <Plus className="h-4 w-4" />
                   New
@@ -832,7 +835,7 @@ export default function Profile() {
                     <div
                       key={routine.id}
                       className="rounded-xl border p-3"
-                      style={{ borderColor: 'rgba(96, 62, 18, 0.15)', background: '#FFFEF8' }}
+                      style={{ borderColor: 'rgba(178, 104, 5, 0.15)', background: '#FFFEF8' }}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <p className="text-xs" style={{ ...bodySans, opacity: 0.85 }}>
@@ -846,7 +849,7 @@ export default function Profile() {
                           type="button"
                           onClick={() => deleteRoutine(routine.id)}
                           className="p-1"
-                          style={{ color: '#603E12' }}
+                          style={{ color: '#B26805' }}
                           title="Delete"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -858,7 +861,7 @@ export default function Profile() {
                         placeholder="Notes…"
                         rows={2}
                         className="mt-2 w-full rounded-lg border px-2 py-1.5 text-xs"
-                        style={{ borderColor: 'rgba(96,62,18,0.2)', ...bodySans }}
+                        style={{ borderColor: 'rgba(178, 104, 5,0.2)', ...bodySans }}
                       />
                       <div className="mt-2 flex gap-2">
                         <button
@@ -866,7 +869,7 @@ export default function Profile() {
                           onClick={() => setExpandedRoutine(expandedRoutine === routine.id ? null : routine.id)}
                           className="flex-1 rounded-lg py-2 text-xs font-semibold"
                           style={{
-                            border: '1px solid rgba(96,62,18,0.25)',
+                            border: '1px solid rgba(178, 104, 5,0.25)',
                             ...bodySans,
                           }}
                         >

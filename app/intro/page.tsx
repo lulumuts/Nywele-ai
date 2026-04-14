@@ -76,7 +76,7 @@ export default function IntroPage() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#FFFEE1' }}>
+      <div className="flex min-h-screen items-center justify-center bg-transparent">
         <div className="animate-pulse" style={{ color: '#AF5500', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Loading...</div>
       </div>
     );
@@ -95,7 +95,7 @@ export default function IntroPage() {
           bottom: 0,
           width: '100vw',
           height: '100vh',
-          background: '#FFFEE1',
+          background: 'transparent',
           zIndex: 9999,
           overflow: 'hidden',
         }}

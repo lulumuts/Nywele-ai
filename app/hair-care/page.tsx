@@ -582,13 +582,13 @@ export default function HairCarePage() {
     const base = { fontFamily: 'Bricolage Grotesque, sans-serif' as const };
     switch (importance) {
       case 'essential':
-        return { ...base, background: 'rgba(96, 62, 18, 0.14)', color: '#603E12', border: '1px solid rgba(175, 85, 0, 0.35)' };
+        return { ...base, background: 'rgba(178, 104, 5, 0.14)', color: '#B26805', border: '1px solid rgba(175, 85, 0, 0.35)' };
       case 'recommended':
-        return { ...base, background: 'rgba(96, 62, 18, 0.08)', color: '#603E12', border: '1px solid rgba(175, 85, 0, 0.25)' };
+        return { ...base, background: 'rgba(178, 104, 5, 0.08)', color: '#B26805', border: '1px solid rgba(175, 85, 0, 0.25)' };
       case 'optional':
-        return { ...base, background: 'rgba(96, 62, 18, 0.05)', color: '#603E12', border: '1px solid rgba(175, 85, 0, 0.2)' };
+        return { ...base, background: 'rgba(178, 104, 5, 0.05)', color: '#B26805', border: '1px solid rgba(175, 85, 0, 0.2)' };
       default:
-        return { ...base, background: 'rgba(96, 62, 18, 0.06)', color: '#603E12', border: '1px solid rgba(175, 85, 0, 0.2)' };
+        return { ...base, background: 'rgba(178, 104, 5, 0.06)', color: '#B26805', border: '1px solid rgba(175, 85, 0, 0.2)' };
     }
   };
 
@@ -602,8 +602,8 @@ export default function HairCarePage() {
   const lockPageScroll =
     (currentStep === 3 && hairImage && !recommendation) || (currentStep === 4 && !!recommendation);
 
-  const metricLabelStyle = { color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' } as const;
-  const metricValueStyle = { color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' } as const;
+  const metricLabelStyle = { color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' } as const;
+  const metricValueStyle = { color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' } as const;
 
   return (
     <>
@@ -612,8 +612,8 @@ export default function HairCarePage() {
       <div
         className={
           lockPageScroll
-            ? 'relative flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden'
-            : `relative min-h-screen ${
+            ? 'relative flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden bg-transparent'
+            : `relative min-h-screen bg-transparent ${
                 currentStep === 2 && !hairImage ? 'md:pt-14' : 'md:pt-20'
               } ${
                 currentStep === 2 && !hairImage
@@ -621,7 +621,6 @@ export default function HairCarePage() {
                   : 'pb-24 md:pb-8'
               }`
         }
-        style={{ background: '#FFFEE1' }}
       >
         <style jsx global>{`
           @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
@@ -696,7 +695,7 @@ export default function HairCarePage() {
                   <div className="flex flex-col justify-center">
                     <h1
                       className="text-4xl md:text-5xl font-bold mb-4"
-                      style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                      style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
                     >
                       Let&apos;s get started
                     </h1>
@@ -778,14 +777,14 @@ export default function HairCarePage() {
                 <div className="mb-2 flex items-start justify-between gap-4">
                   <h1
                     className="min-w-0 flex-1 text-3xl font-bold md:text-4xl"
-                    style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
+                    style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
                   >
                     How Healthy is your Hair?
                   </h1>
                 </div>
                 <p
                   className="mb-2 text-base md:mb-6"
-                  style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   Get immediate feedback with a quick selfie.
                 </p>
@@ -795,7 +794,7 @@ export default function HairCarePage() {
                     style={{
                       background: '#FFFFFF',
                       border: '2px solid rgba(175, 85, 0, 0.25)',
-                      color: '#C17208',
+                      color: '#B26805',
                     }}
                   >
                     <div className="flex min-h-0 max-h-full flex-1 flex-col gap-4 overflow-y-auto md:gap-5">
@@ -803,7 +802,7 @@ export default function HairCarePage() {
                         <div className="flex w-full max-w-xs flex-col rounded-2xl p-5 sm:max-w-sm md:max-w-4xl md:p-6">
                           <p
                             className="mb-5 text-center text-base md:mb-6 md:text-lg"
-                            style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                            style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                           >
                             Upload a clear photo of your hair for AI-powered analysis.
                           </p>
@@ -812,11 +811,11 @@ export default function HairCarePage() {
                             onDrop={handleHairPhotoDrop}
                             className="mx-auto flex aspect-square w-full max-w-[min(100%,17.5rem)] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all hover:bg-opacity-80 md:max-w-xs"
                             style={{
-                              borderColor: 'rgba(193, 114, 8, 0.45)',
-                              background: 'rgba(193, 114, 8, 0.06)',
+                              borderColor: 'rgba(178, 104, 5, 0.45)',
+                              background: 'rgba(178, 104, 5, 0.06)',
                             }}
                           >
-                            <Camera className="h-11 w-11 shrink-0 md:h-14 md:w-14" style={{ color: '#C17208' }} aria-hidden />
+                            <Camera className="h-11 w-11 shrink-0 md:h-14 md:w-14" style={{ color: '#B26805' }} aria-hidden />
                             <input
                               ref={hairPhotoInputRef}
                               type="file"
@@ -828,7 +827,7 @@ export default function HairCarePage() {
                           </label>
                           <p
                             className="mt-5 px-2 text-center text-xs leading-snug md:mt-6 md:px-4 md:text-sm"
-                            style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                            style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                           >
                             Click to upload or drag and drop PNG, JPG or JPEG (max. 10MB)
                           </p>
@@ -854,7 +853,7 @@ export default function HairCarePage() {
                   style={{
                     background: '#FFFFFF',
                     border: '2px solid rgba(175, 85, 0, 0.25)',
-                    color: '#603E12',
+                    color: '#B26805',
                   }}
                 >
                   <div
@@ -866,8 +865,8 @@ export default function HairCarePage() {
                       {hairAnalysis && (
                         <div className="space-y-4">
                           <div className="mb-2 flex flex-wrap items-center gap-2 border-b border-[rgba(175,85,0,0.2)] pb-4">
-                            <CheckCircle className="h-6 w-6 shrink-0" style={{ color: '#603E12' }} aria-hidden />
-                            <h3 className="text-lg font-bold md:text-xl" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+                            <CheckCircle className="h-6 w-6 shrink-0" style={{ color: '#B26805' }} aria-hidden />
+                            <h3 className="text-lg font-bold md:text-xl" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
                               Analysis complete
                             </h3>
                             {geminiHealth && (
@@ -919,7 +918,7 @@ export default function HairCarePage() {
                                     })()}
                           </p>
                                   {typeof hairAnalysis.hairType?.confidence === 'number' && (
-                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: '#FFFEE1', color: '#603E12' }}>
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: '#FFFEE1', color: '#B26805' }}>
                                       {Math.round(hairAnalysis.hairType.confidence * 100)}%
                                     </span>
                                   )}
@@ -935,7 +934,7 @@ export default function HairCarePage() {
                                   <p className="text-2xl font-bold tabular-nums" style={metricValueStyle}>
                                     {(hairAnalysis.health?.healthScore || hairAnalysis.health?.score || 60)}/100
                                   </p>
-                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full capitalize" style={{ background: '#FFFEE1', color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full capitalize" style={{ background: '#FFFEE1', color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                     {healthStatus(hairAnalysis.health?.healthScore ?? hairAnalysis.health?.score)}
                                   </span>
                         </div>
@@ -1022,9 +1021,9 @@ export default function HairCarePage() {
                             {geminiHealth?.healthScore !== undefined && (
                               <div className="rounded-lg p-4" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
                                 <p className="text-xs mb-2 font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>Health Score</p>
-                                <div className="relative flex h-3 w-full overflow-hidden rounded-full border-2 border-[#603E12] bg-white">
+                                <div className="relative flex h-3 w-full overflow-hidden rounded-full border-2 border-[#B26805] bg-white">
                                   <div
-                                    className="absolute inset-y-0 left-0 rounded-full bg-[#603E12]"
+                                    className="absolute inset-y-0 left-0 rounded-full bg-[#B26805]"
                                     style={{
                                       width: `${Math.max(0, Math.min(100, geminiHealth.healthScore))}%`,
                                     }}
@@ -1037,7 +1036,7 @@ export default function HairCarePage() {
                             {/* Hair Characteristics (Gemini) */}
                             {geminiHealth && (
                               <div className="rounded-lg p-4 space-y-3" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
-                                <p className="text-sm font-semibold" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>Hair Characteristics</p>
+                                <p className="text-sm font-semibold" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>Hair Characteristics</p>
                                 <div className="grid grid-cols-2 gap-3">
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>Curl Pattern</p>
@@ -1066,7 +1065,7 @@ export default function HairCarePage() {
                             {/* Health Indicators (severity color-coded) */}
                             {geminiHealth && (
                               <div className="rounded-lg p-4 space-y-3" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
-                                <p className="text-sm font-semibold" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>Health Indicators</p>
+                                <p className="text-sm font-semibold" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>Health Indicators</p>
                                 <div className="grid grid-cols-2 gap-3">
                                   {[
                                     { label: 'Moisture', key: 'moistureLevel' },
@@ -1115,7 +1114,7 @@ export default function HairCarePage() {
                                             style={{
                                               background: 'white',
                                               borderColor: 'rgba(175, 85, 0, 0.25)',
-                                              color: '#603E12',
+                                              color: '#B26805',
                                               fontFamily: 'Bricolage Grotesque, sans-serif',
                                             }}
                                           >
@@ -1132,36 +1131,36 @@ export default function HairCarePage() {
                             {/* Recommendations (expandable) */}
                             {geminiHealth?.recommendations && (
                               <details className="rounded-lg p-4" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
-                                <summary className="cursor-pointer text-sm font-semibold" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Recommendations</summary>
+                                <summary className="cursor-pointer text-sm font-semibold" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Recommendations</summary>
                                 <div className="mt-3 space-y-3">
                                   {Array.isArray(geminiHealth.recommendations.immediate) && (
                                     <div>
-                                      <p className="text-xs mb-1" style={{ color: '#603E12' }}>Immediate Actions</p>
-                                      <ul className="list-disc list-inside text-sm" style={{ color: '#603E12' }}>
+                                      <p className="text-xs mb-1" style={{ color: '#B26805' }}>Immediate Actions</p>
+                                      <ul className="list-disc list-inside text-sm" style={{ color: '#B26805' }}>
                                         {geminiHealth.recommendations.immediate.map((r: string, i: number) => <li key={i}>{r}</li>)}
                                       </ul>
                                     </div>
                                   )}
                                   {Array.isArray(geminiHealth.recommendations.products) && (
                                     <div>
-                                      <p className="text-xs mb-1" style={{ color: '#603E12' }}>Product Suggestions</p>
-                                      <ul className="list-disc list-inside text-sm" style={{ color: '#603E12' }}>
+                                      <p className="text-xs mb-1" style={{ color: '#B26805' }}>Product Suggestions</p>
+                                      <ul className="list-disc list-inside text-sm" style={{ color: '#B26805' }}>
                                         {geminiHealth.recommendations.products.map((r: string, i: number) => <li key={i}>{r}</li>)}
                                       </ul>
                                     </div>
                                   )}
                                   {Array.isArray(geminiHealth.recommendations.techniques) && (
                                     <div>
-                                      <p className="text-xs mb-1" style={{ color: '#603E12' }}>Techniques</p>
-                                      <ul className="list-disc list-inside text-sm" style={{ color: '#603E12' }}>
+                                      <p className="text-xs mb-1" style={{ color: '#B26805' }}>Techniques</p>
+                                      <ul className="list-disc list-inside text-sm" style={{ color: '#B26805' }}>
                                         {geminiHealth.recommendations.techniques.map((r: string, i: number) => <li key={i}>{r}</li>)}
                                       </ul>
                                     </div>
                                   )}
                                   {geminiHealth.recommendations.schedule && (
                                     <div>
-                                      <p className="text-xs mb-1" style={{ color: '#603E12' }}>Maintenance Schedule</p>
-                                      <p className="text-sm" style={{ color: '#603E12' }}>{geminiHealth.recommendations.schedule}</p>
+                                      <p className="text-xs mb-1" style={{ color: '#B26805' }}>Maintenance Schedule</p>
+                                      <p className="text-sm" style={{ color: '#B26805' }}>{geminiHealth.recommendations.schedule}</p>
                                     </div>
                                   )}
                                 </div>
@@ -1171,13 +1170,13 @@ export default function HairCarePage() {
                             {/* Damage Assessment */}
                             {hairAnalysis.damage && hairAnalysis.damage.severity !== 'none' && (
                               <div className="rounded-lg p-4" style={{ background: hairAnalysis.damage.severity === 'severe' ? '#fee2e2' : hairAnalysis.damage.severity === 'moderate' ? '#fef3c7' : '#f0fdf4', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
-                                <p className="text-sm font-bold mb-2 capitalize" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+                                <p className="text-sm font-bold mb-2 capitalize" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
                                   Damage: {hairAnalysis.damage.severity}
                                 </p>
                                 {hairAnalysis.damage.damageTypes.length > 0 && (
                                   <div className="flex flex-wrap gap-2">
                                     {hairAnalysis.damage.damageTypes.map((type: string, i: number) => (
-                                      <span key={i} className="text-xs px-2 py-1 rounded-full capitalize" style={{ background: 'white', color: '#603E12', border: '1px solid rgba(175, 85, 0, 0.25)' }}>
+                                      <span key={i} className="text-xs px-2 py-1 rounded-full capitalize" style={{ background: 'white', color: '#B26805', border: '1px solid rgba(175, 85, 0, 0.25)' }}>
                                         {type}
                                       </span>
                                     ))}
@@ -1189,15 +1188,15 @@ export default function HairCarePage() {
                             {/* Detected Style */}
                             {hairAnalysis.detectedStyle?.style && (
                             <div className="rounded-lg p-4" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
-                              <p className="text-sm mb-1" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                              <p className="text-sm mb-1" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                   Detected Style
                               </p>
                                 <div className="flex items-baseline gap-2">
-                                  <p className="text-xl font-bold capitalize" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+                                  <p className="text-xl font-bold capitalize" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
                                     {hairAnalysis.detectedStyle.style.replace(/-/g, ' ')}
                           </p>
                                   {typeof hairAnalysis.detectedStyle.confidence === 'number' && (
-                                    <span className="text-xs px-2 py-1 rounded-full" style={{ background: '#FFFEE1', color: '#603E12', border: '1px solid rgba(175, 85, 0, 0.25)' }}>
+                                    <span className="text-xs px-2 py-1 rounded-full" style={{ background: '#FFFEE1', color: '#B26805', border: '1px solid rgba(175, 85, 0, 0.25)' }}>
                                       {Math.round(hairAnalysis.detectedStyle.confidence * 100)}%
                                     </span>
                                   )}
@@ -1208,10 +1207,10 @@ export default function HairCarePage() {
                             {/* Color Treatment */}
                             {hairAnalysis.colorTreatment && hairAnalysis.colorTreatment.hasColorTreatment && (
                               <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
-                                <p className="text-xs mb-1" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                <p className="text-xs mb-1" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                   Color Treatment
                                 </p>
-                                <p className="text-lg font-bold capitalize" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+                                <p className="text-lg font-bold capitalize" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
                                   {hairAnalysis.colorTreatment.treatmentType}
                                 </p>
                               </div>
@@ -1220,12 +1219,12 @@ export default function HairCarePage() {
                             {/* Product Residues */}
                             {hairAnalysis.productResidues && hairAnalysis.productResidues.visible && (
                               <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
-                                <p className="text-xs mb-1" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                <p className="text-xs mb-1" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                   Products Detected
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                   {hairAnalysis.productResidues.products.map((product: string, i: number) => (
-                                    <span key={i} className="text-xs px-2 py-1 rounded-full capitalize" style={{ background: '#FFFEE1', color: '#603E12', border: '1px solid rgba(175, 85, 0, 0.25)' }}>
+                                    <span key={i} className="text-xs px-2 py-1 rounded-full capitalize" style={{ background: '#FFFEE1', color: '#B26805', border: '1px solid rgba(175, 85, 0, 0.25)' }}>
                                       {product}
                                     </span>
                                   ))}
@@ -1236,18 +1235,18 @@ export default function HairCarePage() {
                             {/* Scalp Health */}
                             {hairAnalysis.scalp && hairAnalysis.scalp.visible && (
                               <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
-                                <p className="text-xs mb-1" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                <p className="text-xs mb-1" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                   Scalp Visibility
                                 </p>
                                 {hairAnalysis.scalp.health && (
-                                  <p className="text-sm font-semibold capitalize" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+                                  <p className="text-sm font-semibold capitalize" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
                                     {hairAnalysis.scalp.health}
                                   </p>
                                 )}
                                 {hairAnalysis.scalp.concerns.length > 0 && (
                                   <div className="flex flex-wrap gap-2 mt-2">
                                     {hairAnalysis.scalp.concerns.map((concern: string, i: number) => (
-                                      <span key={i} className="text-xs px-2 py-1 rounded-full capitalize" style={{ background: '#fee2e2', color: '#603E12' }}>
+                                      <span key={i} className="text-xs px-2 py-1 rounded-full capitalize" style={{ background: '#fee2e2', color: '#B26805' }}>
                                         {concern}
                                       </span>
                                     ))}
@@ -1259,10 +1258,10 @@ export default function HairCarePage() {
                             {/* Top Features Labels */}
                             {(Array.isArray(hairAnalysis.labels) && hairAnalysis.labels.length > 0) && (
                               <div className="rounded-lg p-4 space-y-2" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
-                                <p className="text-sm font-semibold" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Detected Features</p>
+                                <p className="text-sm font-semibold" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Detected Features</p>
                                 <div className="flex flex-wrap gap-2">
                                   {hairAnalysis.labels.slice(0, 10).map((l: any, i: number) => (
-                                    <span key={i} className="text-xs px-2 py-1 rounded-full" style={{ background: '#FFFEE1', color: '#603E12', border: '1px solid rgba(175, 85, 0, 0.25)' }}>
+                                    <span key={i} className="text-xs px-2 py-1 rounded-full" style={{ background: '#FFFEE1', color: '#B26805', border: '1px solid rgba(175, 85, 0, 0.25)' }}>
                                       {(l.name || l.description || '').toString()}
                                     </span>
                                   ))}
@@ -1273,7 +1272,7 @@ export default function HairCarePage() {
                             {/* Dominant Colors */}
                             {(Array.isArray(hairAnalysis.colors) && hairAnalysis.colors.length > 0) && (
                               <div className="rounded-lg p-4 space-y-2" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
-                                <p className="text-sm font-semibold" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Dominant Colors</p>
+                                <p className="text-sm font-semibold" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Dominant Colors</p>
                                 <div className="flex items-center gap-2 flex-wrap">
                                   {hairAnalysis.colors.slice(0, 6).map((c: any, i: number) => (
                                     <div key={i} className="w-8 h-8 rounded-full border-2 shadow-sm" title={`${Math.round((c.score || 0) * 100)}%`}
@@ -1296,7 +1295,7 @@ export default function HairCarePage() {
                             className="flex-1 px-6 py-3 rounded-xl font-semibold transition-all"
                       style={{ 
                               background: '#FFFEE1',
-                              color: '#603E12',
+                              color: '#B26805',
                               border: '2px solid rgba(175, 85, 0, 0.25)',
                               fontFamily: 'Bricolage Grotesque, sans-serif'
                             }}
@@ -1306,7 +1305,7 @@ export default function HairCarePage() {
                     <button
                       onClick={generateRoutine}
                             className="flex-1 px-8 py-3 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
-                            style={{ background: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                            style={{ background: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                           >
                             Generate My Routine
                     </button>
@@ -1328,10 +1327,10 @@ export default function HairCarePage() {
           >
             <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-1 sm:px-2 md:px-4">
               <div className="mx-auto mb-3 w-full max-w-4xl shrink-0 text-center sm:mb-4 md:mb-5">
-                <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+                <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
                   Your routine
                 </h1>
-                <p className="text-base md:text-lg" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                <p className="text-base md:text-lg" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   Here&apos;s what we recommend based on your profile.
                 </p>
               </div>
@@ -1341,7 +1340,7 @@ export default function HairCarePage() {
                 style={{
                   background: '#FFFFFF',
                   border: '2px solid rgba(175, 85, 0, 0.25)',
-                  color: '#603E12',
+                  color: '#B26805',
                 }}
               >
                 <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain md:gap-5">
@@ -1351,8 +1350,8 @@ export default function HairCarePage() {
                     {/* You can expect — always visible (cream inset, same as metrics) */}
                     <div className="rounded-xl p-4 sm:p-5" style={routinePanelStyle}>
                       <div className="mb-4 flex items-center gap-2 sm:mb-5 sm:gap-3">
-                        <TrendingUp size={22} className="shrink-0 sm:h-7 sm:w-7" style={{ color: '#603E12' }} aria-hidden />
-                        <h2 className="text-lg font-bold sm:text-xl" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+                        <TrendingUp size={22} className="shrink-0 sm:h-7 sm:w-7" style={{ color: '#B26805' }} aria-hidden />
+                        <h2 className="text-lg font-bold sm:text-xl" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
                           You can expect
                         </h2>
                       </div>
@@ -1380,8 +1379,8 @@ export default function HairCarePage() {
                         </p>
                         <ul className="space-y-2">
                           {recommendation?.expectedResults?.improvements?.map((improvement, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                              <CheckCircle size={18} className="mt-0.5 shrink-0" style={{ color: '#603E12' }} aria-hidden />
+                            <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                              <CheckCircle size={18} className="mt-0.5 shrink-0" style={{ color: '#B26805' }} aria-hidden />
                               <span>{improvement}</span>
                             </li>
                           ))}
@@ -1401,10 +1400,10 @@ export default function HairCarePage() {
                           }`}
                           style={
                             activeSection === section
-                              ? { background: '#603E12', color: '#FFFFFF', fontFamily: 'Bricolage Grotesque, sans-serif' }
+                              ? { background: '#B26805', color: '#FFFFFF', fontFamily: 'Bricolage Grotesque, sans-serif' }
                               : {
                                   background: 'rgba(255, 254, 225, 0.55)',
-                                  color: '#603E12',
+                                  color: '#B26805',
                                   border: '2px solid rgba(175, 85, 0, 0.25)',
                                   fontFamily: 'Bricolage Grotesque, sans-serif',
                                 }
@@ -1422,10 +1421,10 @@ export default function HairCarePage() {
               {/* Your Routine Section */}
               {activeSection === 'routine' && (
                 <div>
-              <div className="relative mb-6 flex h-10 w-full overflow-hidden rounded-full border-2 border-[#603E12] bg-white sm:h-11">
+              <div className="relative mb-6 flex h-10 w-full overflow-hidden rounded-full border-2 border-[#B26805] bg-white sm:h-11">
                 <motion.div
                   aria-hidden
-                  className="absolute inset-y-0 rounded-full bg-[#603E12]"
+                  className="absolute inset-y-0 rounded-full bg-[#B26805]"
                   initial={false}
                   animate={{
                     left: `${
@@ -1442,7 +1441,7 @@ export default function HairCarePage() {
                     onClick={() => setActiveTab(tab)}
                     className="relative z-10 flex min-w-0 flex-1 items-center justify-center px-0.5 py-0 text-[10px] font-semibold capitalize leading-tight transition-colors sm:px-1 sm:text-xs"
                     style={{
-                      color: activeTab === tab ? '#FFFFFF' : '#603E12',
+                      color: activeTab === tab ? '#FFFFFF' : '#B26805',
                       fontFamily: 'Bricolage Grotesque, sans-serif',
                       background: 'transparent',
                     }}
@@ -1467,7 +1466,7 @@ export default function HairCarePage() {
                     <div className="mb-3 flex items-start justify-between gap-2">
                       <div
                         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-                        style={{ background: '#603E12', fontFamily: 'Caprasimo, serif' }}
+                        style={{ background: '#B26805', fontFamily: 'Caprasimo, serif' }}
                       >
                         {step.stepNumber}
                       </div>
@@ -1479,15 +1478,15 @@ export default function HairCarePage() {
                       </span>
                     </div>
 
-                    <h3 className="mb-1 text-base font-semibold leading-snug" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    <h3 className="mb-1 text-base font-semibold leading-snug" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                       {step.action}
                     </h3>
-                    <p className="mb-3 text-xs" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif', opacity: 0.9 }}>
+                    <p className="mb-3 text-xs" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif', opacity: 0.9 }}>
                       {step.frequency}
                     </p>
 
                     {step.duration && (
-                      <div className="mb-3 flex items-center gap-2" style={{ color: '#3C270C' }}>
+                      <div className="mb-3 flex items-center gap-2" style={{ color: '#B26805' }}>
                         <Clock size={14} className="shrink-0" aria-hidden />
                         <span className="text-xs" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                           {step.duration}
@@ -1505,7 +1504,7 @@ export default function HairCarePage() {
                       <p className="mb-1 text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>
                         Why
                       </p>
-                      <p className="text-sm leading-snug" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                      <p className="text-sm leading-snug" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                         {step.reasoning}
                       </p>
                     </div>
@@ -1515,12 +1514,12 @@ export default function HairCarePage() {
                         className="mt-auto flex items-start gap-2 rounded-lg border border-[rgba(175,85,0,0.2)] p-2"
                         style={{ background: 'rgba(255, 254, 225, 0.25)' }}
                       >
-                        <Package className="mt-0.5 shrink-0" size={14} style={{ color: '#603E12' }} aria-hidden />
+                        <Package className="mt-0.5 shrink-0" size={14} style={{ color: '#B26805' }} aria-hidden />
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>
                             Product
                           </p>
-                          <p className="text-xs leading-snug" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          <p className="text-xs leading-snug" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             {step.product}
                           </p>
                         </div>
@@ -1535,7 +1534,7 @@ export default function HairCarePage() {
               {/* Maintenance Schedule Section */}
               {activeSection === 'maintenance' && (
                 <div>
-                  <h2 className="mb-4 text-xl font-bold sm:mb-6 sm:text-2xl" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+                  <h2 className="mb-4 text-xl font-bold sm:mb-6 sm:text-2xl" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
                     Maintenance schedule
                   </h2>
                   <div className="grid gap-3 md:grid-cols-2 md:gap-4">
@@ -1580,7 +1579,7 @@ export default function HairCarePage() {
                 {/* Products Section */}
               {activeSection === 'products' && recommendation?.productRecommendations && recommendation?.productRecommendations?.essential?.length > 0 && (
                 <div>
-                  <h2 className="mb-4 text-xl font-bold sm:mb-6 sm:text-2xl" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+                  <h2 className="mb-4 text-xl font-bold sm:mb-6 sm:text-2xl" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
                     Recommended products
                   </h2>
                     <div className="grid gap-4 md:grid-cols-3">
@@ -1594,8 +1593,8 @@ export default function HairCarePage() {
                             <span
                               className="inline-block rounded-full px-3 py-1 text-xs font-semibold"
                               style={{
-                                background: 'rgba(96, 62, 18, 0.1)',
-                                color: '#603E12',
+                                background: 'rgba(178, 104, 5, 0.1)',
+                                color: '#B26805',
                                 border: '1px solid rgba(175, 85, 0, 0.25)',
                                 fontFamily: 'Bricolage Grotesque, sans-serif',
                               }}
@@ -1604,10 +1603,10 @@ export default function HairCarePage() {
                             </span>
                         </div>
                           
-                          <h3 className="mb-1 text-lg font-semibold" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          <h3 className="mb-1 text-lg font-semibold" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             {product.brand}
                           </h3>
-                          <p className="mb-3 text-sm" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                          <p className="mb-3 text-sm" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             {product.name}
                           </p>
                           
@@ -1615,7 +1614,7 @@ export default function HairCarePage() {
                             <p className="mb-1 text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>
                               Why we recommend
                             </p>
-                            <p className="text-sm leading-snug" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                            <p className="text-sm leading-snug" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                               {product.purpose}
                             </p>
                       </div>
@@ -1626,8 +1625,8 @@ export default function HairCarePage() {
                             </p>
                         <ul className="space-y-1">
                               {product.benefits.slice(0, 2).map((benefit, bidx) => (
-                                <li key={bidx} className="flex items-start gap-2 text-xs" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                  <span className="text-[#603E12]">•</span>
+                                <li key={bidx} className="flex items-start gap-2 text-xs" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                  <span className="text-[#B26805]">•</span>
                               <span>{benefit}</span>
                             </li>
                           ))}
@@ -1636,17 +1635,17 @@ export default function HairCarePage() {
 
                           <div className="flex flex-col gap-3 border-t border-[rgba(175,85,0,0.2)] pt-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
-                              <p className="text-lg font-bold tabular-nums" style={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                              <p className="text-lg font-bold tabular-nums" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                 {product.pricing.currency} {product.pricing.amount.toLocaleString()}
                               </p>
-                              <p className="text-xs" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                              <p className="text-xs" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                 {product.pricing.size}
                               </p>
                         </div>
                             <button
                               type="button"
                               className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-95"
-                              style={{ background: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                              style={{ background: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                             >
                           Buy now
                         </button>
@@ -1660,22 +1659,22 @@ export default function HairCarePage() {
               {/* Tips Section */}
               {activeSection === 'tips' && (
                 <div>
-                  <h2 className="mb-4 text-xl font-bold sm:mb-6 sm:text-2xl" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+                  <h2 className="mb-4 text-xl font-bold sm:mb-6 sm:text-2xl" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
                     Hair care tips
                   </h2>
             <div className="grid gap-4 md:grid-cols-3 md:gap-6">
                       {/* Do's */}
                       <div className="rounded-xl p-5 sm:p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(175, 85, 0, 0.2)' }}>
                 <div className="mb-4 flex items-center gap-2">
-                          <CheckCircle size={22} className="shrink-0" style={{ color: '#603E12' }} aria-hidden />
-                          <h3 className="text-lg font-bold sm:text-xl" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+                          <CheckCircle size={22} className="shrink-0" style={{ color: '#B26805' }} aria-hidden />
+                          <h3 className="text-lg font-bold sm:text-xl" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
                             Do&apos;s
                           </h3>
                 </div>
                 <ul className="space-y-3">
                   {recommendation?.tips?.dos?.map((tip, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                              <CheckCircle size={16} className="mt-0.5 shrink-0" style={{ color: '#603E12' }} aria-hidden />
+                            <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                              <CheckCircle size={16} className="mt-0.5 shrink-0" style={{ color: '#B26805' }} aria-hidden />
                       <span>{tip}</span>
                     </li>
                   ))}
@@ -1685,15 +1684,15 @@ export default function HairCarePage() {
               {/* Don'ts */}
                       <div className="rounded-xl p-5 sm:p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(175, 85, 0, 0.2)' }}>
                 <div className="mb-4 flex items-center gap-2">
-                          <AlertCircle size={22} className="shrink-0" style={{ color: '#603E12' }} aria-hidden />
-                          <h3 className="text-lg font-bold sm:text-xl" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+                          <AlertCircle size={22} className="shrink-0" style={{ color: '#B26805' }} aria-hidden />
+                          <h3 className="text-lg font-bold sm:text-xl" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
                             Don&apos;ts
                           </h3>
                 </div>
                 <ul className="space-y-3">
                   {recommendation?.tips?.donts?.map((tip, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                              <AlertCircle size={16} className="mt-0.5 shrink-0" style={{ color: '#603E12' }} aria-hidden />
+                            <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                              <AlertCircle size={16} className="mt-0.5 shrink-0" style={{ color: '#B26805' }} aria-hidden />
                       <span>{tip}</span>
                     </li>
                   ))}
@@ -1703,15 +1702,15 @@ export default function HairCarePage() {
               {/* Pro Tips */}
                       <div className="rounded-xl p-5 sm:p-6" style={routinePanelStyle}>
                 <div className="mb-4 flex items-center gap-2">
-                  <Lightbulb size={22} className="shrink-0" style={{ color: '#603E12' }} aria-hidden />
-                          <h3 className="text-lg font-bold sm:text-xl" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+                  <Lightbulb size={22} className="shrink-0" style={{ color: '#B26805' }} aria-hidden />
+                          <h3 className="text-lg font-bold sm:text-xl" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
                             Pro tips
                           </h3>
                 </div>
                 <ul className="space-y-3">
                   {recommendation?.tips?.proTips?.map((tip, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                              <Star size={16} className="mt-0.5 shrink-0" style={{ color: '#603E12' }} aria-hidden />
+                            <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                              <Star size={16} className="mt-0.5 shrink-0" style={{ color: '#B26805' }} aria-hidden />
                       <span>{tip}</span>
                     </li>
                   ))}
@@ -1722,10 +1721,10 @@ export default function HairCarePage() {
               )}
 
                   <div className="rounded-xl p-5 text-center sm:p-6" style={routinePanelStyle}>
-                    <h3 className="mb-2 text-xl font-bold sm:text-2xl" style={{ color: '#603E12', fontFamily: 'Caprasimo, serif' }}>
+                    <h3 className="mb-2 text-xl font-bold sm:text-2xl" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
                       Ready to transform your hair?
                     </h3>
-                    <p className="mb-6 text-sm sm:text-base" style={{ color: '#3C270C', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    <p className="mb-6 text-sm sm:text-base" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                       Start your personalized routine today and see results in weeks.
                     </p>
                     <div className="flex flex-wrap justify-center gap-3">
@@ -1738,7 +1737,7 @@ export default function HairCarePage() {
                         className="rounded-xl px-6 py-3 text-sm font-semibold transition-opacity hover:opacity-90 sm:px-8"
                         style={{
                           background: '#FFFFFF',
-                          color: '#603E12',
+                          color: '#B26805',
                           border: '2px solid rgba(175, 85, 0, 0.25)',
                           fontFamily: 'Bricolage Grotesque, sans-serif',
                         }}
@@ -1749,7 +1748,7 @@ export default function HairCarePage() {
                         type="button"
                         onClick={saveRoutine}
                         className="rounded-xl px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-95 sm:px-8"
-                        style={{ background: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                        style={{ background: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                       >
                         Save my routine
                       </button>
@@ -1759,7 +1758,7 @@ export default function HairCarePage() {
                           window.location.href = '/dashboard';
                         }}
                         className="rounded-xl px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-95 sm:px-8"
-                        style={{ background: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                        style={{ background: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                       >
                         Go to dashboard
                       </button>
@@ -1790,7 +1789,7 @@ export default function HairCarePage() {
             title="Analysing your hair…"
             description="We're analysing your image. This may take a moment."
             showChecklist={false}
-            titleStyle={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+            titleStyle={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
           />
         </div>
       )}
@@ -1803,7 +1802,7 @@ export default function HairCarePage() {
             title="Generating your routine..."
             description="We're building your personalised routine from your scan."
             showChecklist={false}
-            titleStyle={{ color: '#603E12', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+            titleStyle={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
           />
         </div>
       )}

@@ -1,43 +1,55 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Camera } from 'lucide-react';
 import BottomNav from '@/app/components/BottomNav';
 import { StyleCheckHubWhiteCard } from '@/app/components/BottomNavHubLayout';
 import { STYLE_CARD_IMAGE_BY_SLUG } from '@/lib/style-check-card-images';
+import { readHairHealthScoreFromLocalProfile } from '@/lib/style-check-health-score';
 
-const FALLBACK_STYLES = [
-  { slug: 'short-afro', name: 'Short Afro', compatibility: 82 },
-  { slug: 'bantu-knots', name: 'Bantu Knots', compatibility: 82 },
-  { slug: 'natural-afro', name: 'Natural Afro', compatibility: 82 },
-  { slug: 'lines', name: 'Lines', compatibility: 82 },
-  { slug: 'box-braids', name: 'Box Braids', compatibility: 82 },
-  { slug: 'passion-twists', name: 'Passion Twists', compatibility: 82 },
-  { slug: 'natural-locs', name: 'Natural Locs', compatibility: 82 },
-  { slug: 'sister-locs', name: 'Sister Locs', compatibility: 82 },
-  { slug: 'permed-hair', name: 'Permed Hair', compatibility: 82 },
-  { slug: 'lace-front-wig', name: 'Lace Front Wig', compatibility: 82 },
+/** Upload flow only: default hub outer uses `flex-1` + `justify-end` on mobile, which pins the card to the bottom and leaves a huge gap under the hero. Keep the card directly under the subtitle instead. */
+const STYLE_CHECK_UPLOAD_OUTER_CLASS =
+  'flex min-h-0 w-full flex-none flex-col justify-start pt-2 md:pt-0 mt-2 md:mt-4 lg:mt-6';
+
+export type StyleLibraryRow = { slug: string; name: string };
+
+const FALLBACK_STYLES: StyleLibraryRow[] = [
+  { slug: 'short-afro', name: 'Short Afro' },
+  { slug: 'bantu-knots', name: 'Bantu Knots' },
+  { slug: 'natural-afro', name: 'Natural Afro' },
+  { slug: 'lines', name: 'Lines' },
+  { slug: 'box-braids', name: 'Box Braids' },
+  { slug: 'passion-twists', name: 'Passion Twists' },
+  { slug: 'natural-locs', name: 'Natural Locs' },
+  { slug: 'sister-locs', name: 'Sister Locs' },
+  { slug: 'permed-hair', name: 'Permed Hair' },
+  { slug: 'lace-front-wig', name: 'Lace Front Wig' },
 ];
 
 function slugFromName(name: string): string {
   return name.toLowerCase().replace(/\s+/g, '-');
 }
 
-function StyleCheckPageContent() {
+export default function StyleCheckPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const libraryFromQuery =
-    searchParams.get('library') === '1' || searchParams.get('library') === 'true';
+  const [showGrid, setShowGrid] = useState(true);
+  const [styles, setStyles] = useState<StyleLibraryRow[]>(FALLBACK_STYLES);
+  /** 0–100; shown as compatibility % — same underlying value as Dashboard → Metrics health score when a scan exists. */
+  const [healthScore, setHealthScore] = useState<number | null>(null);
 
-  const [showGrid, setShowGrid] = useState(libraryFromQuery);
-  const [styles, setStyles] = useState<typeof FALLBACK_STYLES>(FALLBACK_STYLES);
-  /** True while fetching library styles — stay on loader until data is ready (no flash of stale cards). */
-  const [stylesLoading, setStylesLoading] = useState(false);
+  const refreshHealthScore = useCallback(() => {
+    setHealthScore(readHairHealthScoreFromLocalProfile());
+  }, []);
 
-  const openLibraryGrid = useCallback(() => {
-    setShowGrid(true);
-    setStylesLoading(true);
+  useEffect(() => {
+    refreshHealthScore();
+    const onFocus = () => refreshHealthScore();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [refreshHealthScore]);
+
+  const fetchStyles = useCallback(() => {
     fetch('/api/styles')
       .then((res) => {
         if (!res.ok) throw new Error('styles');
@@ -50,7 +62,6 @@ function StyleCheckPageContent() {
             supabaseStyles.map((s) => ({
               slug: slugFromName(s.name),
               name: s.name,
-              compatibility: 82,
             })),
           );
         } else {
@@ -59,96 +70,96 @@ function StyleCheckPageContent() {
       })
       .catch(() => {
         setStyles(FALLBACK_STYLES);
-      })
-      .finally(() => {
-        setStylesLoading(false);
       });
   }, []);
 
+  const openLibraryGrid = useCallback(() => {
+    setShowGrid(true);
+    fetchStyles();
+  }, [fetchStyles]);
+
   useEffect(() => {
-    if (libraryFromQuery) {
-      openLibraryGrid();
-    }
-  }, [libraryFromQuery, openLibraryGrid]);
+    fetchStyles();
+  }, [fetchStyles]);
 
   return (
-    <div className="flex min-h-screen flex-col" style={{ background: '#FFFEE1' }}>
+    <div className="relative flex h-dvh max-h-dvh flex-col overflow-hidden bg-transparent">
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
       `}</style>
       <BottomNav />
 
       <div
-        className={`bottom-nav-hub-main flex min-h-0 flex-1 flex-col px-7 sm:px-8 md:px-14 lg:px-16 ${
-          showGrid ? 'pt-16 md:pt-32' : 'pt-24 md:pt-28'
+        className={`bottom-nav-hub-main flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-7 sm:px-8 md:px-14 lg:px-16 ${
+          showGrid
+            ? 'pt-[calc(0.35rem+env(safe-area-inset-top,0px))] md:pt-[calc(0.5rem+env(safe-area-inset-top,0px))]'
+            : 'pt-32 md:pt-40 lg:pt-44'
         }`}
       >
-        <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-3 sm:px-4 md:px-6 lg:px-8">
-          <div className="mb-2 flex items-start justify-between gap-4">
-            <h1
-              className={`min-w-0 flex-1 text-3xl font-bold md:text-4xl ${showGrid ? 'translate-y-1 md:translate-y-3' : ''}`}
-              style={{
-                color: '#C17208',
-                fontFamily: 'Caprasimo, serif',
-              }}
-            >
-              {showGrid ? 'Style Check' : 'Feeling Inspired?'}
-            </h1>
-            {showGrid ? (
-              <button
-                type="button"
-                onClick={() => setShowGrid(false)}
-                className="-translate-y-1 inline-flex shrink-0 items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:translate-y-2 md:text-base"
+        <div className="mx-auto w-full max-w-6xl flex flex-col px-3 pb-4 sm:px-4 md:px-6 lg:px-8">
+          {showGrid ? (
+            <div className="mb-6 flex flex-col md:mb-8">
+              <div className="mt-10 flex justify-end md:mt-12">
+                <button
+                  type="button"
+                  onClick={() => setShowGrid(false)}
+                  className="inline-flex shrink-0 items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:text-base"
+                  style={{
+                    color: '#C17208',
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                  }}
+                >
+                  <Camera className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#C17208' }} />
+                  Scan a style
+                </button>
+              </div>
+              <h1
+                className="mt-10 min-w-0 text-3xl font-bold md:mt-12 md:text-4xl"
                 style={{
                   color: '#C17208',
-                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                  fontFamily: 'Caprasimo, serif',
                 }}
               >
-                <Camera className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#C17208' }} />
-                Scan a style
-              </button>
-            ) : null}
-          </div>
+                Style Check
+              </h1>
+            </div>
+          ) : (
+            <div className="mb-2 flex items-start justify-between gap-4">
+              <h1
+                className="min-w-0 flex-1 text-3xl font-bold md:text-4xl"
+                style={{
+                  color: '#C17208',
+                  fontFamily: 'Caprasimo, serif',
+                }}
+              >
+                Feeling Inspired?
+              </h1>
+            </div>
+          )}
           <p
-            className={`text-base md:mb-6 ${showGrid ? 'mb-4 md:mt-3' : 'mb-2'}`}
+            className={`text-base md:mb-6 ${showGrid ? 'mb-5 mt-3 md:mb-6 md:mt-4' : 'mb-2'}`}
             style={{
               color: '#C17208',
               fontFamily: 'Bricolage Grotesque, sans-serif',
             }}
           >
             {showGrid
-              ? 'Select a style for your next look, based on your compatibility score.'
+              ? healthScore !== null
+                ? 'Select a style for your next look. The percentage on each card is your compatibility score — aligned with your dashboard metrics (latest Hair care scan).'
+                : 'Select a style to explore details. Complete a Hair care scan to see your compatibility score here; it matches your dashboard once you have a scan.'
               : 'Upload your image below for a compatibility and maintenance check.'}
           </p>
 
           {showGrid ? (
             <div
-              className="flex min-h-0 flex-1 flex-col p-6 md:mt-4 md:p-8"
+              className="mt-5 px-6 pb-6 pt-6 md:mt-7 md:px-8 md:pb-8 md:pt-8 lg:mt-8"
               style={{
                 background: 'transparent',
                 color: '#C17208',
               }}
             >
-              <div className="grid min-h-0 w-full flex-1 auto-rows-min grid-cols-2 gap-4 overflow-y-auto md:gap-6 lg:flex lg:min-h-0 lg:flex-nowrap lg:items-start lg:overflow-x-auto lg:overflow-y-visible lg:pb-2">
-                {stylesLoading ? (
-                  <div
-                    className="col-span-2 flex min-h-[min(50vh,28rem)] w-full flex-col items-center justify-center gap-5 py-12 md:col-span-4 lg:min-h-[min(60vh,32rem)] lg:basis-full lg:shrink-0"
-                    role="status"
-                    aria-live="polite"
-                  >
-                    <div
-                      className="h-14 w-14 shrink-0 rounded-full border-4 border-[rgba(193,114,8,0.22)] border-t-[#C17208] animate-spin md:h-16 md:w-16"
-                      aria-hidden
-                    />
-                    <p
-                      className="text-sm md:text-base"
-                      style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                    >
-                      Loading styles…
-                    </p>
-                  </div>
-                ) : (
-                  styles.map((style) => (
+              <div className="grid w-full auto-rows-min grid-cols-2 gap-4 md:gap-6 lg:flex lg:min-h-0 lg:flex-nowrap lg:items-start lg:gap-6 lg:overflow-x-auto lg:overflow-y-visible lg:pb-2">
+                {styles.map((style) => (
                     <button
                       key={style.slug}
                       type="button"
@@ -197,14 +208,14 @@ function StyleCheckPageContent() {
                       <div className="space-y-1 px-4 pb-3 text-right md:px-5 md:pb-4 lg:pt-1 lg:pb-4">
                         <div className="flex justify-end">
                           <div
-                            className="inline-block rounded-full px-3 py-1 text-sm font-bold"
+                            className="inline-block rounded-full px-3 py-1 text-sm font-bold tabular-nums"
                             style={{
                               background: 'rgba(193, 114, 8, 0.15)',
                               color: '#C17208',
                               fontFamily: 'Bricolage Grotesque, sans-serif',
                             }}
                           >
-                            {style.compatibility}%
+                            {healthScore !== null ? `${healthScore}%` : '—'}
                           </div>
                         </div>
                         <p
@@ -215,63 +226,62 @@ function StyleCheckPageContent() {
                         </p>
                       </div>
                     </button>
-                  ))
-                )}
+                  ))}
               </div>
             </div>
           ) : (
-            <StyleCheckHubWhiteCard>
+            <StyleCheckHubWhiteCard outerClassName={STYLE_CHECK_UPLOAD_OUTER_CLASS}>
               <div className="flex w-full items-center justify-center py-2 md:py-4">
-                    <div
-                      className="w-full max-w-xs rounded-2xl p-5 sm:max-w-sm md:max-w-4xl md:p-6"
-                      style={{
-                        background: '#FFFCF3',
-                        border: '1px solid rgba(193, 114, 8, 0.25)',
-                      }}
-                    >
-                      <p
-                        className="mb-5 text-center text-base md:mb-6 md:text-lg"
-                        style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                      >
-                        Upload a clear photo of your hair for AI-powered analysis.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => router.push('/style-advisor')}
-                        className="mx-auto flex aspect-square w-full max-w-[min(100%,17.5rem)] flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all hover:bg-opacity-80 md:max-w-xs"
-                        style={{ borderColor: 'rgba(193, 114, 8, 0.45)', background: 'rgba(193, 114, 8, 0.06)' }}
-                      >
-                        <Camera className="mb-2 h-11 w-11 shrink-0 md:mb-3 md:h-14 md:w-14" style={{ color: '#C17208' }} />
-                        <p
-                          className="px-3 text-center text-xs leading-snug md:px-4 md:text-sm"
-                          style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                        >
-                          Click to upload or drag and drop PNG, JPG or JPEG (max. 10MB)
-                        </p>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 flex-col items-center gap-3 self-center pt-2 pb-2 text-center md:pb-4">
+                <div
+                  className="w-full max-w-xs rounded-2xl p-5 sm:max-w-sm md:max-w-4xl md:p-6"
+                  style={{
+                    background: '#FFFCF3',
+                    border: '1px solid rgba(193, 114, 8, 0.25)',
+                  }}
+                >
+                  <p
+                    className="mb-5 text-center text-base md:mb-6 md:text-lg"
+                    style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  >
+                    Upload a clear photo of your hair for AI-powered analysis.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => router.push('/style-advisor')}
+                    className="mx-auto flex aspect-square w-full max-w-[min(100%,17.5rem)] flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all hover:bg-opacity-80 md:max-w-xs"
+                    style={{ borderColor: 'rgba(193, 114, 8, 0.45)', background: 'rgba(193, 114, 8, 0.06)' }}
+                  >
+                    <Camera className="mb-2 h-11 w-11 shrink-0 md:mb-3 md:h-14 md:w-14" style={{ color: '#C17208' }} />
                     <p
-                      className="text-sm font-medium"
+                      className="px-3 text-center text-xs leading-snug md:px-4 md:text-sm"
                       style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                     >
-                      Don&apos;t know what you want yet?
+                      Click to upload or drag and drop PNG, JPG or JPEG (max. 10MB)
                     </p>
-                    <button
-                      type="button"
-                      onClick={openLibraryGrid}
-                      className="w-full max-w-sm rounded-xl py-3 text-sm font-semibold transition-all md:max-w-md md:text-base"
-                      style={{
-                        background: 'rgba(193, 114, 8, 0.12)',
-                        color: '#C17208',
-                        border: '2px solid rgba(193, 114, 8, 0.45)',
-                        fontFamily: 'Bricolage Grotesque, sans-serif',
-                      }}
-                    >
-                      Browse our library
-                    </button>
-                  </div>
+                  </button>
+                </div>
+              </div>
+              <div className="flex shrink-0 flex-col items-center gap-3 self-center pt-2 pb-6 text-center md:pb-8">
+                <p
+                  className="text-base font-medium md:text-lg"
+                  style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                >
+                  Don&apos;t know what you want yet?
+                </p>
+                <button
+                  type="button"
+                  onClick={openLibraryGrid}
+                  className="w-full max-w-sm rounded-xl py-3 text-sm font-semibold transition-all md:max-w-md md:text-base"
+                  style={{
+                    background: 'rgba(193, 114, 8, 0.12)',
+                    color: '#C17208',
+                    border: '2px solid rgba(193, 114, 8, 0.45)',
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                  }}
+                >
+                  Browse our library
+                </button>
+              </div>
             </StyleCheckHubWhiteCard>
           )}
         </div>
@@ -280,28 +290,3 @@ function StyleCheckPageContent() {
   );
 }
 
-function StyleCheckPageFallback() {
-  return (
-    <div className="flex min-h-screen flex-col" style={{ background: '#FFFEE1' }}>
-      <BottomNav />
-      <div
-        className="bottom-nav-hub-main flex flex-1 flex-col items-center justify-center px-7 pt-24"
-        aria-busy="true"
-        aria-live="polite"
-      >
-        <div
-          className="h-12 w-12 shrink-0 rounded-full border-4 border-[rgba(193,114,8,0.22)] border-t-[#C17208] animate-spin"
-          aria-hidden
-        />
-      </div>
-    </div>
-  );
-}
-
-export default function StyleCheckPage() {
-  return (
-    <Suspense fallback={<StyleCheckPageFallback />}>
-      <StyleCheckPageContent />
-    </Suspense>
-  );
-}

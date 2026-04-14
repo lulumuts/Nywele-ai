@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -9,6 +9,7 @@ import {
   BottomNavHubShell,
   StyleCheckHubWhiteCard,
   bottomNavHubMainTightClass,
+  styleCheckHubWhiteCardOuterClass,
 } from '@/app/components/BottomNavHubLayout';
 import { normalizeUserProfile, type UserProfile } from '@/types/userProfile';
 import {
@@ -19,29 +20,33 @@ import {
   type IngredientStatus,
 } from '@/lib/productExplorerCatalog';
 
+/** Slightly shorter than global hub shell; outer uses default `justify-end` so the card hugs just above the bottom nav */
+const PRODUCT_COMPAT_CARD_SHELL_CLASS =
+  'max-md:[max-height:min(64dvh,calc(100dvh-12.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))]';
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Dark brown accent (replaces gold on this page) */
-const BR = '#4A3428';
-const BR_RGB = '74, 52, 40';
+/** Brand accent — aligned with app-wide #B26805 */
+const BR = '#B26805';
+const BR_RGB = '178, 104, 5';
 
 function compatStyle(score: number): { bg: string; text: string } {
-  if (score >= 88) return { bg: `rgba(${BR_RGB}, 0.14)`, text: '#2E2418' };
-  if (score >= 65) return { bg: 'rgba(180, 160, 140, 0.4)', text: '#5C4033' };
-  return { bg: 'rgba(200, 175, 155, 0.45)', text: '#6B3D2E' };
+  if (score >= 88) return { bg: `rgba(${BR_RGB}, 0.14)`, text: BR };
+  if (score >= 65) return { bg: `rgba(${BR_RGB}, 0.22)`, text: BR };
+  return { bg: `rgba(${BR_RGB}, 0.32)`, text: BR };
 }
 
 const INGR_STYLES: Record<IngredientStatus, { bg: string; text: string }> = {
-  good: { bg: `rgba(${BR_RGB}, 0.12)`, text: '#2E2418' },
-  warn: { bg: 'rgba(180, 160, 140, 0.45)', text: '#5C4033' },
+  good: { bg: `rgba(${BR_RGB}, 0.12)`, text: BR },
+  warn: { bg: `rgba(${BR_RGB}, 0.2)`, text: BR },
   bad: { bg: 'rgba(254, 202, 202, 0.65)', text: '#991B1B' },
 };
 
 const AVATAR_COLORS = [
   { bg: `rgba(${BR_RGB}, 0.2)`, text: BR },
-  { bg: `rgba(${BR_RGB}, 0.12)`, text: '#5C4033' },
-  { bg: 'rgba(180, 160, 140, 0.35)', text: '#4A3428' },
-  { bg: `rgba(${BR_RGB}, 0.16)`, text: '#3D2914' },
+  { bg: `rgba(${BR_RGB}, 0.12)`, text: BR },
+  { bg: `rgba(${BR_RGB}, 0.26)`, text: BR },
+  { bg: `rgba(${BR_RGB}, 0.16)`, text: BR },
 ];
 
 function avatarColor(initials: string) {
@@ -59,14 +64,14 @@ function ProductAvatar({ product }: { product: ExplorerProduct }) {
       <img
         src={product.imageSrc}
         alt={product.name}
-        className="h-14 w-14 shrink-0 rounded-2xl border-2 border-[rgba(74,52,40,0.22)] object-cover sm:h-16 sm:w-16"
+        className="h-14 w-14 shrink-0 rounded-2xl border-2 border-[rgba(178,104,5,0.22)] object-cover sm:h-16 sm:w-16"
       />
     );
   }
 
   return (
     <div
-      className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-[rgba(74,52,40,0.2)] text-xs font-semibold sm:h-16 sm:w-16"
+      className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-[rgba(178,104,5,0.2)] text-xs font-semibold sm:h-16 sm:w-16"
       style={{ background: col.bg, color: col.text }}
     >
       {product.initials}
@@ -91,17 +96,17 @@ function ProductCard({ product }: { product: ExplorerProduct }) {
         }
       }}
       className={`cursor-pointer rounded-2xl px-4 py-3.5 transition-colors duration-200 ${
-        open ? 'bg-white' : 'bg-white hover:bg-[rgba(74,52,40,0.04)]'
+        open ? 'bg-white' : 'bg-white hover:bg-[rgba(178,104,5,0.04)]'
       }`}
     >
       <div className="flex items-start gap-3.5">
         <ProductAvatar product={product} />
         <div className="min-w-0 flex-1">
-          <div className="mb-0.5 text-[11px] font-medium uppercase tracking-wide text-[#4A3428]/80">
+          <div className="mb-0.5 text-[11px] font-medium uppercase tracking-wide text-[#B26805]/80">
             {product.brand}
           </div>
-          <div className="text-[15px] font-semibold leading-snug text-[#3D2E1F]">{product.name}</div>
-          <div className="mt-1 text-xs text-[#6B5344]">{product.type}</div>
+          <div className="text-[15px] font-semibold leading-snug text-[#B26805]">{product.name}</div>
+          <div className="mt-1 text-xs text-[#B26805]">{product.type}</div>
         </div>
         <div className="shrink-0 text-right">
           <div
@@ -110,13 +115,13 @@ function ProductCard({ product }: { product: ExplorerProduct }) {
           >
             {product.compat}%
           </div>
-          <div className="text-sm font-semibold text-[#4A3428]">{product.price}</div>
+          <div className="text-sm font-semibold text-[#B26805]">{product.price}</div>
         </div>
       </div>
 
       {open && (
         <div
-          className="mt-3 border-t border-[rgba(74,52,40,0.15)] pt-3"
+          className="mt-3 border-t border-[rgba(178,104,5,0.15)] pt-3"
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => e.stopPropagation()}
         >
@@ -136,11 +141,11 @@ function ProductCard({ product }: { product: ExplorerProduct }) {
               })}
             </div>
           ) : (
-            <div className="mb-3 text-xs text-[#6B5344]">No ingredient list — physical product</div>
+            <div className="mb-3 text-xs text-[#B26805]">No ingredient list — physical product</div>
           )}
 
-          <p className="m-0 text-xs leading-relaxed text-[#5C4A3D]">
-            <span className="font-semibold text-[#3D2E1F]">Trichologist note: </span>
+          <p className="m-0 text-xs leading-relaxed text-[#B26805]">
+            <span className="font-semibold text-[#B26805]">Trichologist note: </span>
             {product.note}
           </p>
 
@@ -152,8 +157,8 @@ function ProductCard({ product }: { product: ExplorerProduct }) {
             }}
             className={`mt-3 w-full rounded-xl border-2 px-3 py-2.5 text-xs font-semibold transition-colors ${
               saved
-                ? 'border-[#4A3428] bg-[rgba(74,52,40,0.1)] text-[#4A3428]'
-                : 'border-[rgba(74,52,40,0.35)] bg-transparent text-[#4A3428] hover:bg-[rgba(74,52,40,0.06)]'
+                ? 'border-[#B26805] bg-[rgba(178,104,5,0.1)] text-[#B26805]'
+                : 'border-[rgba(178,104,5,0.35)] bg-transparent text-[#B26805] hover:bg-[rgba(178,104,5,0.06)]'
             }`}
           >
             {saved ? 'Saved to my products \u2713' : 'Save to my products'}
@@ -167,6 +172,14 @@ function ProductCard({ product }: { product: ExplorerProduct }) {
 function ProductExplorer({ hairTypeLabel }: { hairTypeLabel: string }) {
   const [activeTab, setActiveTab] = useState<TabKey>('care');
   const [query, setQuery] = useState('');
+  const listScrollRef = useRef<HTMLDivElement>(null);
+
+  const tabCount = TABS.length;
+  const activeTabIndex = Math.max(
+    0,
+    TABS.findIndex((t) => t.key === activeTab),
+  );
+  const segmentPct = 100 / tabCount;
 
   const products = PRODUCTS[activeTab].filter(
     (p) =>
@@ -175,63 +188,91 @@ function ProductExplorer({ hairTypeLabel }: { hairTypeLabel: string }) {
       p.brand.toLowerCase().includes(query.toLowerCase()),
   );
 
+  useEffect(() => {
+    const el = listScrollRef.current;
+    if (el) el.scrollTop = 0;
+  }, [activeTab]);
+
   return (
     <div className="mx-auto w-full max-w-full pb-1 font-[family-name:var(--font-bricolage,ui-sans-serif)] [font-family:Bricolage_Grotesque,system-ui,sans-serif]">
-      <div className="mb-5 flex items-center gap-3 rounded-xl border-2 border-[rgba(74,52,40,0.22)] bg-[rgba(74,52,40,0.06)] px-3.5 py-3 transition-colors focus-within:border-[rgba(74,52,40,0.45)] focus-within:bg-[rgba(74,52,40,0.08)]">
-        <Search className="h-[18px] w-[18px] shrink-0 text-[#4A3428]/55" aria-hidden />
+      <div className="mb-5 flex items-center gap-3 rounded-xl border-2 border-[rgba(178,104,5,0.22)] bg-[rgba(178,104,5,0.06)] px-3.5 py-3 transition-colors focus-within:border-[rgba(178,104,5,0.45)] focus-within:bg-[rgba(178,104,5,0.08)]">
+        <Search className="h-[18px] w-[18px] shrink-0 text-[#B26805]/55" aria-hidden />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by product name or brand..."
-          className="min-w-0 flex-1 border-0 bg-transparent text-sm text-[#3D2E1F] outline-none placeholder:text-[#8B7355]/70"
+          className="min-w-0 flex-1 border-0 bg-transparent text-sm text-[#B26805] outline-none placeholder:text-[#B26805]/55"
         />
       </div>
 
-      <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[rgba(74,52,40,0.2)] bg-[rgba(74,52,40,0.08)] px-3 py-1.5 text-xs font-medium text-[#8B5A14]">
-        <span className="h-2 w-2 shrink-0 rounded-full bg-[#4A3428]" aria-hidden />
-        Matched to your <span className="font-semibold text-[#4A3428]">{hairTypeLabel}</span> hair profile
+      <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[rgba(178,104,5,0.2)] bg-[rgba(178,104,5,0.08)] px-3 py-1.5 text-xs font-medium text-[#B26805]">
+        <span className="h-2 w-2 shrink-0 rounded-full bg-[#B26805]" aria-hidden />
+        Matched to your <span className="font-semibold text-[#B26805]">{hairTypeLabel}</span> hair profile
       </div>
 
       <h3
         className="mb-3 text-base font-bold"
-        style={{ color: '#4A3428', fontFamily: 'Caprasimo, serif' }}
+        style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
       >
         Recommended for you
       </h3>
 
-      <div className="mb-4 flex gap-1 rounded-xl border border-[rgba(74,52,40,0.15)] bg-[rgba(74,52,40,0.07)] p-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setActiveTab(tab.key)}
-            className={`min-w-[4.5rem] flex-1 whitespace-nowrap rounded-lg px-2.5 py-2 text-center text-xs font-semibold transition-all ${
-              activeTab === tab.key
-                ? 'bg-white text-[#4A3428] shadow-sm ring-1 ring-[rgba(74,52,40,0.15)]'
-                : 'text-[#6B5344] hover:text-[#4A3428]'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="mb-4">
+        <div
+          role="tablist"
+          aria-label="Product categories"
+          className="relative flex h-9 w-full overflow-hidden rounded-full border-2 border-[#B26805] bg-white sm:h-10"
+        >
+          <motion.div
+            aria-hidden
+            className="absolute inset-y-0 rounded-full bg-[#B26805]"
+            initial={false}
+            animate={{
+              left: `${activeTabIndex * segmentPct}%`,
+              width: `${segmentPct}%`,
+            }}
+            transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+          />
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === tab.key}
+              id={`product-compat-tab-${tab.key}`}
+              onClick={() => setActiveTab(tab.key)}
+              className="relative z-10 flex min-w-0 flex-1 items-center justify-center px-0.5 py-0 text-center text-[10px] font-semibold leading-tight transition-colors sm:px-1 sm:text-xs md:text-sm"
+              style={{
+                color: activeTab === tab.key ? '#FFFFFF' : '#B26805',
+                fontFamily: 'Bricolage Grotesque, sans-serif',
+                background: 'transparent',
+              }}
+            >
+              <span className="max-w-full truncate">{tab.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div
+        ref={listScrollRef}
+        className="flex min-h-[min(40dvh,24rem)] max-h-[min(40dvh,24rem)] flex-col gap-3 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] pr-1"
+      >
         {products.length > 0 ? (
           products.map((p, i) => <ProductCard key={`${activeTab}-${p.brand}-${p.name}-${i}`} product={p} />)
         ) : (
-          <div className="rounded-xl bg-[rgba(74,52,40,0.04)] py-10 text-center text-sm text-[#6B5344]">
+          <div className="flex min-h-[12rem] flex-1 items-center justify-center rounded-xl bg-[rgba(178,104,5,0.04)] px-4 py-10 text-center text-sm text-[#B26805]">
             No products found for &quot;{query}&quot;
           </div>
         )}
       </div>
 
-      <div className="mt-6 rounded-2xl bg-white px-4 py-5 text-center">
-        <div className="mb-1 text-2xl text-[#4A3428]/80" aria-hidden>
+      <div className="mt-4 rounded-2xl bg-white px-3 py-4 text-center md:mt-5 md:px-4 md:py-5">
+        <div className="mb-1 text-2xl text-[#B26805]/80" aria-hidden>
           {'\u2661'}
         </div>
-        <div className="text-sm font-semibold text-[#3D2E1F]">No saved products yet</div>
-        <div className="mt-1 text-xs text-[#6B5344]">Tap the save button on any product to keep it here</div>
+        <div className="text-sm font-semibold text-[#B26805]">No saved products yet</div>
+        <div className="mt-1 text-xs text-[#B26805]">Tap the save button on any product to keep it here</div>
       </div>
     </div>
   );
@@ -244,21 +285,21 @@ function ProductsCompatibilityHeader() {
         <Link
           href="/products/scan"
           className="inline-flex min-h-[44px] items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:text-base"
-          style={{ color: '#4A3428', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+          style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
         >
-          <ScanBarcode className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#4A3428' }} />
+          <ScanBarcode className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#B26805' }} />
           Scan barcode
         </Link>
       </div>
       <h1
         className="mb-1.5 min-w-0 text-3xl font-bold md:mb-2 md:text-4xl"
-        style={{ color: '#4A3428', fontFamily: 'Caprasimo, serif' }}
+        style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
       >
         Product Compatibility
       </h1>
       <p
         className="mb-1 max-w-2xl text-base md:mb-4 md:text-lg"
-        style={{ color: '#5C4A3D', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+        style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
       >
         Scan or search products to see if they work with your hair profile
       </p>
@@ -291,8 +332,8 @@ export default function Products() {
       <BottomNavHubShell mainAreaClassName={bottomNavHubMainTightClass}>
         <div className="flex min-h-0 flex-1 items-center justify-center">
           <div className="text-center">
-            <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-b-4 border-[#4A3428]" />
-            <p style={{ color: '#4A3428', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Loading...</p>
+            <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-b-4 border-[#B26805]" />
+            <p style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>Loading...</p>
           </div>
         </div>
       </BottomNavHubShell>
@@ -303,25 +344,28 @@ export default function Products() {
     return (
       <BottomNavHubShell mainAreaClassName={bottomNavHubMainTightClass}>
         <ProductsCompatibilityHeader />
-        <StyleCheckHubWhiteCard>
+        <StyleCheckHubWhiteCard
+          outerClassName={styleCheckHubWhiteCardOuterClass}
+          shellClassName={PRODUCT_COMPAT_CARD_SHELL_CLASS}
+        >
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="text-center">
             <div
               className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full"
-              style={{ background: 'rgba(74, 52, 40, 0.18)' }}
+              style={{ background: 'rgba(178, 104, 5, 0.18)' }}
             >
-              <User size={32} style={{ color: '#4A3428' }} />
+              <User size={32} style={{ color: '#B26805' }} />
             </div>
-            <h2 className="mb-4 text-2xl font-bold" style={{ color: '#4A3428', fontFamily: 'Caprasimo, serif' }}>
+            <h2 className="mb-4 text-2xl font-bold" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
               Create Your Hair Profile First
             </h2>
-            <p className="mb-6" style={{ color: '#4A3428', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+            <p className="mb-6" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
               Create your hair profile to check product compatibility
             </p>
             <button
               type="button"
               onClick={() => router.push('/onboarding')}
               className="mx-auto flex items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold shadow-lg transition-all hover:shadow-xl"
-              style={{ background: '#4A3428', fontFamily: 'Bricolage Grotesque, sans-serif', color: '#FFFEE1' }}
+              style={{ background: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif', color: '#FFFEE1' }}
             >
               Get Started
               <ArrowRight size={20} />
@@ -344,7 +388,10 @@ export default function Products() {
   return (
     <BottomNavHubShell mainAreaClassName={bottomNavHubMainTightClass}>
       <ProductsCompatibilityHeader />
-      <StyleCheckHubWhiteCard>
+      <StyleCheckHubWhiteCard
+        outerClassName={styleCheckHubWhiteCardOuterClass}
+        shellClassName={PRODUCT_COMPAT_CARD_SHELL_CLASS}
+      >
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
           <ProductExplorer hairTypeLabel={hairLabel} />
         </motion.div>

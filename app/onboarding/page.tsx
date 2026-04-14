@@ -119,10 +119,7 @@ export default function OnboardingPrompt() {
   }, []);
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center px-4 md:px-8"
-      style={{ background: '#FFFEE1' }}
-    >
+    <div className="flex min-h-screen flex-col items-center justify-center bg-transparent px-4 md:px-8">
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
       `}</style>
@@ -189,7 +186,7 @@ export default function OnboardingPrompt() {
           <div ref={exploreRef} className="mt-6 text-base md:text-lg opacity-0 text-center" style={{ color: '#AF5500', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
             <p>Or</p>
             <Link
-              href="/style-check?library=1"
+              href="/style-check"
               className="font-semibold underline hover:no-underline inline-block mt-1"
               style={{ color: '#AF5500' }}
             >

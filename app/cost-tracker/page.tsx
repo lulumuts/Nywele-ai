@@ -102,7 +102,7 @@ export default function CostTracker() {
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&display=swap');
       `}</style>
       
-      <div className="min-h-screen bg-peach px-4 py-12">
+      <div className="min-h-screen bg-transparent px-4 py-12">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <motion.div

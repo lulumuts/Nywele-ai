@@ -246,7 +246,7 @@ export default function StyleAdvisor() {
   const styleCost = desiredStyle ? getStyleCost(desiredStyle) : null;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#FFFEE1' }}>
+    <div className="flex min-h-screen flex-col bg-transparent">
       <BottomNav />
       
       {/* Progress Steps */}

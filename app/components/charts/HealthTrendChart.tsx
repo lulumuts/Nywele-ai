@@ -61,7 +61,7 @@ export default function HealthTrendChart({ dates, scores }: HealthTrendChartProp
       x: {
         grid: { color: CHART_COLORS.grid },
         ticks: {
-          color: '#9ca3af',
+          color: '#B26805',
           font: { size: 12, family: 'Bricolage Grotesque, sans-serif' },
           maxRotation: 45,
           autoSkip: true,
@@ -72,7 +72,7 @@ export default function HealthTrendChart({ dates, scores }: HealthTrendChartProp
         max: 100,
         grid: { color: CHART_COLORS.grid },
         ticks: {
-          color: '#9ca3af',
+          color: '#B26805',
           font: { size: 12, family: 'Bricolage Grotesque, sans-serif' },
           padding: 6,
         },
@@ -86,7 +86,7 @@ export default function HealthTrendChart({ dates, scores }: HealthTrendChartProp
         className="flex h-64 items-center justify-center rounded-lg md:h-72"
         style={{ background: 'rgba(100, 49, 0, 0.05)' }}
       >
-        <p className="text-sm" style={{ color: '#6b7280', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+        <p className="text-sm" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
           Complete a hair scan to see your health trend
         </p>
       </div>

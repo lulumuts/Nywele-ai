@@ -2,15 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  html {
-    background-color: #fffee1;
-  }
-  body {
-    background-color: #fffee1;
-  }
-}
-
 :root {
   --background: #FFFEE1;
   --foreground: #DD8106;
@@ -18,6 +9,9 @@
   --primary-dark: #643100;
   --accent: #CE935F;
   --cream: #FFFEE1;
+  /** Grid line colour #FFF4C1 on cream base #FFFEE1 */
+  --app-grid-line: rgba(255, 244, 193, 0.72);
+  --app-grid-line-fine: rgba(255, 244, 193, 0.42);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -28,14 +22,42 @@
 }
 
 html {
-  background: #FFFEE1;
+  background-color: var(--cream);
 }
 
 body {
   color: var(--foreground);
-  background: #FFFEE1;
+  background-color: transparent;
   overflow-x: hidden;
   min-height: 100vh;
+}
+
+/** Shared cream (#FFFEE1) + #FFF4C1 grid (backdrop + intro shell). */
+.nywele-cream-grid-surface {
+  background-color: var(--cream);
+  background-image: linear-gradient(var(--app-grid-line-fine) 1px, transparent 1px),
+    linear-gradient(90deg, var(--app-grid-line-fine) 1px, transparent 1px),
+    linear-gradient(var(--app-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--app-grid-line) 1px, transparent 1px);
+  background-size: 8px 8px, 8px 8px, 32px 32px, 32px 32px;
+  background-position: 0 0, 0 0, 0 0, 0 0;
+  background-attachment: fixed;
+}
+
+/** Fixed layer behind all app UI */
+.nywele-grid-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/** All pages render inside this so text, nav, and cards stack above the grid backdrop */
+.nywele-app-content {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Override Tailwind gray and white text to use brand color */

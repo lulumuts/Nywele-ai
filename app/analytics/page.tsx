@@ -49,7 +49,7 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-cream">
+      <div className="flex min-h-screen items-center justify-center bg-transparent">
         <LoaderSVG />
       </div>
     );
@@ -57,7 +57,7 @@ export default function AnalyticsPage() {
 
   if (!stats) {
     return (
-      <div className="min-h-screen bg-cream p-8">
+      <div className="min-h-screen bg-transparent p-8">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white/60 backdrop-blur-sm rounded-2xl border-2 border-[#E9A96A] shadow-xl p-8 text-center">
             <h2 className="text-2xl font-bold text-[#C87726] mb-4">Analytics Not Available</h2>
@@ -77,7 +77,7 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-transparent">
       {/* Header */}
       <header className="backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">

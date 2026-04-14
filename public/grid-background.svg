@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <!-- Transparent tile: white lines only; creams shows from CSS underneath. -->
+  <!-- Outer cell (tiles seamlessly). -->
+  <path d="M 48 0 H 0 V 48" fill="none" stroke="#FFFFFF" stroke-width="0.9" opacity="0.11"/>
+  <!-- Mid + quarter divisions (reference-style hierarchy). -->
+  <path d="M 24 0 V 48 M 0 24 H 48" fill="none" stroke="#FFFFFF" stroke-width="0.55" opacity="0.065"/>
+  <path d="M 12 0 V 48 M 36 0 V 48 M 0 12 H 48 M 0 36 H 48" fill="none" stroke="#FFFFFF" stroke-width="0.4" opacity="0.045"/>
+  <!-- Finer 8px rhythm, very light. -->
+  <path
+    d="M 8 0 V 48 M 16 0 V 48 M 32 0 V 48 M 40 0 V 48 M 0 8 H 48 M 0 16 H 48 M 0 32 H 48 M 0 40 H 48"
+    fill="none"
+    stroke="#FFFFFF"
+    stroke-width="0.35"
+    opacity="0.032"
+  />
+  <circle cx="24" cy="24" r="0.75" fill="#FFFFFF" opacity="0.085"/>
+  <!-- Corner + marker -->
+  <path d="M 0 1.5 L 3 1.5 M 1.5 0 L 1.5 3" fill="none" stroke="#FFFFFF" stroke-width="0.5" stroke-linecap="square" opacity="0.075"/>
+</svg>

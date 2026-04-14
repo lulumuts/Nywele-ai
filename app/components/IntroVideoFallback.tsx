@@ -1,5 +1,3 @@
-import { APP_PAGE_BACKGROUND } from '@/lib/app-theme';
-
 /** Legacy asset path (e.g. tests / tools); home intro now uses WebGL `OpeningSequence` in layout. */
 export const INTRO_VIDEO_SRC = '/videos/final-nywele-video.mp4';
 
@@ -8,15 +6,15 @@ export default function IntroVideoFallback() {
   return (
     <div
       className="fixed inset-0 z-[9999] overflow-hidden"
-      style={{ background: APP_PAGE_BACKGROUND }}
+           style={{ background: 'transparent' }}
       role="progressbar"
       aria-label="Loading"
     >
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+        className="pointer-events-none absolute inset-0 opacity-[0.22]"
         style={{
           backgroundImage:
-            'repeating-linear-gradient(0deg, transparent, transparent 2px, #c76f16 2px, #c76f16 3px)',
+            'repeating-linear-gradient(0deg, transparent, transparent 2px, #FFF4C1 2px, #FFF4C1 3px)',
         }}
       />
     </div>
