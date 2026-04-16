@@ -31,13 +31,13 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/icons/coil.svg", type: "image/svg+xml" }
+      { url: "/coil.svg", type: "image/svg+xml" }
     ],
     shortcut: [
-      { url: "/icons/coil.svg", type: "image/svg+xml" }
+      { url: "/coil.svg", type: "image/svg+xml" }
     ],
     apple: [
-      { url: "/icons/coil.svg" }
+      { url: "/coil.svg" }
     ]
   }
 };

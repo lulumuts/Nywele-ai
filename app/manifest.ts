@@ -16,13 +16,13 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["health", "lifestyle"],
     icons: [
       {
-        src: "/icons/coil.svg",
+        src: "/coil.svg",
         sizes: "any",
         type: "image/svg+xml",
         purpose: "any",
       },
       {
-        src: "/icons/coil.svg",
+        src: "/coil.svg",
         sizes: "any",
         type: "image/svg+xml",
         purpose: "maskable",
