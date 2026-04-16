@@ -22,6 +22,11 @@ const HAIR_TYPES = [
   { id: '4b', label: '4b' },
   { id: '4c', label: '4c' },
 ];
+const HAIR_TYPE_IMAGE_SRC: Record<string, string> = {
+  '4a': '/icons/4c_hair.svg',
+  '4b': '/icons/4b_hair.svg',
+  '4c': '/icons/4a_hair.svg',
+};
 const POROSITY_OPTIONS = [
   { id: 'low', label: 'Low', icon: 1 },
   { id: 'normal', label: 'Medium', icon: 2 },
@@ -108,21 +113,20 @@ export default function OnboardingProfile() {
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
       `}</style>
 
-      <div className="flex min-h-0 flex-1 flex-col pb-8 md:pb-12 pt-8 md:pt-12">
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-          <div className="flex min-h-full flex-col justify-center py-2">
-            <div className="mx-auto flex w-full max-w-[428px] flex-col">
-              <h1
-                className="mb-2 text-3xl font-bold md:text-4xl"
-                style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
-              >
-                Set up Your Profile
-              </h1>
-              <p className="mb-6" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                Fill in the short form below to get the best out of our service!
-              </p>
+      <div className="flex flex-1 flex-col justify-center py-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] md:py-10">
+        <div className="min-h-0 overflow-y-auto overscroll-contain">
+          <div className="mx-auto flex w-full max-w-[428px] flex-col justify-center">
+            <h1
+              className="mb-2 text-3xl font-bold md:text-4xl"
+              style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
+            >
+              Set up Your Profile
+            </h1>
+            <p className="mb-6" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              Fill in the short form below to get the best out of our service!
+            </p>
 
-              <FormCard progress={progress} className="flex flex-col">
+            <FormCard progress={progress} className="flex flex-col">
           {step === 0 && (
             <div className="space-y-4">
               <div>
@@ -193,7 +197,7 @@ export default function OnboardingProfile() {
                     onClick={() => setHairType(t.id)}
                     className="rounded-xl border-2 flex flex-col items-center gap-0 transition-all overflow-hidden p-0"
                     style={{
-                      borderColor: hairType === t.id ? '#DD8106' : '#CE935F',
+                      borderColor: hairType === t.id ? '#C17208' : '#573203',
                       backgroundColor: 'transparent',
                       color: hairType === t.id ? '#DD8106' : '#573203',
                       fontFamily: 'Bricolage Grotesque, sans-serif',
@@ -204,7 +208,7 @@ export default function OnboardingProfile() {
                       style={{ backgroundColor: hairType === t.id ? 'rgba(249, 160, 40, 0.4)' : 'transparent' }}
                     >
                       <img
-                        src={`/icons/${t.id}_hair.svg`}
+                        src={HAIR_TYPE_IMAGE_SRC[t.id]}
                         alt={`Hair type ${t.label}`}
                         className="w-full h-full object-contain"
                       />
@@ -387,22 +391,21 @@ export default function OnboardingProfile() {
               </div>
             </div>
           )}
-              </FormCard>
+            </FormCard>
 
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={handleNext}
-                  disabled={!canProceed()}
-                  className="flex items-center gap-2 rounded-xl px-6 py-3 font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50"
-                  style={{
-                    color: canProceed() ? '#573203' : '#9CA3AF',
-                    fontFamily: 'Bricolage Grotesque, sans-serif',
-                  }}
-                >
-                  {step === TOTAL_STEPS - 1 ? 'Finish' : 'Next'}{' '}
-                  <ArrowRight className="h-5 w-5" />
-                </button>
-              </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="flex items-center gap-2 rounded-xl px-6 py-3 font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50"
+                style={{
+                  color: canProceed() ? '#573203' : '#9CA3AF',
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                }}
+              >
+                {step === TOTAL_STEPS - 1 ? 'Finish' : 'Next'}{' '}
+                <ArrowRight className="h-5 w-5" />
+              </button>
             </div>
           </div>
         </div>

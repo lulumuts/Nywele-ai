@@ -163,7 +163,7 @@ export default function OnboardingPrompt() {
         <div className="text-center">
           <button
             ref={buttonRef}
-            onClick={() => router.push('/onboarding/profile')}
+            onClick={() => router.push('/onboarding/features')}
             className="w-full py-3 px-5 rounded-full font-semibold text-base transition-all hover:shadow-lg opacity-0"
             style={{
               background: 'transparent',
