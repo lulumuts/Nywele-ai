@@ -84,7 +84,8 @@ body {
   .bottom-nav-hub-main {
     padding-bottom: max(1rem, calc(9rem + env(safe-area-inset-bottom, 0px)));
   }
-  @media (min-width: 768px) {
+  /** Match BottomNav: top bar only from `lg` (1024px); below that keep space for bottom pill. */
+  @media (min-width: 1024px) {
     .bottom-nav-hub-main {
       padding-bottom: 2.5rem;
     }
@@ -98,7 +99,7 @@ body {
       )
     );
   }
-  @media (min-width: 768px) {
+  @media (min-width: 1024px) {
     .style-check-hub-white-shell-mobile {
       max-height: none;
     }

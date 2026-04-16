@@ -7,6 +7,13 @@ const nextConfig: NextConfig = {
   experimental: {
     devtoolSegmentExplorer: false,
   },
+  webpack: (config, { dev, isServer }) => {
+    if (dev && !isServer && config.output) {
+      // Avoid ChunkLoadError when the first compile of a large route is slower than the default timeout.
+      config.output.chunkLoadTimeout = 300_000;
+    }
+    return config;
+  },
   images: {
     domains: ["images.unsplash.com", "images.pexels.com"],
     unoptimized: false,

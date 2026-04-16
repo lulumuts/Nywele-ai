@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { DASHBOARD_CARD_TEXT } from '@/lib/app-theme';
 
 ChartJS.register(
   CategoryScale,
@@ -57,7 +58,7 @@ export default function GoalProgressChart({ labels, values }: GoalProgressChartP
         max: 100,
         grid: { color: CHART_COLORS.grid },
         ticks: {
-          color: '#B26805',
+          color: DASHBOARD_CARD_TEXT,
           font: { size: 12, family: 'Bricolage Grotesque, sans-serif' },
           padding: 6,
         },
@@ -65,7 +66,7 @@ export default function GoalProgressChart({ labels, values }: GoalProgressChartP
       y: {
         grid: { display: false },
         ticks: {
-          color: '#B26805',
+          color: DASHBOARD_CARD_TEXT,
           font: { size: 12, family: 'Bricolage Grotesque, sans-serif' },
           padding: 10,
         },
@@ -79,7 +80,7 @@ export default function GoalProgressChart({ labels, values }: GoalProgressChartP
         className="flex h-40 items-center justify-center rounded-lg md:h-44"
         style={{ background: 'rgba(100, 49, 0, 0.05)' }}
       >
-        <p className="text-sm" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+        <p className="text-sm" style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
           Add hair goals in your profile to track progress
         </p>
       </div>

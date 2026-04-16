@@ -151,24 +151,24 @@ export default function BottomNav() {
     <nav
       className="fixed bottom-0 left-0 right-0 top-auto z-50
         px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-0
-        md:bottom-auto md:left-0 md:right-0 md:top-0 md:px-0 md:pb-0 md:pt-0"
+        lg:bottom-auto lg:left-0 lg:right-0 lg:top-0 lg:px-0 lg:pb-0 lg:pt-0"
       aria-label="Main navigation"
     >
       <div
         className="mx-auto flex w-full max-w-6xl items-center justify-around gap-1
           rounded-full bg-white py-2.5 px-3
           shadow-[0_10px_40px_rgba(55,73,87,0.14),0_2px_12px_rgba(55,73,87,0.08)]
-          md:justify-between md:gap-2 md:rounded-none md:bg-transparent md:py-3 md:px-2 md:pr-8 md:pl-6
-          md:shadow-none"
+          lg:justify-between lg:gap-2 lg:rounded-none lg:bg-transparent lg:py-3 lg:px-2 lg:pr-8 lg:pl-6
+          lg:shadow-none"
       >
         <Link
           href="/dashboard"
-          className="hidden shrink-0 items-center md:flex"
+          className="hidden shrink-0 items-center lg:flex"
           aria-label="Home"
         >
           <img src="/icons/coil.svg" alt="" className="h-8 w-8" />
         </Link>
-        <div className="flex w-full min-w-0 flex-1 items-center justify-around md:w-auto md:flex-initial md:justify-end md:gap-8">
+        <div className="flex w-full min-w-0 flex-1 items-center justify-around lg:w-auto lg:flex-initial lg:justify-end lg:gap-8">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
@@ -183,14 +183,14 @@ export default function BottomNav() {
                 <item.Icon
                   className={
                     item.href === '/dashboard'
-                      ? 'h-9 w-9 shrink-0 object-contain md:h-8 md:w-8'
+                      ? 'h-9 w-9 shrink-0 object-contain lg:h-8 lg:w-8'
                       : item.href === '/products'
-                        ? 'h-10 w-10 shrink-0 object-contain md:h-8 md:w-8'
-                        : 'h-8 w-8 shrink-0 object-contain md:h-7 md:w-7'
+                        ? 'h-10 w-10 shrink-0 object-contain lg:h-8 lg:w-8'
+                        : 'h-8 w-8 shrink-0 object-contain lg:h-7 lg:w-7'
                   }
                 />
                 <span
-                  className={`text-[10px] font-medium capitalize md:text-[11px] ${item.href === '/style-check' ? 'mt-1' : ''}`}
+                  className={`text-[10px] font-medium capitalize lg:text-[11px] ${item.href === '/style-check' ? 'mt-1' : ''}`}
                   style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   {item.name}

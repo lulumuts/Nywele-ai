@@ -17,24 +17,29 @@ export default function HairCareReferencePhoto({
   compact,
   headingColor = '#B26805',
   bodyColor = '#B26805',
+  alignStart = false,
 }: {
   src: string | null | undefined;
   /** Tighter layout for dashboard / profile cards */
   compact?: boolean;
   headingColor?: string;
   bodyColor?: string;
+  /** Left-align block (e.g. photo column beside metrics). */
+  alignStart?: boolean;
 }) {
   if (!isDisplayableHairReference(src)) return null;
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
-      <div className={`mx-auto w-full shrink-0 sm:mx-0 ${compact ? 'max-w-[160px]' : 'max-w-[220px]'}`}>
+    <div
+      className={`flex flex-col gap-3 ${alignStart ? 'items-start text-left' : 'items-center text-center'}`}
+    >
+      <div className={`w-full shrink-0 ${compact ? 'max-w-[160px]' : 'max-w-[220px]'}`}>
         <img
           src={src}
           alt="Photo used for this hair analysis"
           className={`w-full rounded-lg object-cover ${compact ? 'h-36' : 'h-44 sm:min-h-[11rem] sm:max-h-52 sm:h-full'}`}
         />
       </div>
-      <div className="min-w-0 flex-1">
+      <div className="w-full max-w-md">
         <p
           className="text-sm font-semibold uppercase tracking-wide"
           style={{ color: headingColor, fontFamily: 'Bricolage Grotesque, sans-serif' }}

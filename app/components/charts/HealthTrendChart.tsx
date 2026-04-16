@@ -12,6 +12,7 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
+import { DASHBOARD_CARD_TEXT } from '@/lib/app-theme';
 
 ChartJS.register(
   CategoryScale,
@@ -61,7 +62,7 @@ export default function HealthTrendChart({ dates, scores }: HealthTrendChartProp
       x: {
         grid: { color: CHART_COLORS.grid },
         ticks: {
-          color: '#B26805',
+          color: DASHBOARD_CARD_TEXT,
           font: { size: 12, family: 'Bricolage Grotesque, sans-serif' },
           maxRotation: 45,
           autoSkip: true,
@@ -72,7 +73,7 @@ export default function HealthTrendChart({ dates, scores }: HealthTrendChartProp
         max: 100,
         grid: { color: CHART_COLORS.grid },
         ticks: {
-          color: '#B26805',
+          color: DASHBOARD_CARD_TEXT,
           font: { size: 12, family: 'Bricolage Grotesque, sans-serif' },
           padding: 6,
         },
@@ -86,7 +87,7 @@ export default function HealthTrendChart({ dates, scores }: HealthTrendChartProp
         className="flex h-64 items-center justify-center rounded-lg md:h-72"
         style={{ background: 'rgba(100, 49, 0, 0.05)' }}
       >
-        <p className="text-sm" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+        <p className="text-sm" style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
           Complete a hair scan to see your health trend
         </p>
       </div>

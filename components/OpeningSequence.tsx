@@ -878,6 +878,10 @@ export default function OpeningSequence({
           if (progress >= HIDE_SEC) {
             phase = 'fadeUi';
             uiFade = 0;
+            /** Let clicks reach the app during the fade-out; opacity can hit ~0 before unmount. */
+            if (!disposed && shellRef.current) {
+              shellRef.current.style.pointerEvents = 'none';
+            }
             if (!disposed && !loadingLabelDismissed) {
               loadingLabelDismissed = true;
               setOpeningAssetLoading(false);

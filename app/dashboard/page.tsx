@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Package, Sparkles, Loader, ChevronDown, ChevronUp, Clock, HelpCircle, User } from 'lucide-react';
 import {
   BottomNavHubShell,
+  bottomNavHubInnerDashboardClass,
   bottomNavHubMainDashboardClass,
 } from '@/app/components/BottomNavHubLayout';
 import HairCareReferencePhoto from '@/app/components/HairCareReferencePhoto';
@@ -21,12 +22,20 @@ import {
   getProductSpendData,
   getGoalProgressData,
 } from '@/lib/analyticsTransform';
+import { DASHBOARD_CARD_TEXT } from '@/lib/app-theme';
+import { squashHairTypeDisplayLabel } from '@/lib/hairHealthSnapshot';
 import HealthTrendChart from '@/app/components/charts/HealthTrendChart';
 import ProductSpendDonut from '@/app/components/charts/ProductSpendDonut';
 import GoalProgressChart from '@/app/components/charts/GoalProgressChart';
 
 /** Same catalog as Product Compatibility (/products), default "Cleanse & Care" tab */
 const DASHBOARD_RECOMMENDED = explorerProductsToCarousel('care', 3);
+
+function carouselProductPriceLabel(product: ExplorerCarouselProduct): string | null {
+  if (!product.pricing) return null;
+  const { currency, amount } = product.pricing;
+  return `${currency} ${amount.toLocaleString()}`;
+}
 
 const ROUTINE_CARDS = [
   { id: '1', title: 'Refresh Your Style', schedule: 'Every Morning', tag: 'Daily', duration: '5-10 Mins', why: 'Keep Your Afro Looking Fresh Throughout The Day' },
@@ -58,9 +67,24 @@ function routineCardSurfaceOpacity(tag: string): number {
   return 0.36;
 }
 
+function profileDisplayName(profile: UserProfile | null): string | null {
+  const n = profile?.name?.trim();
+  if (!n || n.toLowerCase() === 'guest') return null;
+  return n;
+}
+
+/** Full onboarding wizard sets porosity + density; hair-care “basic profile” leaves them empty. */
+function hasCompletedOnboarding(profile: UserProfile | null): boolean {
+  if (!profile) return false;
+  const p = profile.hairPorosity;
+  const d = profile.hairDensity;
+  const porosityOk = p === 'low' || p === 'normal' || p === 'high';
+  const densityOk = d === 'low' || d === 'medium' || d === 'high';
+  return porosityOk && densityOk;
+}
+
 export default function Dashboard() {
   const router = useRouter();
-  const [userName, setUserName] = useState<string>('Layla');
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [activeTab, setActiveTab] = useState<'routine' | 'metrics'>('routine');
   const [recommendedProducts, setRecommendedProducts] = useState<ExplorerCarouselProduct[]>(DASHBOARD_RECOMMENDED);
@@ -69,22 +93,22 @@ export default function Dashboard() {
   const [showAiRecommendation, setShowAiRecommendation] = useState(false);
 
   useEffect(() => {
-    const profile = localStorage.getItem('nywele-user-profile');
-    if (profile) {
-      const parsed = normalizeUserProfile(JSON.parse(profile));
-      setUserName(parsed.name || 'Layla');
-      setUserProfile(parsed);
+    const raw = localStorage.getItem('nywele-user-profile');
+    if (raw) {
+      setUserProfile(normalizeUserProfile(JSON.parse(raw)));
+    } else {
+      setUserProfile(null);
     }
     setRecommendedProducts(explorerProductsToCarousel('care', 3));
   }, []);
 
   useEffect(() => {
     const refresh = () => {
-      const profile = localStorage.getItem('nywele-user-profile');
-      if (profile) {
-        const parsed = normalizeUserProfile(JSON.parse(profile));
-        setUserName(parsed.name || 'Layla');
-        setUserProfile(parsed);
+      const raw = localStorage.getItem('nywele-user-profile');
+      if (raw) {
+        setUserProfile(normalizeUserProfile(JSON.parse(raw)));
+      } else {
+        setUserProfile(null);
       }
     };
     const onVisibility = () => {
@@ -97,6 +121,14 @@ export default function Dashboard() {
       document.removeEventListener('visibilitychange', onVisibility);
     };
   }, []);
+
+  const greetingName = useMemo(() => profileDisplayName(userProfile), [userProfile]);
+  const onboardingDone = useMemo(() => hasCompletedOnboarding(userProfile), [userProfile]);
+  const hairHealthSnapshot = userProfile?.hairHealthSnapshot;
+  const healthScorePercent =
+    hairHealthSnapshot != null
+      ? Math.round(Math.min(100, Math.max(0, hairHealthSnapshot.healthScore)))
+      : null;
 
   const hairCareCtx = useMemo(() => getDashboardHairCareContext(userProfile), [userProfile]);
 
@@ -158,44 +190,64 @@ export default function Dashboard() {
         .dashboard-tab-panel-enter {
           animation: dashboardTabPanelFromBottom 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
+        /** Nudge greeting up on narrow phones only — tablet/desktop (768+) match layout at lg. */
+        @media (max-width: 767px) {
+          .dashboard-greeting-nudge-up {
+            transform: translateY(-0.75rem);
+          }
+        }
       `}</style>
-      <BottomNavHubShell mainAreaClassName={bottomNavHubMainDashboardClass}>
-        <div className="mb-2 shrink-0 md:mb-3 md:pt-10">
-          <div className="flex flex-col md:mt-12 md:pt-10 md:flex-row md:items-start md:justify-between md:gap-6">
+      <BottomNavHubShell
+        mainAreaClassName={bottomNavHubMainDashboardClass}
+        innerClassName={bottomNavHubInnerDashboardClass}
+      >
+        <div className="mb-0 shrink-0 lg:mb-3 lg:pt-10">
+          <div className="flex flex-col gap-0 lg:mt-12 lg:flex-row lg:items-start lg:justify-between lg:gap-6 lg:pt-10">
             <h1
-              className="order-2 mt-5 min-w-0 text-3xl font-bold md:order-1 md:mt-0 md:flex-1 md:text-4xl"
+              className={`dashboard-greeting-nudge-up min-w-0 text-3xl font-bold md:text-4xl lg:flex-1 ${userProfile ? 'order-2 lg:order-1' : 'order-1'}`}
               style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
             >
-              Hey {userName || 'Layla'},
+              {!onboardingDone
+                ? 'Welcome'
+                : greetingName
+                  ? `Hey ${greetingName},`
+                  : 'Hey there,'}
             </h1>
-            <div className="order-1 mt-5 flex justify-end md:order-2 md:mt-0 md:shrink-0 md:justify-end md:pt-1">
-              <button
-                type="button"
-                onClick={() => router.push('/profile')}
-                className="inline-flex min-h-[44px] shrink-0 items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:text-base"
-                style={{
-                  color: '#B26805',
-                  fontFamily: 'Bricolage Grotesque, sans-serif',
-                }}
-              >
-                <User className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#B26805' }} />
-                View Profile
-              </button>
-            </div>
+            {userProfile ? (
+              <div className="order-1 flex w-full justify-end max-md:pt-3 lg:order-2 lg:w-auto lg:shrink-0 lg:justify-end lg:pt-1">
+                <button
+                  type="button"
+                  onClick={() => router.push('/profile')}
+                  className="inline-flex min-h-[44px] shrink-0 items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:text-base"
+                  style={{
+                    color: '#B26805',
+                    fontFamily: 'Bricolage Grotesque, sans-serif',
+                  }}
+                >
+                  <User className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#B26805' }} />
+                  View Profile
+                </button>
+              </div>
+            ) : null}
           </div>
         </div>
 
         {userProfile && (
         <div
-          className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl max-h-[min(70dvh,calc(100dvh-10.5rem))] md:mt-2 md:max-h-[min(74dvh,calc(100dvh-11rem))]"
+          className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl max-h-[min(76dvh,calc(100dvh-9.5rem))] lg:mt-2 lg:max-h-[min(72dvh,calc(100dvh-11.5rem))]"
           style={{ background: '#FFFFFF', border: '2px solid rgba(175, 85, 0, 0.25)' }}
         >
-          {/* Segmented toggle — single track, sliding active thumb */}
-          <div className="shrink-0 px-4 pb-3 pt-5 sm:px-5 sm:pb-4 sm:pt-6 md:px-6 md:pb-4 md:pt-8">
+          {/* Segmented toggle — single track, sliding active thumb (tighter below when Metrics so first heading sits higher). */}
+          <div
+            className={[
+              'shrink-0 px-2 pt-4 sm:px-3 sm:pt-5 lg:px-4',
+              activeTab === 'metrics' ? 'lg:pt-4 pb-0 sm:pb-1 lg:pb-1' : 'lg:pt-7 pb-2 sm:pb-3 lg:pb-4',
+            ].join(' ')}
+          >
             <div
               role="tablist"
               aria-label="Dashboard view"
-              className="relative flex h-9 w-full overflow-hidden rounded-full border-2 border-[#B26805] bg-white sm:h-10"
+              className="relative flex h-11 w-full overflow-hidden rounded-full border-2 border-[#B26805] bg-white sm:h-12"
             >
               <motion.div
                 aria-hidden
@@ -213,7 +265,7 @@ export default function Dashboard() {
                 aria-selected={activeTab === 'routine'}
                 id="dashboard-tab-routine"
                 onClick={() => setActiveTab('routine')}
-                className="relative z-10 flex flex-1 items-center justify-center px-1 py-0 text-xs font-semibold leading-tight transition-colors sm:px-2 sm:text-sm"
+                className="relative z-10 flex flex-1 items-center justify-center px-2 py-0 text-sm font-semibold leading-tight transition-colors sm:px-3 sm:text-base"
                 style={{
                   color: activeTab === 'routine' ? '#FFFFFF' : '#B26805',
                   fontFamily: 'Bricolage Grotesque, sans-serif',
@@ -228,7 +280,7 @@ export default function Dashboard() {
                 aria-selected={activeTab === 'metrics'}
                 id="dashboard-tab-metrics"
                 onClick={() => setActiveTab('metrics')}
-                className="relative z-10 flex flex-1 items-center justify-center px-1 py-0 text-xs font-semibold leading-tight transition-colors sm:px-2 sm:text-sm"
+                className="relative z-10 flex flex-1 items-center justify-center px-2 py-0 text-sm font-semibold leading-tight transition-colors sm:px-3 sm:text-base"
                 style={{
                   color: activeTab === 'metrics' ? '#FFFFFF' : '#B26805',
                   fontFamily: 'Bricolage Grotesque, sans-serif',
@@ -240,13 +292,51 @@ export default function Dashboard() {
             </div>
           </div>
 
+        {!onboardingDone && (
+          <div
+            className="shrink-0 border-b border-[rgba(175,85,0,0.22)] px-3 py-3 sm:px-4 md:px-5"
+            style={{ background: 'rgba(255, 254, 225, 0.55)' }}
+            role="status"
+          >
+            <p
+              className="mb-2 text-sm font-medium leading-snug"
+              style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+            >
+              Add porosity and density in onboarding to unlock the full personalized routine—or use Hair care and Metrics below.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => router.push('/onboarding')}
+                className="rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90"
+                style={{ background: '#643100', color: '#FFFEE1', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+              >
+                Continue setup
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push('/style-check')}
+                className="rounded-xl border-2 px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-90"
+                style={{
+                  background: 'transparent',
+                  borderColor: '#914600',
+                  color: '#B26805',
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                }}
+              >
+                Style Check
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {activeTab === 'routine' && (
           <div
             role="tabpanel"
             id="dashboard-panel-routine"
             aria-labelledby="dashboard-tab-routine"
-            className="dashboard-tab-panel-enter space-y-8 p-6 md:p-8"
+            className="dashboard-tab-panel-enter space-y-6 px-3 py-5 lg:space-y-8 lg:px-5 lg:py-6"
           >
             <div>
               <div className="mb-4">
@@ -268,62 +358,62 @@ export default function Dashboard() {
                 ) : null}
               </div>
               <div
-                className="rounded-xl p-4 md:p-5"
+                className="rounded-xl p-4 md:p-5 min-h-[min(48dvh,22rem)] lg:min-h-0"
                 style={{
                   background: 'rgba(255, 254, 225, 0.43)',
                   border: '1px solid rgba(175, 85, 0, 0.14)',
                 }}
               >
-                <div className="overflow-x-auto pb-1 flex gap-4 scrollbar-hide">
+                <div className="flex w-full min-w-0 flex-col gap-4 overflow-x-hidden lg:flex-row lg:flex-nowrap lg:gap-4 lg:overflow-x-auto lg:pb-1 scrollbar-hide">
                 {routineCardsLive.map((card) => (
                   <div
                     key={card.id}
-                    className="flex-shrink-0 w-[320px] px-6 py-5 md:w-[360px] md:px-8 md:py-7 rounded-xl"
+                    className="w-full max-w-full shrink-0 rounded-xl px-5 py-6 lg:w-[360px] lg:min-w-[360px] lg:max-w-none lg:px-8 lg:py-7"
                     style={{
                       background: `rgba(178, 104, 5, ${routineCardSurfaceOpacity(card.tag)})`,
                       border: '2px solid #DD8106',
                     }}
                   >
-                    <div className="flex items-start justify-between gap-2 mb-0">
+                    <div className="-mt-0.5 mb-0 flex items-start justify-between gap-2">
                       <span
-                        className="text-base font-semibold leading-tight"
-                        style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                        className="min-w-0 text-sm font-bold leading-snug lg:text-[0.9375rem]"
+                        style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
                       >
                         {card.title}
                       </span>
                       <span
-                        className="px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
+                        className="-mt-1 shrink-0 self-start rounded-full px-2.5 py-1 text-[10px] font-semibold leading-tight sm:px-3 sm:py-1.5 sm:text-[11px]"
                         style={{ background: '#374151', color: '#FFFFFF' }}
                       >
                         {routineCardTagLabel(card.tag)}
                       </span>
                     </div>
                     <p
-                      className="text-sm mb-2 mt-0 leading-tight"
-                      style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                      className="mb-2 mt-1.5 text-sm leading-tight"
+                      style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
                     >
                       {card.schedule}
                     </p>
                     <div className="mb-2">
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#B26805' }} />
-                        <span className="text-xs font-medium" style={{ color: '#B26805' }}>Duration</span>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" style={{ color: DASHBOARD_CARD_TEXT }} />
+                        <span className="text-[11px] font-medium leading-tight" style={{ color: DASHBOARD_CARD_TEXT }}>Duration</span>
                       </div>
                       <p
-                        className="text-xs leading-snug mt-0.5 pl-[calc(0.875rem+0.375rem)]"
-                        style={{ color: '#B26805' }}
+                        className="mt-0.5 pl-4 text-[11px] leading-snug sm:pl-[calc(0.875rem+0.375rem)]"
+                        style={{ color: DASHBOARD_CARD_TEXT }}
                       >
                         {card.duration}
                       </p>
                     </div>
                     <div>
-                      <div className="flex items-center gap-1.5">
-                        <HelpCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#B26805' }} />
-                        <span className="text-xs font-medium" style={{ color: '#B26805' }}>Why:</span>
+                      <div className="flex items-center gap-1">
+                        <HelpCircle className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" style={{ color: DASHBOARD_CARD_TEXT }} />
+                        <span className="text-[11px] font-medium leading-tight" style={{ color: DASHBOARD_CARD_TEXT }}>Why:</span>
                       </div>
                       <p
-                        className="text-xs leading-snug mt-0.5 pl-[calc(0.875rem+0.375rem)]"
-                        style={{ color: '#B26805' }}
+                        className="mt-0.5 pl-4 text-[11px] leading-snug sm:pl-[calc(0.875rem+0.375rem)]"
+                        style={{ color: DASHBOARD_CARD_TEXT }}
                       >
                         {card.why}
                       </p>
@@ -344,11 +434,11 @@ export default function Dashboard() {
               >
                 <h3
                   className="mb-2 text-base font-bold md:text-lg"
-                  style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
+                  style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Caprasimo, serif' }}
                 >
                   Past hair scans
                 </h3>
-                <p className="mb-3 text-sm" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                <p className="mb-3 text-sm" style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                   Reopen any saved scan and routine in Hair care.
                 </p>
                 <ul className="max-h-40 space-y-2 overflow-y-auto pr-1 md:max-h-48">
@@ -360,11 +450,11 @@ export default function Dashboard() {
                         className="w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors hover:bg-white/80"
                         style={{
                           borderColor: 'rgba(175, 85, 0, 0.25)',
-                          color: '#B26805',
+                          color: DASHBOARD_CARD_TEXT,
                           fontFamily: 'Bricolage Grotesque, sans-serif',
                         }}
                       >
-                        <span className="font-medium text-[#B26805]">
+                        <span className="font-medium" style={{ color: DASHBOARD_CARD_TEXT }}>
                           {new Date(h.scannedAt).toLocaleDateString(undefined, {
                             month: 'short',
                             day: 'numeric',
@@ -397,23 +487,25 @@ export default function Dashboard() {
                 </p>
               </div>
               <div
-                className="rounded-xl p-4 md:p-5"
+                className="rounded-xl p-4 md:p-5 min-h-[min(44dvh,20rem)] lg:min-h-0"
                 style={{
                   background: 'rgba(255, 254, 225, 0.43)',
                   border: '1px solid rgba(175, 85, 0, 0.14)',
                 }}
               >
-                <div className="overflow-x-auto pb-1 flex gap-4 scrollbar-hide">
+                <div className="flex w-full min-w-0 flex-col gap-5 sm:gap-6">
                   {productCarouselLive.map(
-                    (product, i) => (
+                    (product, i) => {
+                      const priceLabel = carouselProductPriceLabel(product);
+                      return (
                     <div
                       key={`${product.brand}-${product.name}-${i}`}
-                      className="flex w-[240px] shrink-0 flex-col rounded-xl p-4"
-                      style={{ background: 'transparent' }}
+                      className="flex w-full max-w-full flex-col gap-4 rounded-xl p-3 sm:p-4"
+                      style={{ background: 'rgba(175, 85, 0, 0.06)' }}
                     >
                       <div
-                        className="mb-3 h-24 w-full shrink-0 overflow-hidden rounded-lg"
-                        style={{ background: 'rgba(175, 85, 0, 0.06)' }}
+                        className="h-40 w-full shrink-0 overflow-hidden rounded-lg sm:h-44"
+                        style={{ background: 'rgba(175, 85, 0, 0.08)' }}
                       >
                         {product.imageUrl ? (
                           <img
@@ -425,19 +517,45 @@ export default function Dashboard() {
                           />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center">
-                            <Package className="h-10 w-10" style={{ color: '#B26805' }} />
+                            <Package className="h-10 w-10" style={{ color: DASHBOARD_CARD_TEXT }} />
                           </div>
                         )}
                       </div>
-                      <p className="text-sm font-bold" style={{ color: '#B26805' }}>{product.name}</p>
-                      {product.brand ? (
-                        <p className="text-[11px] font-semibold uppercase tracking-wide opacity-80" style={{ color: '#B26805' }}>
-                          {product.brand}
+                      <div className="flex min-w-0 w-full flex-col gap-2 text-left">
+                        {priceLabel ? (
+                          <p
+                            className="text-base font-bold tabular-nums leading-tight sm:text-lg"
+                            style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                          >
+                            {priceLabel}
+                          </p>
+                        ) : null}
+                        <p
+                          className="w-full text-sm font-bold leading-snug break-words sm:text-base"
+                          style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                        >
+                          {product.name}
                         </p>
-                      ) : null}
-                      <p className="mt-1 line-clamp-3 text-xs" style={{ color: '#B26805' }}>{product.purpose || ''}</p>
+                        {product.brand ? (
+                          <p
+                            className="text-[11px] font-semibold uppercase tracking-wide opacity-80"
+                            style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                          >
+                            {product.brand}
+                          </p>
+                        ) : null}
+                        {product.purpose ? (
+                          <p
+                            className="text-xs leading-relaxed break-words sm:text-sm"
+                            style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                          >
+                            {product.purpose}
+                          </p>
+                        ) : null}
+                      </div>
                     </div>
-                  ))}
+                      );
+                    })}
                 </div>
               </div>
             </div>
@@ -527,107 +645,127 @@ export default function Dashboard() {
             role="tabpanel"
             id="dashboard-panel-metrics"
             aria-labelledby="dashboard-tab-metrics"
-            className="dashboard-tab-panel-enter space-y-8 p-6 md:p-8"
+            className="dashboard-tab-panel-enter space-y-5 px-3 pb-5 pt-4 lg:space-y-7 lg:px-5 lg:pb-6 lg:pt-5"
           >
-            {userProfile?.hairHealthSnapshot && (
-              <div
-                className="rounded-xl p-4 md:p-5"
-                style={{
-                  background: 'rgba(255, 254, 225, 0.43)',
-                  border: '2px solid rgba(175, 85, 0, 0.25)',
-                }}
-              >
+            <>
+              <div className="mb-0 mt-1 lg:mt-2">
                 <h2
-                  className="text-xl md:text-2xl font-bold mb-1"
+                  className="text-xl md:text-2xl font-bold mb-1 leading-tight"
                   style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
                 >
                   How healthy is your hair
                 </h2>
-                <p className="text-sm mb-4" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                  From your latest scan in Hair care
-                  {userProfile.hairHealthSnapshot.analyzedAt
-                    ? ` · ${new Date(userProfile.hairHealthSnapshot.analyzedAt).toLocaleDateString(undefined, {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}`
-                    : ''}
-                </p>
-                <div className="mb-4">
-                  <HairCareReferencePhoto
-                    src={userProfile.hairHealthSnapshot.referenceImageDataUrl}
-                    compact
-                    headingColor="#B26805"
-                    bodyColor="#B26805"
-                  />
-                </div>
-                <div className="flex flex-wrap items-end gap-6">
-                  <div>
-                    <p
-                      className="text-xs font-semibold uppercase tracking-wide opacity-80"
-                      style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                    >
-                      Health score
-                    </p>
-                    <p
-                      className="text-2xl font-bold tabular-nums leading-tight md:text-3xl"
-                      style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                    >
-                      85<span className="text-base font-semibold opacity-80 md:text-lg">%</span>
-                    </p>
-                  </div>
-                  {userProfile.hairHealthSnapshot.hairTypeDetected && (
-                    <div>
-                      <p
-                        className="text-xs font-semibold uppercase tracking-wide opacity-80"
-                        style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                      >
-                        Type (detected)
-                      </p>
-                      <p
-                        className="text-2xl font-bold capitalize leading-tight md:text-3xl"
-                        style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                      >
-                        {String(userProfile.hairHealthSnapshot.hairTypeDetected)}
-                      </p>
-                    </div>
+                <p className="text-sm" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                  {hairHealthSnapshot ? (
+                    <>
+                      From your latest scan in Hair care
+                      {hairHealthSnapshot.analyzedAt
+                        ? ` · ${new Date(hairHealthSnapshot.analyzedAt).toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}`
+                        : ''}
+                    </>
+                  ) : (
+                    'Complete a scan in Hair care to see your score, photo reference, and breakdown here.'
                   )}
-                  {userProfile.hairHealthSnapshot.damageSeverity &&
-                    userProfile.hairHealthSnapshot.damageSeverity !== 'none' && (
+                </p>
+              </div>
+              {hairHealthSnapshot ? (
+                <div
+                  className="rounded-xl px-4 pb-4 pt-3 md:px-5 md:pb-5 md:pt-4"
+                  style={{
+                    background: 'rgba(255, 254, 225, 0.43)',
+                    border: '2px solid rgba(175, 85, 0, 0.25)',
+                  }}
+                >
+                  <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+                    <div className="shrink-0 lg:max-w-[200px]">
+                      <HairCareReferencePhoto
+                        src={hairHealthSnapshot.referenceImageDataUrl}
+                        compact
+                        alignStart
+                        headingColor={DASHBOARD_CARD_TEXT}
+                        bodyColor={DASHBOARD_CARD_TEXT}
+                      />
+                    </div>
+                    <div className="flex min-w-0 flex-1 flex-col gap-5 sm:gap-6 lg:pt-0.5">
                       <div>
                         <p
                           className="text-xs font-semibold uppercase tracking-wide opacity-80"
-                          style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                          style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
                         >
-                          Damage
+                          Health score
                         </p>
                         <p
-                          className="text-2xl font-bold capitalize leading-tight md:text-3xl"
-                          style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                          className="text-2xl font-bold tabular-nums leading-tight md:text-3xl"
+                          style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
                         >
-                          {userProfile.hairHealthSnapshot.damageSeverity}
+                          {healthScorePercent}
+                          <span className="text-base font-semibold opacity-80 md:text-lg">%</span>
                         </p>
                       </div>
-                    )}
-                  {userProfile.hairHealthSnapshot.moistureLevel && (
-                    <div>
-                      <p
-                        className="text-xs font-semibold uppercase tracking-wide opacity-80"
-                        style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                      >
-                        Moisture
-                      </p>
-                      <p
-                        className="text-2xl font-bold capitalize leading-tight md:text-3xl"
-                        style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                      >
-                        {userProfile.hairHealthSnapshot.moistureLevel.replace(/-/g, ' ')}
-                      </p>
+                      {(() => {
+                        const typeLabel = squashHairTypeDisplayLabel(hairHealthSnapshot.hairTypeDetected);
+                        return typeLabel ? (
+                          <div>
+                            <p
+                              className="text-xs font-semibold uppercase tracking-wide opacity-80"
+                              style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                            >
+                              Type (detected)
+                            </p>
+                            <p
+                              className="text-2xl font-bold capitalize leading-tight md:text-3xl"
+                              style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                            >
+                              {typeLabel}
+                            </p>
+                          </div>
+                        ) : null;
+                      })()}
+                      {hairHealthSnapshot.moistureLevel ? (
+                        <div>
+                          <p
+                            className="text-xs font-semibold uppercase tracking-wide opacity-80"
+                            style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                          >
+                            Moisture
+                          </p>
+                          <p
+                            className="text-2xl font-bold capitalize leading-tight md:text-3xl"
+                            style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                          >
+                            {hairHealthSnapshot.moistureLevel.replace(/-/g, ' ')}
+                          </p>
+                        </div>
+                      ) : null}
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            )}
+              ) : (
+                <div
+                  className="rounded-xl px-4 py-5 md:px-5 md:py-6"
+                  style={{
+                    background: 'rgba(255, 254, 225, 0.43)',
+                    border: '2px solid rgba(175, 85, 0, 0.25)',
+                  }}
+                >
+                  <p className="mb-4 text-sm" style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                    Your health snapshot will appear after you run Hair care with a reference photo.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => router.push('/hair-care')}
+                    className="w-full rounded-xl px-4 py-3 text-center text-sm font-semibold shadow-md transition-opacity hover:opacity-90 sm:w-auto sm:min-w-[12rem]"
+                    style={{ background: '#643100', color: '#FFFEE1', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  >
+                    Go to Hair care
+                  </button>
+                </div>
+              )}
+            </>
 
             <div>
               <h2
@@ -681,18 +819,34 @@ export default function Dashboard() {
             style={{ background: '#FFFEE1', border: '2px solid #914600' }}
           >
             <h3 className="text-2xl font-bold mb-2" style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}>
-              Create Your Profile
+              Set up your profile
             </h3>
-            <p className="mb-6" style={{ color: '#B26805' }}>
-              Get personalized hair care recommendations and product suggestions
+            <p className="mb-2 max-w-md" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+              Create a profile for personalized routines and product picks—or try Style Check first.
             </p>
-            <button
-              onClick={() => router.push('/onboarding')}
-              className="px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
-              style={{ background: '#643100', color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-            >
-              Get Started
-            </button>
+            <div className="mt-6 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
+              <button
+                type="button"
+                onClick={() => router.push('/onboarding')}
+                className="w-full px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all sm:w-auto sm:min-w-[11rem]"
+                style={{ background: '#643100', color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+              >
+                Go to onboarding
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push('/style-check')}
+                className="w-full px-8 py-4 rounded-xl font-semibold border-2 transition-all sm:w-auto sm:min-w-[11rem]"
+                style={{
+                  background: 'transparent',
+                  borderColor: '#914600',
+                  color: '#B26805',
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                }}
+              >
+                Style Check
+              </button>
+            </div>
           </motion.div>
         )}
       </BottomNavHubShell>

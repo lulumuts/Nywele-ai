@@ -10,7 +10,7 @@ import { readHairHealthScoreFromLocalProfile } from '@/lib/style-check-health-sc
 
 /** Upload flow only: default hub outer uses `flex-1` + `justify-end` on mobile, which pins the card to the bottom and leaves a huge gap under the hero. Keep the card directly under the subtitle instead. */
 const STYLE_CHECK_UPLOAD_OUTER_CLASS =
-  'flex min-h-0 w-full flex-none flex-col justify-start pt-2 md:pt-0 mt-2 md:mt-4 lg:mt-6';
+  'flex min-h-0 w-full flex-none flex-col justify-start pt-2 md:pt-0 mt-6 md:mt-8 lg:mt-10';
 
 export type StyleLibraryRow = { slug: string; name: string };
 
@@ -92,8 +92,8 @@ export default function StyleCheckPage() {
       <div
         className={`bottom-nav-hub-main flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-7 sm:px-8 md:px-14 lg:px-16 ${
           showGrid
-            ? 'pt-[calc(0.35rem+env(safe-area-inset-top,0px))] md:pt-[calc(0.5rem+env(safe-area-inset-top,0px))]'
-            : 'pt-32 md:pt-40 lg:pt-44'
+            ? 'pt-[calc(0.35rem+env(safe-area-inset-top,0px))] lg:pt-[calc(0.5rem+env(safe-area-inset-top,0px))]'
+            : 'pt-32 lg:pt-44'
         }`}
       >
         <div className="mx-auto w-full max-w-6xl flex flex-col px-3 pb-4 sm:px-4 md:px-6 lg:px-8">

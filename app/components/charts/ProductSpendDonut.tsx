@@ -7,6 +7,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { DASHBOARD_CARD_TEXT } from '@/lib/app-theme';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -59,30 +60,38 @@ export default function ProductSpendDonut({ labels, values, total }: ProductSpen
       <div className="relative mx-auto h-56 w-56 max-w-full sm:h-60 sm:w-60 md:h-64 md:w-64">
         <Doughnut data={data} options={options} />
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-lg font-bold sm:text-xl" style={{ color: '#B26805' }}>
+        <span className="text-lg font-bold sm:text-xl" style={{ color: DASHBOARD_CARD_TEXT }}>
           {total > 0 ? `KES ${total.toLocaleString()}` : '—'}
         </span>
-        <span className="text-xs sm:text-sm" style={{ color: '#B26805' }}>
+        <span className="text-xs sm:text-sm" style={{ color: DASHBOARD_CARD_TEXT }}>
           {total > 0 ? 'Estimated total' : 'Share of top picks'}
         </span>
         </div>
       </div>
       {hasData && (
-        <div className="mt-5 flex flex-wrap justify-center gap-x-6 gap-y-2.5">
+        <div className="mx-auto mt-5 flex w-full max-w-md flex-col gap-4">
           {labels.map((label, i) =>
             values[i] > 0 && label ? (
-              <div key={`${label}-${i}`} className="flex max-w-[10rem] items-center gap-1.5 sm:max-w-none">
+              <div key={`${label}-${i}`} className="flex gap-3 items-start text-left">
                 <span
-                  className="h-2.5 w-2.5 shrink-0 rounded-full"
+                  className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"
                   style={{ backgroundColor: segmentColors[i] }}
                   aria-hidden
                 />
-                <span className="shrink-0 text-sm font-bold sm:text-base" style={{ color: '#B26805' }}>
-                  {total > 0 ? `KES ${values[i].toLocaleString()}` : `${values[i]}%`}
-                </span>
-                <span className="text-sm leading-snug sm:text-base" style={{ color: '#B26805' }}>
-                  {label}
-                </span>
+                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span
+                    className="text-sm font-bold tabular-nums sm:text-base"
+                    style={{ color: DASHBOARD_CARD_TEXT }}
+                  >
+                    {total > 0 ? `KES ${values[i].toLocaleString()}` : `${values[i]}%`}
+                  </span>
+                  <span
+                    className="text-sm leading-snug break-words sm:text-base"
+                    style={{ color: DASHBOARD_CARD_TEXT }}
+                  >
+                    {label}
+                  </span>
+                </div>
               </div>
             ) : null
           )}

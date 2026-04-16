@@ -287,7 +287,7 @@ export function explorerProductsToCarousel(tab: TabKey, count: number): Explorer
   return list.slice(0, count).map((p) => ({
     brand: p.brand,
     name: p.name,
-    purpose: (p.note.slice(0, 120) || p.name).trim(),
+    purpose: (p.note.trim() || p.name).trim(),
     imageUrl: p.imageSrc ?? null,
     pricing: parseExplorerPrice(p.price),
   }));

@@ -55,6 +55,20 @@ function mapGeminiLength(len: string | undefined): HairLength | '' {
   return '';
 }
 
+/** One curl class for UI (e.g. "4a/4b/4c" or "4a, 4b" → "4a"). */
+export function squashHairTypeDisplayLabel(raw: string | undefined | null): string | undefined {
+  if (raw == null) return undefined;
+  const s = String(raw).trim();
+  if (!s) return undefined;
+  const m = s.match(/\b(4[abc])\b/i);
+  if (m) return m[1].toLowerCase();
+  const first = s
+    .split(/[/,|]+/)
+    .map((x) => x.trim())
+    .filter(Boolean)[0];
+  return first || s;
+}
+
 function hairTypeFromStrings(visionType: unknown, curlPatternType: unknown): HairType | undefined {
   const candidates = [visionType, curlPatternType].filter(Boolean).map((s) => String(s).toLowerCase());
   for (const c of candidates) {
