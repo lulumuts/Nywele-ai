@@ -110,6 +110,7 @@ export function BottomNavHubShell({
   background = 'transparent',
   mainAreaClassName,
   innerClassName,
+  showNav = true,
 }: {
   children: ReactNode;
   background?: string;
@@ -117,11 +118,13 @@ export function BottomNavHubShell({
   mainAreaClassName?: string;
   /** Override inner max-width column padding (default `bottomNavHubInnerClass`). */
   innerClassName?: string;
+  /** Hide BottomNav for standalone pages (e.g. About). */
+  showNav?: boolean;
 }) {
   return (
     <div className="flex min-h-dvh flex-col" style={{ background }}>
       <CaprasimoBricolageFonts />
-      <BottomNav />
+      {showNav ? <BottomNav /> : null}
       <div className={mainAreaClassName ?? bottomNavHubMainClass}>
         <div className={innerClassName ?? bottomNavHubInnerClass}>{children}</div>
       </div>

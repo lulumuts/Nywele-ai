@@ -104,6 +104,16 @@ body {
       max-height: none;
     }
   }
+
+  /* How it works hero: tune background position at exact 750px breakpoint. */
+  .how-it-works-hero-phone-bg {
+    background-position: 15% 35%;
+  }
+  @media (min-width: 1024px) {
+    .how-it-works-hero-phone-bg {
+      background-position: 50% 55%;
+    }
+  }
 }
 
 /* Animated Gradient Background */
