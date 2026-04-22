@@ -251,11 +251,11 @@ export default function HowItWorks() {
         {/* ── 1. Hero ── */}
         <section className={`${heroPanelClassName} overflow-hidden`}>
           <div className="flex flex-col gap-7 lg:flex-row lg:items-stretch lg:justify-between">
-            <div className="bg-transparent px-7 py-9 md:px-9 md:py-10 lg:flex lg:w-[55%] lg:flex-col lg:justify-center lg:pl-12 lg:pr-6">
+            <div className="bg-transparent px-7 py-10 md:px-9 md:py-12 lg:flex lg:w-[55%] lg:flex-col lg:justify-center lg:pl-12 lg:pr-6">
               <div className="mb-3 flex justify-end">
                 <div
                   className="inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.3)] bg-transparent px-4 py-2 text-xs font-semibold md:text-sm"
-                  style={{ color: '#7A3F00', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ color: '#3B1C00', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   <Sparkles className="h-4 w-4" />
                   Product case study
@@ -263,20 +263,20 @@ export default function HowItWorks() {
               </div>
               <h1
                 className="text-3xl font-bold leading-tight md:text-4xl"
-                style={{ color: '#7A3F00', fontFamily: 'Caprasimo, serif' }}
+                style={{ color: '#3B1C00', fontFamily: 'Caprasimo, serif' }}
               >
                 AI for African hair.
               </h1>
               <p
                 className="mt-4 text-base leading-7 md:text-lg"
-                style={{ color: '#7A3F00', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                style={{ color: '#3B1C00', fontFamily: 'Bricolage Grotesque, sans-serif' }}
               >
                 African hair, particularly 4c curl patterns, are one of the most underserved categories in consumer technology.
                 Thats where nywele ai comes in.
               </p>
               <p
                 className="mt-3 text-sm leading-7"
-                style={{ color: '#7A3F00', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                style={{ color: '#3B1C00', fontFamily: 'Bricolage Grotesque, sans-serif' }}
               >
                 Nywele AI accommodates coil patterns from 4a to 4c. We put the coil pattern first, then tailor your needs
                 using Gemini AI for hair analysis, a trichologist-informed ingredient layer, and a 3D experience built with
@@ -287,7 +287,7 @@ export default function HowItWorks() {
                   <span
                     key={tag}
                     className="rounded-full border border-[rgba(255,255,255,0.3)] bg-[rgba(255,255,255,0.15)] px-3 py-1 text-xs font-semibold"
-                    style={{ color: '#7A3F00', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    style={{ color: '#3B1C00', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
                     {tag}
                   </span>
@@ -296,7 +296,7 @@ export default function HowItWorks() {
             </div>
             <div className="flex flex-col items-stretch gap-5 lg:flex lg:w-[45%] lg:-ml-8">
               <div
-                className="how-it-works-hero-phone-bg relative h-[280px] w-full overflow-hidden rounded-[28px] bg-[#FB8C1C] bg-[url('/images/mobile-image.png')] bg-cover md:h-[360px] lg:h-auto lg:flex-1"
+                className="how-it-works-hero-phone-bg relative h-[340px] w-full overflow-hidden rounded-[28px] bg-[#FB8C1C] bg-[url('/images/mobile-image.png')] bg-cover md:h-[440px] lg:h-auto lg:min-h-[560px] lg:flex-1"
                 aria-label="Nywele.ai running on a phone"
               />
             </div>
