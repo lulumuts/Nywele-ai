@@ -672,6 +672,10 @@ export async function generateHairCareRoutine(
     benefits: rec.product.benefits,
     howToUse: rec.product.howToUse,
     frequency: rec.routineStep,
+    /** Pass through from Supabase `image_url` → `product` / `images` so hair-care UI can render photos */
+    image_url: rec.product.productImage ?? rec.product.images?.[0] ?? null,
+    images: rec.product.images ?? [],
+    productImage: rec.product.productImage,
     pricing: {
       amount: rec.product.pricing.estimatedPrice,
       currency: rec.product.pricing.currency,
@@ -697,6 +701,9 @@ export async function generateHairCareRoutine(
     benefits: rec.product.benefits,
     howToUse: rec.product.howToUse,
     frequency: rec.routineStep,
+    image_url: rec.product.productImage ?? rec.product.images?.[0] ?? null,
+    images: rec.product.images ?? [],
+    productImage: rec.product.productImage,
     pricing: {
       amount: rec.product.pricing.estimatedPrice,
       currency: rec.product.pricing.currency,

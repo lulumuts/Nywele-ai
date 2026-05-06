@@ -105,6 +105,33 @@ body {
     }
   }
 
+  /**
+   * Hair-care scan (Step 3) white container height.
+   * Use CSS (not Tailwind) so it cannot be missed by class scanning/caching.
+   */
+  .hair-care-analysis-shell-enhanced {
+    max-height: min(
+      70dvh,
+      calc(100dvh - 7.5rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))
+    );
+  }
+  @media (min-width: 768px) {
+    .hair-care-analysis-shell-enhanced {
+      max-height: min(
+        66dvh,
+        calc(100dvh - 6rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))
+      );
+    }
+  }
+  @media (min-width: 1024px) {
+    .hair-care-analysis-shell-enhanced {
+      max-height: min(
+        68dvh,
+        calc(100dvh - 6rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))
+      );
+    }
+  }
+
   /* How it works hero: tune background position at exact 750px breakpoint. */
   .how-it-works-hero-phone-bg {
     background-position: 15% 35%;

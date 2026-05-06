@@ -43,23 +43,43 @@ export async function requireApiKey(request: NextRequest): Promise<NextResponse 
   return null; // null means authorization passed
 }
 
+function hostFromUrlish(value: string | null): string | null {
+  if (!value) return null;
+  try {
+    return new URL(value).host;
+  } catch {
+    return null;
+  }
+}
+
+function isTrustedInternalHost(host: string | null): boolean {
+  if (!host) return false;
+  return host === 'localhost' || host.startsWith('localhost:') || host === 'nywele.ai' || host.endsWith('.nywele.ai');
+}
+
 /**
  * Check if request is from internal origin (same domain)
  * This allows your own frontend to access the API without a key
  */
 export function isInternalRequest(request: NextRequest): boolean {
-  const origin = request.headers.get('origin');
-  const referer = request.headers.get('referer');
-  
-  // Allow same-origin requests
-  if (origin && (origin.includes('localhost') || origin.includes('nywele.ai'))) {
-    return true;
-  }
-  
-  if (referer && (referer.includes('localhost') || referer.includes('nywele.ai'))) {
-    return true;
-  }
-  
+  const originHost = hostFromUrlish(request.headers.get('origin'));
+  const refererHost = hostFromUrlish(request.headers.get('referer'));
+
+  // If the request includes an Origin/Referer and it matches the current host, it’s internal.
+  // This covers Vercel previews/prod automatically without maintaining an allowlist.
+  const requestHost = request.nextUrl.host;
+  if (originHost && originHost === requestHost) return true;
+  if (refererHost && refererHost === requestHost) return true;
+
+  // Explicitly trust these common internal hosts (useful in dev or when upstream strips Origin).
+  if (isTrustedInternalHost(originHost)) return true;
+  if (isTrustedInternalHost(refererHost)) return true;
+
+  // Support Vercel preview/prod where the host can differ between app and API subdomains/routes.
+  // This keeps “internal” behavior for same-deployment calls.
+  if (originHost && originHost.endsWith('.vercel.app')) return true;
+  if (refererHost && refererHost.endsWith('.vercel.app')) return true;
+
   return false;
 }
 

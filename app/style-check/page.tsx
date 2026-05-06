@@ -14,6 +14,9 @@ const STYLE_CHECK_UPLOAD_OUTER_CLASS =
 
 export type StyleLibraryRow = { slug: string; name: string };
 
+/** Dashboard primary body text (`app/dashboard/page.tsx` → `DASHBOARD_CONTAINER_TEXT`). */
+const DASH_TEXT = '#7A3500';
+
 const FALLBACK_STYLES: StyleLibraryRow[] = [
   { slug: 'short-afro', name: 'Short Afro' },
   { slug: 'bantu-knots', name: 'Bantu Knots' },
@@ -98,28 +101,28 @@ export default function StyleCheckPage() {
       >
         <div className="mx-auto w-full max-w-6xl flex flex-col px-3 pb-4 sm:px-4 md:px-6 lg:px-8">
           {showGrid ? (
-            <div className="mb-6 flex flex-col md:mb-8 md:pt-10">
-              <div className="flex flex-col md:mt-12 md:pt-10 md:flex-row md:items-start md:justify-between md:gap-6">
+            <div className="mb-2 flex shrink-0 flex-col md:mb-3 lg:pt-10">
+              <div className="flex flex-col lg:mt-12 lg:pt-10 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
                 <h1
-                  className="order-2 mt-10 min-w-0 text-3xl font-bold md:order-1 md:mt-0 md:flex-1 md:text-4xl"
+                  className="order-2 mt-8 min-w-0 text-3xl font-bold lg:order-1 lg:mt-0 lg:flex-1 lg:text-4xl"
                   style={{
-                    color: '#C17208',
+                    color: DASH_TEXT,
                     fontFamily: 'Caprasimo, serif',
                   }}
                 >
                   Style Check
                 </h1>
-                <div className="order-1 mt-10 flex justify-end md:order-2 md:mt-0 md:shrink-0 md:justify-end md:pt-1">
+                <div className="order-1 mt-4 flex justify-end lg:order-2 lg:mt-0 lg:shrink-0 lg:justify-end lg:pt-1">
                   <button
                     type="button"
                     onClick={() => setShowGrid(false)}
-                    className="inline-flex shrink-0 items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline md:text-base"
+                    className="inline-flex min-h-[44px] shrink-0 items-center gap-2 border-0 bg-transparent p-0 text-sm font-semibold shadow-none transition-opacity hover:opacity-80 focus:outline-none focus-visible:underline lg:text-base"
                     style={{
-                      color: '#C17208',
+                      color: DASH_TEXT,
                       fontFamily: 'Bricolage Grotesque, sans-serif',
                     }}
                   >
-                    <Camera className="h-5 w-5 shrink-0" aria-hidden style={{ color: '#C17208' }} />
+                    <Camera className="h-5 w-5 shrink-0" aria-hidden style={{ color: DASH_TEXT }} />
                     Scan a style
                   </button>
                 </div>
@@ -130,7 +133,7 @@ export default function StyleCheckPage() {
               <h1
                 className="min-w-0 flex-1 text-3xl font-bold md:text-4xl"
                 style={{
-                  color: '#C17208',
+                  color: DASH_TEXT,
                   fontFamily: 'Caprasimo, serif',
                 }}
               >
@@ -141,7 +144,7 @@ export default function StyleCheckPage() {
           <p
             className={`text-base md:mb-6 ${showGrid ? 'mb-5 mt-1.5 pb-6 md:mb-4 md:mt-2 md:pb-3' : 'mb-2'}`}
             style={{
-              color: '#C17208',
+              color: DASH_TEXT,
               fontFamily: 'Bricolage Grotesque, sans-serif',
             }}
           >
@@ -157,7 +160,7 @@ export default function StyleCheckPage() {
               className="mt-5 px-6 pb-6 pt-6 md:mt-2 md:px-8 md:pb-8 md:pt-3 lg:mt-2"
               style={{
                 background: 'transparent',
-                color: '#C17208',
+                color: DASH_TEXT,
               }}
             >
               <div className="grid w-full auto-rows-min grid-cols-2 gap-4 md:gap-6 lg:flex lg:min-h-0 lg:flex-nowrap lg:items-start lg:gap-4 lg:overflow-x-auto lg:overflow-y-visible lg:pb-2">
@@ -166,12 +169,12 @@ export default function StyleCheckPage() {
                       key={style.slug}
                       type="button"
                       onClick={() => router.push(`/style-check/${style.slug}`)}
-                      className="flex min-h-0 flex-col overflow-hidden rounded-[32px] border-2 border-solid border-[rgba(193,114,8,0.35)] bg-transparent text-left shadow-none transition-[border-width,border-color,background-color] duration-200 hover:border-[3px] hover:border-[#C17208] hover:bg-[rgba(193,114,8,0.2)] active:border-[3px] active:border-[#C17208] active:bg-[rgba(193,114,8,0.2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C17208] focus-visible:ring-offset-2 lg:shrink-0 lg:basis-[11.75rem] xl:basis-[12.5rem]"
+                      className="group flex min-h-0 flex-col overflow-hidden rounded-[32px] border-2 border-solid border-[rgba(122,53,0,0.35)] bg-transparent text-left shadow-none transition-[border-width,border-color,background-color,box-shadow] duration-200 hover:border-[3px] hover:border-[#FB8C1C] hover:bg-[#FB8C1C] hover:shadow-[0_8px_28px_rgba(251,140,28,0.45)] active:border-[3px] active:border-[#E67600] active:bg-[#E67600] active:shadow-[0_6px_22px_rgba(251,140,28,0.55)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FB8C1C] focus-visible:ring-offset-2 lg:shrink-0 lg:basis-[11.75rem] xl:basis-[12.5rem]"
                     >
                       <div className="px-4 pt-5 text-center md:px-5 md:pt-6 lg:px-3 lg:pt-4">
                         <h3
-                          className="text-xl font-normal not-italic leading-tight tracking-wide md:text-2xl md:tracking-wider lg:text-[1.125rem] lg:tracking-wide xl:text-xl"
-                          style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
+                          className="text-[#7A3500] text-xl font-normal not-italic leading-tight tracking-wide transition-colors duration-200 group-hover:text-[#3B1C00] group-active:text-[#3B1C00] md:text-2xl md:tracking-wider lg:text-[1.125rem] lg:tracking-wide xl:text-xl"
+                          style={{ fontFamily: 'Caprasimo, serif' }}
                         >
                           {style.name}
                         </h3>
@@ -192,10 +195,9 @@ export default function StyleCheckPage() {
                           />
                         ) : (
                           <svg
-                            className="mx-auto block h-20 w-20 shrink-0 opacity-80 md:h-24 md:w-24"
+                            className="mx-auto block h-20 w-20 shrink-0 text-[#7A3500] opacity-80 transition-[color,opacity] duration-200 group-hover:text-[#3B1C00] group-hover:opacity-100 group-active:text-[#3B1C00] group-active:opacity-100 md:h-24 md:w-24"
                             viewBox="0 0 81 77"
                             fill="none"
-                            style={{ color: '#C17208' }}
                             aria-hidden
                           >
                             <path
@@ -210,19 +212,15 @@ export default function StyleCheckPage() {
                       <div className="space-y-1 px-4 pb-3 text-right md:px-5 md:pb-4 lg:px-3 lg:pt-0 lg:pb-3">
                         <div className="flex justify-end">
                           <div
-                            className="inline-block rounded-full px-3 py-1 text-sm font-bold tabular-nums"
-                            style={{
-                              background: 'rgba(193, 114, 8, 0.15)',
-                              color: '#C17208',
-                              fontFamily: 'Bricolage Grotesque, sans-serif',
-                            }}
+                            className="inline-block rounded-full bg-[rgba(122,53,0,0.15)] px-3 py-1 text-sm font-bold text-[#7A3500] tabular-nums transition-colors duration-200 group-hover:bg-white/35 group-hover:text-[#3B1C00] group-active:bg-white/40 group-active:text-[#3B1C00]"
+                            style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}
                           >
                             {healthScore !== null ? `${healthScore}%` : '—'}
                           </div>
                         </div>
                         <p
-                          className="text-xs"
-                          style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                          className="text-xs text-[#7A3500] transition-colors duration-200 group-hover:text-[#3B1C00] group-active:text-[#3B1C00]"
+                          style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}
                         >
                           Compatibility score
                         </p>
@@ -232,18 +230,24 @@ export default function StyleCheckPage() {
               </div>
             </div>
           ) : (
-            <StyleCheckHubWhiteCard outerClassName={STYLE_CHECK_UPLOAD_OUTER_CLASS}>
+            <StyleCheckHubWhiteCard
+              outerClassName={STYLE_CHECK_UPLOAD_OUTER_CLASS}
+              surfaceStyle={{
+                color: DASH_TEXT,
+                border: '2px solid rgba(122, 53, 0, 0.25)',
+              }}
+            >
               <div className="flex w-full items-center justify-center py-2 md:py-4">
                 <div
                   className="w-full max-w-xs rounded-2xl p-5 sm:max-w-sm md:max-w-4xl md:p-6"
                   style={{
                     background: '#FFFCF3',
-                    border: '1px solid rgba(193, 114, 8, 0.25)',
+                    border: '1px solid rgba(122, 53, 0, 0.25)',
                   }}
                 >
                   <p
                     className="mb-5 text-center text-base md:mb-6 md:text-lg"
-                    style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
                     Upload a clear photo of your hair for AI-powered analysis.
                   </p>
@@ -251,12 +255,15 @@ export default function StyleCheckPage() {
                     type="button"
                     onClick={() => router.push('/style-advisor')}
                     className="mx-auto flex aspect-square w-full max-w-[min(100%,17.5rem)] flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all hover:bg-opacity-80 md:max-w-xs"
-                    style={{ borderColor: 'rgba(193, 114, 8, 0.45)', background: 'rgba(193, 114, 8, 0.06)' }}
+                    style={{
+                      borderColor: 'rgba(122, 53, 0, 0.45)',
+                      background: 'rgba(122, 53, 0, 0.06)',
+                    }}
                   >
-                    <Camera className="mb-2 h-11 w-11 shrink-0 md:mb-3 md:h-14 md:w-14" style={{ color: '#C17208' }} />
+                    <Camera className="mb-2 h-11 w-11 shrink-0 md:mb-3 md:h-14 md:w-14" style={{ color: DASH_TEXT }} />
                     <p
                       className="px-3 text-center text-xs leading-snug md:px-4 md:text-sm"
-                      style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                      style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
                     >
                       Click to upload or drag and drop PNG, JPG or JPEG (max. 10MB)
                     </p>
@@ -266,7 +273,7 @@ export default function StyleCheckPage() {
               <div className="flex shrink-0 flex-col items-center gap-3 self-center pt-2 pb-6 text-center md:pb-8">
                 <p
                   className="text-base font-medium md:text-lg"
-                  style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   Don&apos;t know what you want yet?
                 </p>
@@ -275,9 +282,9 @@ export default function StyleCheckPage() {
                   onClick={openLibraryGrid}
                   className="w-full max-w-sm rounded-xl py-3 text-sm font-semibold transition-all md:max-w-md md:text-base"
                   style={{
-                    background: 'rgba(193, 114, 8, 0.12)',
-                    color: '#C17208',
-                    border: '2px solid rgba(193, 114, 8, 0.45)',
+                    background: 'rgba(122, 53, 0, 0.12)',
+                    color: DASH_TEXT,
+                    border: '2px solid rgba(122, 53, 0, 0.45)',
                     fontFamily: 'Bricolage Grotesque, sans-serif',
                   }}
                 >

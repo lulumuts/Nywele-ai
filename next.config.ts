@@ -8,6 +8,14 @@ const nextConfig: NextConfig = {
     devtoolSegmentExplorer: false,
   },
   webpack: (config, { dev, isServer }) => {
+    if (dev) {
+      /**
+       * Dev stability: on this machine Next's webpack persistent cache regularly corrupts
+       * (`*.pack.gz_` rename ENOENT → missing chunks → `__webpack_modules__` runtime errors).
+       * Disabling the persistent cache avoids the broken state at the cost of rebuild speed.
+       */
+      config.cache = false;
+    }
     if (dev && !isServer && config.output) {
       // Avoid ChunkLoadError when the first compile of a large route is slower than the default timeout.
       config.output.chunkLoadTimeout = 300_000;

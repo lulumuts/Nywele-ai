@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -9,6 +10,98 @@ import { getStyleByName, getProductsForStyle, getAllStyles } from '@/lib/supabas
 import { findStyleImage } from '@/lib/imageLibrary';
 import { STYLE_CARD_IMAGE_BY_SLUG } from '@/lib/style-check-card-images';
 import { readHairHealthScoreFromLocalProfile } from '@/lib/style-check-health-score';
+
+/** Dashboard primary body text (`app/dashboard/page.tsx` → `DASHBOARD_CONTAINER_TEXT`). */
+const DASH_TEXT = '#7A3500';
+
+/** Routine-style cards on the dashboard (`app/dashboard/page.tsx`): cream fill, `#F8DD65` rim, soft shadow. */
+const SECTION_CARD_SURFACE: CSSProperties = {
+  background: '#FDF8E1',
+  border: '1px solid #F8DD65',
+  boxShadow: '0 10px 22px rgba(122, 53, 0, 0.08)',
+};
+
+/** Dashboard **Weekly** routine card fill (`#FFF4C2`). */
+const WEEKLY_CARD_SURFACE: CSSProperties = {
+  background: '#FFF4C2',
+  border: '1px solid #F8DD65',
+  boxShadow: '0 10px 22px rgba(122, 53, 0, 0.08)',
+};
+
+/** Care instructions — same Weekly hue, lower-opacity fill so the white shell shows through. */
+const CARE_INSTRUCTIONS_SURFACE: CSSProperties = {
+  background: 'rgba(255, 244, 194, 0.55)',
+  border: '1px solid rgba(248, 221, 101, 0.75)',
+  boxShadow: '0 10px 22px rgba(122, 53, 0, 0.06)',
+};
+
+/** Pale yellow panel — matches dashboard “Your recommended products” shell (`dashboard/page.tsx`). */
+const PALE_YELLOW_SECTION_SURFACE: CSSProperties = {
+  background: 'rgba(255, 254, 225, 0.43)',
+  border: '1px solid rgba(175, 85, 0, 0.14)',
+};
+
+/** Same outer shell as dashboard routine cards (`rounded-[32px]` + padding). */
+const ROUTINE_CARD_SHELL_CLASS =
+  'relative min-h-0 rounded-[32px] px-6 pb-6 pt-10 md:px-7 md:pb-6 md:pt-10';
+
+/** Care instructions — extra bottom padding inside the Weekly-style card. */
+const ROUTINE_CARD_SHELL_CARE_CLASS =
+  'relative min-h-0 rounded-[32px] px-6 pb-8 pt-10 md:px-7 md:pb-10 md:pt-10';
+
+function ThingsToKnowLine({ text }: { text: string }) {
+  const m = text.match(/^(.+?):\s*([\s\S]+)$/);
+  if (m) {
+    const label = m[1].trim();
+    const detail = m[2].trim();
+    const diyOrRest = detail.match(/^DIY\s+(or\s+.+)$/i);
+    if (label.toLowerCase() === 'cost estimate' && diyOrRest) {
+      return (
+        <div className="space-y-1">
+          <p
+            className="text-sm font-semibold leading-tight md:text-base"
+            style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+          >
+            {label}
+          </p>
+          <p
+            className="text-sm leading-snug md:text-base"
+            style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+          >
+            DIY
+          </p>
+          <p
+            className="pt-1.5 text-sm leading-snug md:pt-2 md:text-base"
+            style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+          >
+            {diyOrRest[1]}
+          </p>
+        </div>
+      );
+    }
+    return (
+      <div className="space-y-1">
+        <p
+          className="text-sm font-semibold leading-tight md:text-base"
+          style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+        >
+          {label}
+        </p>
+        <p
+          className="text-sm leading-snug md:text-base"
+          style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+        >
+          {detail}
+        </p>
+      </div>
+    );
+  }
+  return (
+    <p className="text-sm leading-snug md:text-base" style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+      {text}
+    </p>
+  );
+}
 
 function slugFromName(name: string): string {
   return name.toLowerCase().replace(/\s+/g, '-');
@@ -198,11 +291,11 @@ export default function StyleDetailPage() {
           products && (products.essential?.length || products.recommended?.length) ? (
             <ul
               className="list-inside list-disc space-y-1.5"
-              style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+              style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
             >
               {[...(products.essential || []), ...(products.recommended || [])].map((p: any, i: number) => (
                 <li key={i}>
-                  <strong style={{ color: '#C17208' }}>
+                  <strong style={{ color: DASH_TEXT }}>
                     {p.brand} {p.name}
                   </strong>
                   {p.estimated_price != null && ` — ${p.currency || 'KES'} ${Number(p.estimated_price).toLocaleString()}`}
@@ -242,13 +335,13 @@ export default function StyleDetailPage() {
       `}</style>
       <BottomNav />
 
-      <div className="flex min-h-0 flex-1 flex-col px-4 pb-24 pt-6 md:px-6 md:pb-8 md:pt-20">
+      <div className="flex min-h-0 flex-1 flex-col px-4 pb-[max(7.5rem,calc(env(safe-area-inset-bottom,0px)+6rem))] pt-[calc(4rem+env(safe-area-inset-top,0px))] sm:pt-[calc(4.5rem+env(safe-area-inset-top,0px))] md:px-6 md:pb-8 md:pt-[calc(4rem+env(safe-area-inset-top,0px))]">
         <div className="mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col">
-          <div className="flex flex-col px-2 pb-5 sm:px-3 md:px-4 md:pb-6">
+          <div className="flex flex-col px-2 pb-0 sm:px-3 md:px-4 md:pb-1">
             <Link
               href="/style-check"
-              className="mb-6 inline-flex w-fit items-center gap-2 text-sm font-medium text-[#C17208] transition-colors hover:opacity-80"
-              style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}
+              className="mb-3 inline-flex w-fit items-center gap-2 text-sm font-medium transition-colors hover:opacity-80 md:mb-4"
+              style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
             >
               <ArrowLeft className="h-5 w-5" />
               Back
@@ -258,10 +351,9 @@ export default function StyleDetailPage() {
               <div
                 className={`flex shrink-0 items-center justify-center overflow-hidden rounded-2xl ${
                   slug === 'sister-locs'
-                    ? 'h-52 w-40 md:h-64 md:w-48'
-                    : 'h-40 w-32 md:h-48 md:w-40'
+                    ? 'h-80 w-56 md:h-[28rem] md:w-72'
+                    : 'h-64 w-48 md:h-80 md:w-56'
                 }`}
-                style={{ background: 'rgba(193, 114, 8, 0.12)' }}
               >
                 {STYLE_CARD_IMAGE_BY_SLUG[slug] ? (
                   <img
@@ -271,10 +363,10 @@ export default function StyleDetailPage() {
                   />
                 ) : (
                   <svg
-                    className="h-16 w-16 opacity-80 md:h-20 md:w-20"
+                    className="h-24 w-24 opacity-80 md:h-28 md:w-28"
                     viewBox="0 0 81 77"
                     fill="none"
-                    style={{ color: '#C17208' }}
+                    style={{ color: DASH_TEXT }}
                     aria-hidden
                   >
                     <path
@@ -286,90 +378,80 @@ export default function StyleDetailPage() {
                   </svg>
                 )}
               </div>
-              <div className="min-w-0 flex-1">
+              <div className="flex min-w-0 flex-1 flex-col-reverse gap-1 md:gap-1.5">
                 <h1
-                  className="mb-2 text-2xl font-bold md:text-3xl"
-                  style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
+                  className="text-2xl font-bold md:text-3xl"
+                  style={{ color: DASH_TEXT, fontFamily: 'Caprasimo, serif' }}
                 >
                   {style.name}
                 </h1>
-                <p
-                  className="mb-1 text-6xl font-bold leading-none tabular-nums sm:text-7xl md:text-8xl xl:text-9xl"
-                  style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                >
-                  {style.score !== null ? (
-                    <>
-                      {style.score}
-                      <span className="text-2xl font-semibold opacity-80 md:text-3xl">%</span>
-                    </>
-                  ) : (
-                    <span className="text-4xl md:text-5xl xl:text-6xl">—</span>
-                  )}
-                </p>
-                <p
-                  className="text-sm"
-                  style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                >
-                  Compatibility score
-                </p>
-                {style.score === null ? (
+                <div className="flex min-w-0 flex-col gap-0.5">
                   <p
-                    className="mt-2 max-w-md text-xs leading-snug opacity-90"
-                    style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    className="text-6xl font-bold leading-none tabular-nums sm:text-7xl md:text-8xl xl:text-9xl"
+                    style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
-                    Complete a Hair care scan to see your compatibility percentage — it aligns with your dashboard metrics.
+                    {style.score !== null ? (
+                      <>
+                        {style.score}
+                        <span className="text-2xl font-semibold opacity-80 md:text-3xl">%</span>
+                      </>
+                    ) : (
+                      <span className="text-4xl md:text-5xl xl:text-6xl">—</span>
+                    )}
                   </p>
-                ) : null}
+                  <p
+                    className="text-sm leading-tight"
+                    style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  >
+                    Compatibility score
+                  </p>
+                  {style.score === null ? (
+                    <p
+                      className="mt-1.5 max-w-md text-xs leading-snug opacity-90"
+                      style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    >
+                      Complete a Hair care scan to see your compatibility percentage — it aligns with your dashboard metrics.
+                    </p>
+                  ) : null}
+                </div>
               </div>
             </div>
           </div>
 
           <div
-            className="max-h-[min(60dvh,32rem)] -mb-3 w-full overflow-x-hidden overflow-y-auto overscroll-y-contain rounded-2xl p-6 sm:-mb-2 sm:max-h-[min(58dvh,30rem)] md:mb-0 md:max-h-[min(62dvh,36rem)] md:p-8"
+            className="-mt-2 mb-0 w-full min-h-[min(52dvh,26rem)] max-h-[min(68dvh,38rem)] overflow-x-hidden overflow-y-auto overscroll-y-contain rounded-2xl p-6 sm:-mt-2 sm:min-h-[min(54dvh,28rem)] sm:max-h-[min(70dvh,42rem)] md:-mt-1 md:min-h-[min(56dvh,30rem)] md:max-h-[min(72dvh,46rem)] md:p-8"
             style={{
               background: '#FFFFFF',
-              border: '2px solid rgba(193, 114, 8, 0.25)',
+              border: '2px solid rgba(122, 53, 0, 0.25)',
+              color: DASH_TEXT,
             }}
           >
-            <div className="mb-6 space-y-4">
-              <div
-                className="rounded-2xl p-5"
-                style={{
-                  background: '#FFFCF3',
-                  border: '1px solid rgba(193, 114, 8, 0.18)',
-                }}
-              >
+            <div className="mb-6 grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
+              <div className={ROUTINE_CARD_SHELL_CLASS} style={PALE_YELLOW_SECTION_SURFACE}>
                 <h3
-                  className="mb-2 text-base font-bold"
-                  style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
+                  className="mb-3 text-lg font-bold md:mb-4 md:text-xl"
+                  style={{ color: DASH_TEXT, fontFamily: 'Caprasimo, serif' }}
                 >
                   Things to know
                 </h3>
-                <ul
-                  className="list-inside list-disc space-y-1 text-sm leading-relaxed md:text-base"
-                  style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                >
+                <ul className="list-none space-y-5 md:space-y-6">
                   {style.thingsToKnow.map((item, i) => (
-                    <li key={i}>{item}</li>
+                    <li key={i}>
+                      <ThingsToKnowLine text={item} />
+                    </li>
                   ))}
                 </ul>
               </div>
-              <div
-                className="rounded-2xl p-5"
-                style={{
-                  background: '#FFFCF3',
-                  border: '1px solid rgba(193, 114, 8, 0.18)',
-                }}
-              >
+              <div className={ROUTINE_CARD_SHELL_CLASS} style={SECTION_CARD_SURFACE}>
                 <h3
-                  className="mb-2 text-base font-bold"
-                  style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
+                  className="mb-3 text-lg font-bold md:mb-4 md:text-xl"
+                  style={{ color: DASH_TEXT, fontFamily: 'Caprasimo, serif' }}
                 >
                   Why this works for you
                 </h3>
                 <ul
                   className="list-inside list-disc space-y-1 text-sm leading-relaxed md:text-base"
-                  style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   {style.whyWorks.map((item, i) => (
                     <li key={i}>{item}</li>
@@ -378,59 +460,41 @@ export default function StyleDetailPage() {
               </div>
             </div>
 
-            <div className="mb-6 space-y-4">
-              <div
-                className="rounded-2xl p-5"
-                style={{
-                  background: '#FFFCF3',
-                  border: '1px solid rgba(193, 114, 8, 0.18)',
-                }}
-              >
+            <div className="mb-6 space-y-5 md:space-y-6">
+              <div className={ROUTINE_CARD_SHELL_CARE_CLASS} style={CARE_INSTRUCTIONS_SURFACE}>
                 <h3
-                  className="mb-2 text-base font-bold"
-                  style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
+                  className="mb-3 text-lg font-bold md:mb-4 md:text-xl"
+                  style={{ color: DASH_TEXT, fontFamily: 'Caprasimo, serif' }}
                 >
                   Care instructions
                 </h3>
                 <div
                   className="whitespace-pre-line text-sm leading-relaxed md:text-base"
-                  style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   {style.careInstructions}
                 </div>
               </div>
-              <div
-                className="rounded-2xl p-5"
-                style={{
-                  background: '#FFFCF3',
-                  border: '1px solid rgba(193, 114, 8, 0.18)',
-                }}
-              >
+              <div className={ROUTINE_CARD_SHELL_CLASS} style={WEEKLY_CARD_SURFACE}>
                 <h3
-                  className="mb-2 text-base font-bold"
-                  style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
+                  className="mb-3 text-lg font-bold md:mb-4 md:text-xl"
+                  style={{ color: DASH_TEXT, fontFamily: 'Caprasimo, serif' }}
                 >
                   Product details
                 </h3>
                 <div
                   className="text-sm leading-relaxed md:text-base [&_ul]:list-inside [&_ul]:list-disc [&_ul]:space-y-1"
-                  style={{ color: '#C17208', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ color: DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   {style.productDetails}
                 </div>
               </div>
             </div>
 
-            <div
-              className="rounded-2xl p-5"
-              style={{
-                background: '#FFFCF3',
-                border: '1px solid rgba(193, 114, 8, 0.18)',
-              }}
-            >
+            <div className={ROUTINE_CARD_SHELL_CLASS} style={SECTION_CARD_SURFACE}>
               <h3
-                className="mb-2 text-base font-bold"
-                style={{ color: '#C17208', fontFamily: 'Caprasimo, serif' }}
+                className="mb-3 text-lg font-bold md:mb-4 md:text-xl"
+                style={{ color: DASH_TEXT, fontFamily: 'Caprasimo, serif' }}
               >
                 Style inspiration
               </h3>
@@ -449,9 +513,9 @@ export default function StyleDetailPage() {
                   disabled={loadingStyleInspiration}
                   className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-sm font-semibold transition-all disabled:opacity-70 md:text-base"
                   style={{
-                    background: 'rgba(193, 114, 8, 0.12)',
-                    color: '#C17208',
-                    border: '2px solid #C17208',
+                    background: 'rgba(122, 53, 0, 0.12)',
+                    color: DASH_TEXT,
+                    border: `2px solid ${DASH_TEXT}`,
                     fontFamily: 'Bricolage Grotesque, sans-serif',
                   }}
                 >

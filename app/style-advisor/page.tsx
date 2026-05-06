@@ -121,33 +121,70 @@ export default function StyleAdvisor() {
       const profile = localStorage.getItem('nywele-user-profile');
       const profileData = profile ? JSON.parse(profile) : {};
       const resolvedHairType = userProfile?.hairType || hairType || profileData.hairType || '4c';
-      const response = await fetch('/api/recommend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          hairType: resolvedHairType,
-          goals: userProfile?.hairGoals || profileData.hairGoals || ['moisture', 'growth'],
-          currentStyle: 'natural',
-          desiredStyle,
-          porosity: userProfile?.hairPorosity || profileData.hairPorosity || 'unsure',
-          concerns: userProfile?.currentConcerns || profileData.currentConcerns || [],
-          budget: userProfile?.budget || profileData.budget || 'any',
-          durationPreference: '30 minutes',
+      const ethnicity = 'Black Woman';
+      const length = 'Shoulder-Length';
+      const vibe = 'Professional Studio Portrait';
+
+      // Results expects a routine payload (recommend) and will show a style visual.
+      // Generate both so the CTA matches what it promises.
+      const [recommendRes, styleRes] = await Promise.all([
+        fetch('/api/recommend', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            hairType: resolvedHairType,
+            goals: userProfile?.hairGoals || profileData.hairGoals || ['moisture', 'growth'],
+            currentStyle: 'natural',
+            desiredStyle,
+            porosity: userProfile?.hairPorosity || profileData.hairPorosity || 'unsure',
+            concerns: userProfile?.currentConcerns || profileData.currentConcerns || [],
+            budget: userProfile?.budget || profileData.budget || 'any',
+            durationPreference: '30 minutes',
+          }),
         }),
-      });
-      const result = await response.json();
-      if (result.success && result.data) {
-        sessionStorage.setItem('recommendation', JSON.stringify(result.data));
-        sessionStorage.setItem('desiredStyle', desiredStyle);
-        sessionStorage.setItem('hairType', resolvedHairType);
-        sessionStorage.setItem('currentStyle', desiredStyle);
-        sessionStorage.setItem('ethnicity', 'Black Woman');
-        sessionStorage.setItem('length', 'Shoulder-Length');
-        sessionStorage.setItem('vibe', 'Professional Studio Portrait');
-        router.push('/results');
+        fetch('/api/style', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            hairType: resolvedHairType,
+            styleName: desiredStyle,
+            ethnicity,
+            length,
+            vibe,
+          }),
+        }),
+      ]);
+
+      const recommendJson = await recommendRes.json().catch(() => null);
+      const styleJson = await styleRes.json().catch(() => null);
+
+      if (!recommendRes.ok || !recommendJson?.success || !recommendJson?.data) {
+        const msg =
+          recommendJson?.error ||
+          `Failed to generate routine (${recommendRes.status || 'unknown'}). Check OPENAI_API_KEY + Supabase env vars.`;
+        throw new Error(msg);
       }
+
+      if (styleRes.ok && styleJson?.success && styleJson?.data?.imageUrl) {
+        sessionStorage.setItem('styleImage', styleJson.data.imageUrl);
+        if (styleJson.data.prompt) sessionStorage.setItem('aiPrompt', styleJson.data.prompt);
+      }
+
+      sessionStorage.setItem('recommendation', JSON.stringify(recommendJson.data));
+      sessionStorage.setItem('desiredStyle', desiredStyle);
+      sessionStorage.setItem('hairType', resolvedHairType);
+      sessionStorage.setItem('currentStyle', desiredStyle);
+      sessionStorage.setItem('ethnicity', ethnicity);
+      sessionStorage.setItem('length', length);
+      sessionStorage.setItem('vibe', vibe);
+      router.push('/results');
     } catch (error) {
       console.error('Failed to get style inspiration:', error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : 'Failed to generate inspiration. Please try again.',
+      );
     } finally {
       setLoadingStyleInspiration(false);
     }

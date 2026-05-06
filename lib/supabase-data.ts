@@ -1,6 +1,8 @@
 // Supabase Data Fetching Functions
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 import type { Product } from './products-new';
+import { productToExplorerCarousel, type ExplorerCarouselProduct } from './productExplorerCatalog';
 
 // ==================== PRODUCTS ====================
 
@@ -35,14 +37,38 @@ function coerceTextArray(value: unknown): string[] {
   return [];
 }
 
-function requireClient(): import('@supabase/supabase-js').SupabaseClient | null {
+let supabaseServiceClient: SupabaseClient | null = null;
+
+function requireClient(): SupabaseClient | null {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? '';
+
+  // Prefer service role on the server (avoids RLS issues for product catalog reads).
+  // Never used in the browser.
+  const isServer = typeof window === 'undefined';
+  const serviceKey = process.env.SUPABASE_SERVICE_KEY?.trim() ?? '';
+  if (isServer && url && serviceKey) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[supabase-data] using service role client');
+    }
+    if (!supabaseServiceClient) {
+      supabaseServiceClient = createClient(url, serviceKey, {
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+      });
+    }
+    return supabaseServiceClient;
+  }
+
+  // Fallback to anon client (works in browser + server when RLS allows).
   if (!supabase) {
     if (process.env.NODE_ENV === 'development') {
       console.warn(
-        '[supabase-data] Supabase client unavailable — set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY',
+        '[supabase-data] Supabase client unavailable — set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY (and optionally SUPABASE_SERVICE_KEY for server)',
       );
     }
     return null;
+  }
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[supabase-data] using anon client');
   }
   return supabase;
 }
@@ -77,49 +103,63 @@ export interface SupabaseProduct {
   ingredients: string[];
 }
 
-const CATEGORY_SET = new Set(['extension', 'styling', 'care', 'tool']);
-const QUALITY_SET = new Set(['budget', 'mid-range', 'premium']);
-
 function transformSupabaseProduct(data: Record<string, unknown>): Product {
-  const cat = data.category;
-  const category = typeof cat === 'string' && CATEGORY_SET.has(cat)
-    ? (cat as Product['category'])
-    : 'care';
+  const rawCategory = String(data.category ?? '').trim();
+  const catNorm = rawCategory.toLowerCase();
 
-  const qual = data.quality;
-  const quality =
-    typeof qual === 'string' && QUALITY_SET.has(qual)
-      ? (qual as Product['quality'])
-      : 'mid-range';
+  // Your current `products` table uses categories like:
+  // - braiding_hair, styler, shampoo, conditioner, treatment, accessories
+  // - "Oils & Butters", "Treatments & Masks", etc.
+  const category: Product['category'] =
+    catNorm.includes('braid') || catNorm.includes('braiding') || catNorm.includes('hair')
+      ? 'extension'
+      : catNorm.includes('styler') || catNorm.includes('styling')
+        ? 'styling'
+        : catNorm.includes('accessor')
+          ? 'tool'
+          : 'care';
 
-  const hairTypesMerged = [...coerceTextArray(data.hair_types), ...coerceTextArray(data.compatible_hair_types)];
-  const hairTypes = [...new Set(hairTypesMerged)];
+  const subCategory = (() => {
+    if (catNorm.includes('oil') || catNorm.includes('butter')) return 'oil';
+    if (catNorm.includes('shampoo')) return 'shampoo';
+    if (catNorm.includes('condition')) return 'deep-conditioner';
+    if (catNorm.includes('treatment') || catNorm.includes('mask')) return 'treatment';
+    if (catNorm.includes('styler') || catNorm.includes('styling')) return 'styler';
+    if (catNorm.includes('braid')) return 'braiding-hair';
+    if (catNorm.includes('accessor')) return 'accessories';
+    return catNorm || 'care';
+  })();
 
-  const est = Number(data.estimated_price);
+  // With this table shape, "quality" isn't present. Default to mid-range.
+  const quality: Product['quality'] = 'mid-range';
+
+  const hairTypesMerged = [
+    ...coerceTextArray(data.hair_types),
+    ...coerceTextArray(data.compatible_hair_types),
+  ];
+  const hairTypes = [...new Set(hairTypesMerged.map((x) => x.toLowerCase()))];
+
+  const est =
+    Number(data.estimated_price) ||
+    Number(data.avg_price_kes) ||
+    Number(data.price);
   const estimatedPrice = Number.isFinite(est) ? est : 0;
 
   const imageUrlRaw =
     typeof data.image_url === 'string' && data.image_url.trim()
       ? data.image_url.trim()
-      : typeof data.product_image === 'string' && data.product_image.trim()
-        ? data.product_image.trim()
-        : undefined;
+      : undefined;
 
-  const imagesFromDb = Array.isArray(data.images) ? (data.images as string[]) : [];
-  const imagesResolved =
-    imagesFromDb.length > 0 ? imagesFromDb : imageUrlRaw ? [imageUrlRaw] : [];
+  const imagesResolved = imageUrlRaw ? [imageUrlRaw] : [];
 
-  const minRaw = Number(data.price_min);
-  const maxRaw = Number(data.price_max);
-  const priceRange =
-    Number.isFinite(minRaw) && Number.isFinite(maxRaw) ? { min: minRaw, max: maxRaw } : undefined;
+  const priceRange = undefined;
 
   return {
     id: String(data.id ?? ''),
     name: String(data.name ?? 'Product'),
     brand: String(data.brand ?? ''),
     category,
-    subCategory: String(data.sub_category ?? ''),
+    subCategory,
     description: String(data.description ?? ''),
     benefits: Array.isArray(data.benefits) ? (data.benefits as string[]) : [],
     howToUse: String(data.how_to_use ?? ''),
@@ -145,16 +185,10 @@ function transformSupabaseProduct(data: Record<string, unknown>): Product {
     images: imagesResolved,
     productImage:
       imageUrlRaw ??
-      (imagesFromDb[0] != null ? String(imagesFromDb[0]) : undefined) ??
-      (data.product_image != null ? String(data.product_image) : undefined),
-    stylesCompatible: Array.isArray(data.styles_compatible)
-      ? (data.styles_compatible as string[])
-      : [],
-    routineStep:
-      data.routine_step === 'daily' || data.routine_step === 'weekly' || data.routine_step === 'monthly'
-        ? data.routine_step
-        : undefined,
-    ingredients: Array.isArray(data.ingredients) ? (data.ingredients as string[]) : [],
+      undefined,
+    stylesCompatible: [],
+    routineStep: undefined,
+    ingredients: [],
   };
 }
 
@@ -259,6 +293,28 @@ export async function fetchProductsForHairType(hairType: string): Promise<Produc
   }
 }
 
+/**
+ * Dashboard carousel: `public.products` when `customer_products` has no rows.
+ * Prefers hair-type matches when `hairType` is set; otherwise full catalog (trimmed).
+ */
+export async function fetchCatalogCarouselProducts(options: {
+  hairType?: string | null;
+  limit?: number;
+}): Promise<ExplorerCarouselProduct[]> {
+  const limit = Math.min(Math.max(options.limit ?? 6, 1), 24);
+  const ht = options.hairType?.trim() || null;
+
+  let rows: Product[] = [];
+  if (ht) {
+    rows = await fetchProductsForHairType(ht);
+  }
+  if (!rows.length) {
+    rows = await fetchAllProducts();
+  }
+
+  return rows.slice(0, limit).map(productToExplorerCarousel);
+}
+
 export async function fetchProductById(id: string): Promise<Product | null> {
   const client = requireClient();
   if (!client) return null;
@@ -275,6 +331,37 @@ export async function fetchProductById(id: string): Promise<Product | null> {
   } catch (error) {
     console.error('[supabase-data] fetchProductById:', error);
     return null;
+  }
+}
+
+/** Batch fetch by id; result order matches `ids` (skips missing ids). */
+export async function fetchProductsByIds(ids: string[]): Promise<Product[]> {
+  const client = requireClient();
+  if (!client || !ids.length) return [];
+
+  const ordered = ids.map((id) => String(id).trim()).filter(Boolean);
+  const unique = [...new Set(ordered)];
+  if (!unique.length) return [];
+
+  try {
+    const { data, error } = await client.from('products').select('*').in('id', unique);
+
+    if (error) {
+      console.error('[supabase-data] fetchProductsByIds:', error.message);
+      return [];
+    }
+
+    const mapped = mapRowsToProducts((data || []) as Record<string, unknown>[]);
+    const byId = new Map(mapped.map((p) => [p.id, p]));
+    const out: Product[] = [];
+    for (const id of ordered) {
+      const p = byId.get(id);
+      if (p) out.push(p);
+    }
+    return out;
+  } catch (error) {
+    console.error('[supabase-data] fetchProductsByIds:', error);
+    return [];
   }
 }
 

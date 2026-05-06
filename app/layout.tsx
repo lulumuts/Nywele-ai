@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import RootAppWithIntro from "@/components/RootAppWithIntro";
+import DevServiceWorkerCleanup from "@/components/DevServiceWorkerCleanup";
 import { OPENING_GLB_URL } from "@/lib/intro-crossfade";
 import "./globals.css";
 
@@ -61,6 +62,7 @@ export default function RootLayout({
       <body
         className={`${bricolage.className} min-h-full bg-transparent antialiased`}
       >
+        <DevServiceWorkerCleanup />
         <div className="nywele-cream-grid-surface nywele-grid-backdrop" aria-hidden />
         <div className="nywele-app-content">
           <RootAppWithIntro>{children}</RootAppWithIntro>

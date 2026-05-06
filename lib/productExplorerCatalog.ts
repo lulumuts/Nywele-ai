@@ -1,3 +1,5 @@
+import type { Product } from './products-new';
+
 export type IngredientStatus = 'good' | 'warn' | 'bad';
 
 export interface Ingredient {
@@ -273,6 +275,24 @@ export type ExplorerCarouselProduct = {
   imageUrl: string | null;
   pricing?: { currency: string; amount: number };
 };
+
+/** Map a Supabase-backed `Product` into dashboard / compatibility carousel cards. */
+export function productToExplorerCarousel(p: Product): ExplorerCarouselProduct {
+  const img = p.productImage ?? p.images[0] ?? null;
+  const purpose =
+    (p.description?.trim() || p.howToUse?.trim() || p.benefits?.[0]?.trim() || p.name).trim();
+  const amount = p.pricing?.estimatedPrice;
+  return {
+    brand: p.brand,
+    name: p.name,
+    purpose,
+    imageUrl: img || null,
+    pricing:
+      typeof amount === 'number' && Number.isFinite(amount) && amount > 0
+        ? { currency: p.pricing.currency || 'KES', amount }
+        : undefined,
+  };
+}
 
 /** Parse strings like "KES 2,400" */
 export function parseExplorerPrice(price: string): { currency: string; amount: number } | undefined {

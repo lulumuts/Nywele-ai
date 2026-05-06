@@ -16,6 +16,7 @@ export function HairRoutineOpeningStatus({
   description,
   showChecklist = true,
   titleStyle: titleStyleProp,
+  descriptionStyle: descriptionStyleProp,
 }: {
   title?: string;
   /** Shown under the title when set (e.g. full-screen OpeningSequence). */
@@ -23,36 +24,48 @@ export function HairRoutineOpeningStatus({
   showChecklist?: boolean;
   /** Override title typography (e.g. Bricolage for hair-care text phase). */
   titleStyle?: CSSProperties;
+  /** Override description typography; defaults to same color as title when title sets `color`. */
+  descriptionStyle?: CSSProperties;
 }) {
-  const textStyle = { color: HAIR_ROUTINE_STATUS_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' } as const;
   const titleStyle = titleStyleProp ?? ({ color: HAIR_ROUTINE_STATUS_TEXT, fontFamily: 'Caprasimo, serif' } as const);
+  const accentColor =
+    typeof titleStyle.color === 'string' && titleStyle.color ? titleStyle.color : HAIR_ROUTINE_STATUS_TEXT;
+  const bodyStyle = {
+    color: accentColor,
+    fontFamily: 'Bricolage Grotesque, sans-serif',
+    ...descriptionStyleProp,
+  } satisfies CSSProperties;
+  const checklistStyle = {
+    color: descriptionStyleProp?.color ?? accentColor,
+    fontFamily: 'Bricolage Grotesque, sans-serif',
+  } satisfies CSSProperties;
 
   return (
     <div className="mx-auto w-full max-w-md px-2 text-center">
       <div className="mb-3 flex items-center justify-center gap-2">
-        <Loader className="h-5 w-5 shrink-0 animate-spin" style={{ color: HAIR_ROUTINE_STATUS_TEXT }} aria-hidden />
+        <Loader className="h-5 w-5 shrink-0 animate-spin" style={{ color: accentColor }} aria-hidden />
         <h3 className="text-xl font-bold" style={titleStyle}>
           {title}
         </h3>
       </div>
       {description ? (
-        <p className="mb-4 text-center text-sm leading-snug" style={textStyle}>
+        <p className="mb-4 text-center text-sm leading-snug" style={bodyStyle}>
           {description}
         </p>
       ) : null}
       {showChecklist && (
         <div className="mx-auto space-y-2 text-center">
-          <p className="flex items-center justify-center gap-2 text-sm" style={textStyle}>
-            <CheckCircle className="h-4 w-4 shrink-0" style={{ color: HAIR_ROUTINE_STATUS_TEXT }} aria-hidden />
+          <p className="flex items-center justify-center gap-2 text-sm" style={checklistStyle}>
+            <CheckCircle className="h-4 w-4 shrink-0" style={{ color: accentColor }} aria-hidden />
             Hair type & texture
           </p>
-          <p className="flex items-center justify-center gap-2 text-sm" style={textStyle}>
+          <p className="flex items-center justify-center gap-2 text-sm" style={checklistStyle}>
             ... Health & moisture levels
           </p>
-          <p className="flex items-center justify-center gap-2 text-sm" style={textStyle}>
+          <p className="flex items-center justify-center gap-2 text-sm" style={checklistStyle}>
             ... Porosity indicators
           </p>
-          <p className="flex items-center justify-center gap-2 text-sm" style={textStyle}>
+          <p className="flex items-center justify-center gap-2 text-sm" style={checklistStyle}>
             ... Damage assessment
           </p>
         </div>

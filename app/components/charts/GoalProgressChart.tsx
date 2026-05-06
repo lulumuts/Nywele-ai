@@ -22,9 +22,15 @@ ChartJS.register(
 );
 
 const CHART_COLORS = {
-  bar: '#DD8106',
+  bar: '#FB8C1C',
   grid: 'rgba(156, 163, 175, 0.3)',
 };
+
+const BAR_OPACITIES = [0.2, 0.4, 0.6];
+function barColor(i: number) {
+  const a = BAR_OPACITIES[i % BAR_OPACITIES.length];
+  return `rgba(251, 140, 28, ${a})`;
+}
 
 export interface GoalProgressChartProps {
   labels: string[];
@@ -38,7 +44,7 @@ export default function GoalProgressChart({ labels, values }: GoalProgressChartP
       {
         label: 'Goal Progress',
         data: values,
-        backgroundColor: CHART_COLORS.bar,
+        backgroundColor: labels.map((_, i) => barColor(i)),
         borderRadius: 6,
       },
     ],

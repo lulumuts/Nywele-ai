@@ -26,8 +26,8 @@ ChartJS.register(
 );
 
 const CHART_COLORS = {
-  line: '#643100',
-  fill: 'rgba(100, 49, 0, 0.2)',
+  line: '#FB8C1C',
+  fill: 'rgba(251, 140, 28, 0.22)',
   grid: 'rgba(156, 163, 175, 0.3)',
 };
 

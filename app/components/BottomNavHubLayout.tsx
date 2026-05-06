@@ -62,6 +62,21 @@ export const styleCheckHubWhiteCardShellClass =
 export const styleCheckHubWhiteCardScrollClass =
   'flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-3 max-md:pb-5 [scroll-padding-bottom:1.25rem] lg:gap-5 lg:pb-0 lg:scroll-pb-0';
 
+/**
+ * Tall hub white shell — Product Compatibility, Scan barcode, etc.
+ * `flex-1` overrides default `flex-none` on the shell so the panel fills above the floating nav.
+ */
+export const styleCheckHubWhiteCardShellProductCompatClass = [
+  'flex-1',
+  'max-md:min-h-[min(64dvh,calc(100dvh-12.75rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))]',
+  'md:min-h-[min(66dvh,calc(100dvh-13.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))]',
+  'max-md:[max-height:min(74dvh,calc(100dvh-12.25rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))]',
+  'md:max-h-[min(76dvh,calc(100dvh-13rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))]',
+].join(' ');
+
+/** Desktop: tuck white panel under hero copy; mobile keeps a light upward nudge. */
+export const styleCheckHubWhiteCardOuterProductCompatClass = `${styleCheckHubWhiteCardOuterStartClass} -mt-1 pt-1 md:-mt-2 md:pt-0`;
+
 /** White card block copied from `app/style-check/page.tsx` (Feeling Inspired / upload section). */
 export function StyleCheckHubWhiteCard({
   children,

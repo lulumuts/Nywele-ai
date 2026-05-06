@@ -311,8 +311,10 @@ nywele-ai/
 ### Prerequisites
 
 - Node.js 18+
-- OpenAI API key
-- Google Gemini API key
+- OpenAI API key (required for recommendations + style analysis)
+- Google Gemini API key (optional; used for image generation)
+- (Optional) Supabase project (for styles library, salons, analytics)
+- (Optional) Google Cloud Vision (for hair photo analysis)
 
 ### Installation
 
@@ -326,15 +328,34 @@ npm install
 
 # Set up environment variables
 cp .env.example .env.local
-# Add your API keys:
-# OPENAI_API_KEY=your_openai_key
-# GEMINI_API_KEY=your_gemini_key
+# Fill in required keys (see below)
 
 # Run development server
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000)
+
+### Environment variables (required for core flows)
+
+The app will run without these, but key flows will fail (500/503) until configured.
+
+- **`OPENAI_API_KEY`**: required for:
+  - `POST /api/recommend`
+  - `POST /api/analyze-style`
+  - `POST /api/hair-health`
+- **`NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`**: required for:
+  - `POST /api/recommend` (product lookup + persistence)
+  - `GET /api/styles` (style library)
+  - salon queries in `app/results/page.tsx` and analytics inserts (if enabled)
+
+### Optional environment variables
+
+- **`GEMINI_API_KEY`**: enables Gemini image generation for `POST /api/style` (otherwise it falls back to curated images).
+- **Vision (for `POST /api/analyze-image`)**:
+  - `GOOGLE_APPLICATION_CREDENTIALS` (service account json path), or
+  - `GOOGLE_CLOUD_VISION_API_KEY`
+- **`NYWELE_API_KEY`**: only needed if you call protected API routes from an external origin (non-first-party). For normal first-party browser calls, API access should be treated as internal.
 
 ---
 

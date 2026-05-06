@@ -1,10 +1,74 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/apiAuth';
-import OpenAI from 'openai';
 
-const openai = process.env.OPENAI_API_KEY 
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  : null;
+const ANTHROPIC_MESSAGES_URL = 'https://api.anthropic.com/v1/messages';
+const CLAUDE_MODEL = 'claude-haiku-4-5-20251001';
+
+type AnthropicContentBlock =
+  | { type: 'text'; text: string }
+  | {
+      type: 'image';
+      source: { type: 'base64'; media_type: string; data: string };
+    };
+
+function isConnectTimeoutError(err: unknown): boolean {
+  const anyErr = err as any;
+  return (
+    anyErr?.code === 'UND_ERR_CONNECT_TIMEOUT' ||
+    anyErr?.cause?.code === 'UND_ERR_CONNECT_TIMEOUT' ||
+    String(anyErr?.cause?.name ?? anyErr?.name ?? '').includes('ConnectTimeout')
+  );
+}
+
+async function fetchAnthropicWithRetry(
+  url: string,
+  init: RequestInit,
+  opts?: { timeoutMs?: number; retries?: number }
+): Promise<Response> {
+  const timeoutMs = opts?.timeoutMs ?? 30_000;
+  const retries = opts?.retries ?? 1;
+
+  let attempt = 0;
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    attempt += 1;
+    try {
+      return await fetch(url, { ...init, signal: AbortSignal.timeout(timeoutMs) });
+    } catch (err) {
+      const shouldRetry = attempt <= retries + 1 && isConnectTimeoutError(err);
+      if (!shouldRetry) throw err;
+      // small backoff before retry
+      await new Promise((r) => setTimeout(r, 400 * attempt));
+    }
+  }
+}
+
+function extractJsonFromText(text: string): unknown | null {
+  const trimmed = String(text ?? '').trim();
+  if (!trimmed) return null;
+
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    // Try to salvage a JSON object from surrounding text.
+    const match = trimmed.match(/```json\s*([\s\S]*?)\s*```/) || trimmed.match(/\{[\s\S]*\}/);
+    if (!match) return null;
+    try {
+      return JSON.parse(match[1] || match[0]);
+    } catch {
+      return null;
+    }
+  }
+}
+
+function parseDataUrlImage(image: string): { mediaType: string; base64: string } | null {
+  const m = String(image).match(/^data:(image\/[^;]+);base64,(.+)$/);
+  if (!m) return null;
+  const mediaType = m[1];
+  const base64 = m[2];
+  if (!mediaType || !base64) return null;
+  return { mediaType, base64 };
+}
 
 export async function POST(request: NextRequest) {
   const authError = await requireAuth(request);
@@ -16,8 +80,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Image is required' }, { status: 400 });
     }
 
-    if (!openai) {
-      return NextResponse.json({ error: 'OPENAI_API_KEY not configured' }, { status: 500 });
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'ANTHROPIC_API_KEY not configured' }, { status: 500 });
     }
 
     const prompt = `Analyze this image for African hair health assessment.
@@ -49,55 +114,111 @@ Return ONLY valid JSON (no commentary, no code fences, no markdown) in this exac
 
 If uncertain, use the closest category. Be specific about African hair characteristics like shrinkage, SSKs (single strand knots), and protective styling needs.`;
 
-    console.log('🔍 Calling OpenAI GPT-4 Vision for comprehensive hair health analysis...');
-    
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
+    const parsed = parseDataUrlImage(image);
+    if (!parsed) {
+      return NextResponse.json(
         {
-          role: "user",
-          content: [
-            { type: "text", text: prompt },
-            {
-              type: "image_url",
-              image_url: {
-                url: image, // OpenAI accepts data URLs directly
-              },
-            },
-          ],
+          success: false,
+          error: 'Invalid image format',
+          message: 'Expected a data URL like data:image/jpeg;base64,...',
         },
-      ],
-      max_tokens: 1000,
-      response_format: { type: "json_object" }, // Force JSON response
-    });
+        { status: 400 }
+      );
+    }
 
-    const text = response.choices[0].message.content || '';
-    console.log('📥 OpenAI response received');
+    console.log('🔍 Calling Anthropic Claude (vision) for hair health analysis...');
 
-    let json: any;
-    try {
-      // OpenAI with json_object format should return valid JSON
-      json = JSON.parse(text);
-    } catch (parseError) {
-      // Fallback: try to extract JSON if wrapped in markdown
-      const match = text.match(/```json\s*([\s\S]*?)\s*```/) || text.match(/\{[\s\S]*\}/);
-      if (!match) {
-        console.error('Failed to parse OpenAI response:', text);
-        return NextResponse.json({ success: false, error: 'Failed to parse OpenAI response' }, { status: 500 });
+    const messages = [
+      {
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: parsed.mediaType, data: parsed.base64 } },
+          { type: 'text', text: prompt },
+        ] satisfies AnthropicContentBlock[],
+      },
+    ];
+
+    const res = await fetchAnthropicWithRetry(
+      ANTHROPIC_MESSAGES_URL,
+      {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: CLAUDE_MODEL,
+        max_tokens: 1200,
+        messages,
+      }),
+      },
+      { timeoutMs: 30_000, retries: 1 }
+    );
+
+    const raw = await res.text();
+    if (!res.ok) {
+      let message = raw.slice(0, 800);
+      try {
+        const errJson = JSON.parse(raw) as { error?: { message?: string } };
+        if (errJson?.error?.message) message = errJson.error.message;
+      } catch {
+        /* keep truncated body */
       }
-      json = JSON.parse(match[1] || match[0]);
+      console.error('Hair-health Anthropic API error:', res.status, message);
+      return NextResponse.json(
+        { success: false, error: 'Hair health analysis failed', message },
+        { status: 502 }
+      );
+    }
+
+    let data: { content?: Array<{ type: string; text?: string }> };
+    try {
+      data = JSON.parse(raw) as { content?: Array<{ type: string; text?: string }> };
+    } catch {
+      console.error('Hair-health Anthropic API: invalid JSON response');
+      return NextResponse.json(
+        { success: false, error: 'Hair health analysis failed', message: 'Invalid response from AI provider' },
+        { status: 502 }
+      );
+    }
+
+    const assistantText = (data.content ?? [])
+      .filter((b) => b.type === 'text' && typeof b.text === 'string')
+      .map((b) => b.text as string)
+      .join('\n')
+      .trim();
+
+    const json = extractJsonFromText(assistantText);
+    if (!json || typeof json !== 'object') {
+      console.error('Hair-health: failed to parse JSON from assistant text:', assistantText.slice(0, 600));
+      return NextResponse.json(
+        { success: false, error: 'Hair health analysis failed', message: 'AI did not return valid JSON' },
+        { status: 502 }
+      );
     }
 
     // Basic normalization
-    if (json?.curlPattern?.type) {
-      json.curlPattern.type = String(json.curlPattern.type).toLowerCase();
+    const normalized = json as any;
+    if (normalized?.curlPattern?.type) {
+      normalized.curlPattern.type = String(normalized.curlPattern.type).toLowerCase();
     }
-    if (typeof json.healthScore === 'number') {
-      json.healthScore = Math.max(0, Math.min(100, Math.round(json.healthScore)));
+    if (typeof normalized?.healthScore === 'number') {
+      normalized.healthScore = Math.max(0, Math.min(100, Math.round(normalized.healthScore)));
     }
 
-    return NextResponse.json({ success: true, data: json });
+    return NextResponse.json({ success: true, data: normalized });
   } catch (error: any) {
+    if (isConnectTimeoutError(error)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Hair health analysis unavailable',
+          message: 'Timed out connecting to Anthropic. Please try again in a moment.',
+        },
+        { status: 503 }
+      );
+    }
     console.error('Hair-health analysis error:', error);
     return NextResponse.json({ success: false, error: 'Hair health analysis failed', message: error.message }, { status: 500 });
   }

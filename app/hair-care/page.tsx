@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import {
   Sparkles,
   Calendar,
@@ -23,6 +24,8 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import type { HairCareProfile, HairCareRecommendation } from '@/lib/hairCare';
+import { PRODUCTS as EXPLORER_PRODUCTS, type ExplorerProduct } from '@/lib/productExplorerCatalog';
+import { getProductImageUrl } from '@/lib/product-image';
 import BottomNav from '@/app/components/BottomNav';
 import OpeningSequence from '@/components/OpeningSequence';
 import { HairRoutineOpeningStatus } from '@/components/HairRoutineAnalysingLoader';
@@ -64,6 +67,19 @@ function computeCanonicalHealthScore(hairAnalysis: unknown, geminiHealth: unknow
   return 60;
 }
 
+/** Title-style casing per word for recommendation lines from the model. */
+function toTitleCaseLine(text: string): string {
+  return String(text ?? '')
+    .trim()
+    .split(/\s+/)
+    .map((word) => {
+      if (!word) return word;
+      const lower = word.toLowerCase();
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(' ');
+}
+
 function RoutineAccordionSection({
   title,
   icon: Icon,
@@ -73,6 +89,12 @@ function RoutineAccordionSection({
   bodyClassName = 'p-4 sm:p-5',
   bodyStyle,
   className = '',
+  collapsible = true,
+  headerStyle,
+  showDivider = true,
+  containerStyle,
+  titleStyle,
+  titleClassName,
 }: {
   title: string;
   icon?: LucideIcon;
@@ -82,44 +104,178 @@ function RoutineAccordionSection({
   bodyClassName?: string;
   bodyStyle?: React.CSSProperties;
   className?: string;
+  collapsible?: boolean;
+  headerStyle?: React.CSSProperties;
+  showDivider?: boolean;
+  containerStyle?: React.CSSProperties;
+  titleStyle?: React.CSSProperties;
+  titleClassName?: string;
 }) {
+  const resolvedHeaderStyle: React.CSSProperties = {
+    background: '#FFFFFF',
+    ...headerStyle,
+  };
+  const resolvedContainerStyle: React.CSSProperties = {
+    background: '#FFFFFF',
+    border: '2px solid rgba(175, 85, 0, 0.25)',
+    ...containerStyle,
+  };
   return (
     <div
-      className={`overflow-hidden rounded-xl bg-white ${className}`.trim()}
-      style={{ border: '2px solid rgba(175, 85, 0, 0.25)' }}
+      className={`overflow-hidden rounded-xl ${className}`.trim()}
+      style={resolvedContainerStyle}
     >
-      <button
-        type="button"
-        onClick={onToggle}
-        className="flex w-full items-center justify-between gap-3 bg-white px-4 py-3.5 text-left transition-colors hover:bg-[rgba(100,49,0,0.06)] sm:px-5 sm:py-[1.125rem]"
-        aria-expanded={open}
-      >
-        <span className="flex min-w-0 items-center gap-2 sm:gap-3">
-          {Icon ? <Icon size={22} className="shrink-0 sm:h-7 sm:w-7" style={{ color: '#643100' }} aria-hidden /> : null}
-          <span
-            className="text-xs font-bold uppercase tracking-wide sm:text-sm"
-            style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-          >
-            {title}
+      {collapsible ? (
+        <button
+          type="button"
+          onClick={onToggle}
+          className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left transition-colors hover:bg-[rgba(100,49,0,0.06)] sm:px-5 sm:py-[1.125rem]"
+          aria-expanded={open}
+          style={resolvedHeaderStyle}
+        >
+          <span className="flex min-w-0 items-center gap-2 sm:gap-3">
+            {Icon ? (
+              <Icon size={22} className="shrink-0 sm:h-7 sm:w-7" style={{ color: '#643100' }} aria-hidden />
+            ) : null}
+            <span
+              className={titleClassName ?? 'text-xs font-bold uppercase tracking-wide sm:text-sm'}
+              style={{
+                color: '#643100',
+                fontFamily: 'Bricolage Grotesque, sans-serif',
+                ...(titleStyle ?? {}),
+              }}
+            >
+              {title}
+            </span>
           </span>
-        </span>
-        <ChevronDown
-          className={`shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-          size={22}
-          style={{ color: '#643100' }}
-          aria-hidden
-        />
-      </button>
-      {open ? (
-        <div className={`border-t border-[rgba(175,85,0,0.15)] ${bodyClassName}`} style={bodyStyle}>
+          <ChevronDown
+            className={`shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+            size={22}
+            style={{ color: '#643100' }}
+            aria-hidden
+          />
+        </button>
+      ) : (
+        <div
+          className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5 sm:py-[1.125rem]"
+          style={resolvedHeaderStyle}
+        >
+          <span className="flex min-w-0 items-center gap-2 sm:gap-3">
+            {Icon ? (
+              <Icon size={22} className="shrink-0 sm:h-7 sm:w-7" style={{ color: '#643100' }} aria-hidden />
+            ) : null}
+            <span
+              className={titleClassName ?? 'text-xs font-bold uppercase tracking-wide sm:text-sm'}
+              style={{
+                color: '#643100',
+                fontFamily: 'Bricolage Grotesque, sans-serif',
+                ...(titleStyle ?? {}),
+              }}
+            >
+              {title}
+            </span>
+          </span>
+        </div>
+      )}
+
+      {collapsible ? (
+        open ? (
+          <div
+            className={`${showDivider ? 'border-t border-[rgba(175,85,0,0.15)]' : ''} ${bodyClassName}`}
+            style={bodyStyle}
+          >
+            {children}
+          </div>
+        ) : null
+      ) : (
+        <div
+          className={`${showDivider ? 'border-t border-[rgba(175,85,0,0.15)]' : ''} ${bodyClassName}`}
+          style={bodyStyle}
+        >
           {children}
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
 
 export default function HairCarePage() {
+  const router = useRouter();
+  const DASHBOARD_TEXT_COLOR = '#7A3500';
+  const catalogProducts = Object.values(EXPLORER_PRODUCTS).flat() as ExplorerProduct[];
+
+  const buildFallbackAnalysisFromHairHealth = (hh: any) => {
+    const curlType = typeof hh?.curlPattern?.type === 'string' ? hh.curlPattern.type : undefined;
+    const curlConf = typeof hh?.curlPattern?.confidence === 'number' ? hh.curlPattern.confidence : 0.65;
+    const healthScore = typeof hh?.healthScore === 'number' ? hh.healthScore : undefined;
+
+    const porosity = typeof hh?.porosity === 'string' ? hh.porosity : undefined;
+    const density = typeof hh?.density === 'string' ? hh.density : undefined;
+    const length = typeof hh?.length === 'string' ? hh.length : undefined;
+
+    const texture =
+      curlType && typeof curlType === 'string' && curlType.toLowerCase().startsWith('4') ? 'coily' : null;
+
+    return {
+      // Shape compatible with downstream UI + routine builder usage.
+      hairType: curlType
+        ? {
+            hairType: curlType,
+            confidence: Math.max(0, Math.min(1, curlConf)),
+            texture: texture ?? undefined,
+            porosity: porosity ?? undefined,
+            density: density ?? undefined,
+          }
+        : null,
+      detectedStyle: null,
+      health: {
+        healthScore: typeof healthScore === 'number' ? Math.max(0, Math.min(100, Math.round(healthScore))) : 60,
+      },
+      length: length ? { length, confidence: 0.65 } : null,
+      density: density ? { density, confidence: 0.65 } : null,
+      damage: { severity: 'none', damageTypes: [] as string[] },
+      overallQuality:
+        typeof healthScore === 'number' ? Math.max(0, Math.min(100, Math.round(healthScore))) : undefined,
+      extractedCharacteristics: {
+        texture: texture ?? undefined,
+        length: length ?? undefined,
+        density: density ?? undefined,
+      },
+      _source: 'hair-health-fallback',
+    };
+  };
+
+  const resolveRecommendedProductImage = (product: Record<string, unknown>) => {
+    const direct = getProductImageUrl(product);
+    if (direct) return direct;
+
+    const norm = (s: unknown) =>
+      String(s ?? '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+
+    const b = norm((product as any).brand);
+    const n = norm((product as any).name);
+    if (!b || !n) return '/images/product-compatibility-image.png';
+
+    // Product-specific overrides when AI naming doesn't match catalog exactly.
+    if (/\bwide tooth\b/.test(n) && /\bcomb\b/.test(n)) {
+      // Use a real web image (not local fallback).
+      return 'https://images.unsplash.com/photo-1598457111964-47e0db313e33?auto=format&fit=crop&w=1200&q=80';
+    }
+
+    const hit = catalogProducts.find((p) => {
+      const pb = norm(p.brand);
+      const pn = norm(p.name);
+      if (!pb || !pn) return false;
+      const brandOk = pb === b || pb.includes(b) || b.includes(pb);
+      const nameOk = pn === n || pn.includes(n) || n.includes(pn);
+      return brandOk && nameOk;
+    });
+
+    return hit?.imageSrc || '/images/product-compatibility-image.png';
+  };
   const hasLoadedRoutine = useRef(false);
   /** Set for each new photo upload; used for hairCareHistory upsert + profile merge guard */
   const currentScanIdRef = useRef<string | null>(null);
@@ -133,6 +289,7 @@ export default function HairCarePage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [hairAnalysis, setHairAnalysis] = useState<any>(null);
   const [geminiHealth, setGeminiHealth] = useState<any>(null);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
   /** Opening bust plays once, then text-only analysing UI until analysis finishes */
   const [analysisLoadingPhase, setAnalysisLoadingPhase] = useState<'bust' | 'text'>('bust');
 
@@ -144,11 +301,12 @@ export default function HairCarePage() {
   
   const [showProfilePrompt, setShowProfilePrompt] = useState(false);
   const [hasProfile, setHasProfile] = useState(true);
-  const [routineAccordionOpen, setRoutineAccordionOpen] = useState({
+  const [checkedProfile, setCheckedProfile] = useState(false);
+  const [routineAccordionOpen] = useState({
     routine: true,
-    maintenance: false,
-    products: false,
-    tips: false,
+    maintenance: true,
+    products: true,
+    tips: true,
   });
   /** In-page copy for save (alerts are often suppressed in PWAs / in-app browsers). */
   const [saveRoutineNotice, setSaveRoutineNotice] = useState<{ tone: 'success' | 'error'; text: string } | null>(
@@ -188,6 +346,7 @@ export default function HairCarePage() {
     setHairAnalysis(null);
     setGeminiHealth(null);
     setRecommendation(null);
+    setAnalysisError(null);
   };
 
   // Check for profile on mount and load viewing routine if exists
@@ -195,10 +354,35 @@ export default function HairCarePage() {
     // Check if we're viewing a saved routine via URL parameter
     const urlParams = new URLSearchParams(window.location.search);
     const isViewingSaved = urlParams.get('view') === 'saved';
+    const forceAnalyzeNew =
+      urlParams.get('mode') === 'analyze' || urlParams.get('mode') === 'new' || urlParams.get('fresh') === '1';
     
     console.log('useEffect running:', { isViewingSaved, url: window.location.href, hasLoadedRoutine: hasLoadedRoutine.current });
     
     const scanIdParam = urlParams.get('scan');
+
+    if (forceAnalyzeNew) {
+      clearScanAndSession();
+      localStorage.removeItem('nywele-viewing-routine');
+      const profile = localStorage.getItem('nywele-user-profile');
+      if (!profile) {
+        setHasProfile(false);
+        setShowProfilePrompt(false);
+        setCheckedProfile(true);
+        router.replace('/onboarding');
+        return;
+      }
+      const parsedProfile = normalizeUserProfile(JSON.parse(profile));
+      setUserName(parsedProfile.name);
+      setUserEmail(parsedProfile.email);
+      setUserProfile(parsedProfile);
+      setHasProfile(true);
+      setShowProfilePrompt(false);
+      setCurrentStep(2); // Upload + analyze new photo
+      setCheckedProfile(true);
+      hasLoadedRoutine.current = true;
+      return;
+    }
 
     if (scanIdParam && !hasLoadedRoutine.current) {
       const profileRawEarly = localStorage.getItem('nywele-user-profile');
@@ -307,8 +491,10 @@ export default function HairCarePage() {
     const profile = localStorage.getItem('nywele-user-profile');
     if (!profile) {
       setHasProfile(false);
-      setShowProfilePrompt(true);
-      setCurrentStep(0);
+      setShowProfilePrompt(false);
+      setCheckedProfile(true);
+      router.replace('/onboarding');
+      return;
     } else {
       // If profile exists, skip to upload step
       const parsedProfile = normalizeUserProfile(JSON.parse(profile));
@@ -316,8 +502,14 @@ export default function HairCarePage() {
       setUserEmail(parsedProfile.email);
       setUserProfile(parsedProfile);
       setCurrentStep(2);
+      setCheckedProfile(true);
     }
-  }, []);
+  }, [router]);
+
+  if (checkedProfile && !hasProfile) {
+    // Redirecting to onboarding — avoid showing the old “create your profile” prompt.
+    return null;
+  }
 
   // Persist latest hair scan to profile (dashboard metrics + profile page + scan history)
   useEffect(() => {
@@ -363,13 +555,14 @@ export default function HairCarePage() {
     if (!hairAnalysis || typeof hairAnalysis !== 'object' || Object.keys(hairAnalysis).length === 0) return;
 
     saveHairCareSession({
+      profileEmail: userEmail,
       hairImageDataUrl: hairImage,
       hairAnalysis,
       geminiHealth,
       recommendation,
       currentStep,
     });
-  }, [hairImage, hairAnalysis, geminiHealth, recommendation, currentStep, isAnalyzing]);
+  }, [hairImage, hairAnalysis, geminiHealth, recommendation, currentStep, isAnalyzing, userEmail]);
 
   const handleNameEmailSubmit = () => {
     if (!userName.trim() || !userEmail.trim()) {
@@ -565,93 +758,40 @@ export default function HairCarePage() {
         setRecommendation(null);
         setHairImage(base64Image);
         setCurrentStep(3); // Move to analysis step
+        setAnalysisError(null);
         
-        // Analyze with Vision API
         setIsAnalyzing(true);
         try {
-          const response = await fetch('/api/analyze-image', {
+          console.log('🔍 Calling hair-health API (Claude)...');
+          const hh = await fetch('/api/hair-health', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              image: base64Image,
-              imageType: 'current_hair'
-            })
+            body: JSON.stringify({ image: base64Image }),
           });
-          
-          const result = await response.json();
-          
-          if (result.success) {
-            const analysisData = result.data;
-            
-            // Enhance the analysis with extracted characteristics
-            const enhancedAnalysis = {
-              ...analysisData,
-              // Use extracted characteristics, but prioritize hair type detection for texture
-              texture: (() => {
-                // If hair type is 4a/4b/4c, texture should be coily
-                const hairType = analysisData.hairType?.hairType || analysisData.hairType;
-                if (hairType && typeof hairType === 'string' && hairType.toLowerCase().startsWith('4')) {
-                  return 'coily';
-                }
-                // Otherwise use extracted characteristics
-                return analysisData.extractedCharacteristics?.texture || 
-                       deriveTexture(analysisData) || 
-                       null;
-              })(),
-              // Enhance length if not detected
-              length: analysisData.length || 
-                      (analysisData.extractedCharacteristics?.length ? {
-                        length: analysisData.extractedCharacteristics.length,
-                        confidence: 0.7
-                      } : null),
-              // Enhance density if not detected
-              density: analysisData.density || 
-                       (analysisData.extractedCharacteristics?.density ? {
-                         density: analysisData.extractedCharacteristics.density,
-                         confidence: 0.7
-                       } : null),
-            };
-            
-            setHairAnalysis(enhancedAnalysis);
-            console.log('✅ Hair analysis complete:', enhancedAnalysis);
-            console.log('📊 Extracted characteristics:', analysisData.extractedCharacteristics);
-            console.log('🎨 UI Display Values:');
-            console.log('  - Hair Type:', enhancedAnalysis.hairType?.hairType || enhancedAnalysis.hairType);
-            console.log('  - Texture:', enhancedAnalysis.texture);
-            console.log('  - Health:', enhancedAnalysis.health?.healthScore || enhancedAnalysis.health?.score);
-            console.log('  - Length:', enhancedAnalysis.length?.length || enhancedAnalysis.extractedCharacteristics?.length);
-            console.log('  - Density:', enhancedAnalysis.density?.density || enhancedAnalysis.extractedCharacteristics?.density);
-            console.log('  - Overall Quality:', enhancedAnalysis.overallQuality);
+          const hhJson = await hh.json().catch(() => null);
 
-            // Enrich with Gemini health analysis
-            try {
-              console.log('🔍 Calling Gemini hair-health API...');
-              const hh = await fetch('/api/hair-health', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image: base64Image }),
-              });
-              console.log('📥 Gemini API response status:', hh.status);
-              const hhJson = await hh.json();
-              console.log('📥 Gemini API response:', hhJson);
-              if (hhJson.success && hhJson.data) {
-                setGeminiHealth(hhJson.data);
-                console.log('✅ Gemini hair-health set:', hhJson.data);
-              } else {
-                console.warn('⚠️ Gemini API returned unsuccessful:', hhJson);
-                setGeminiHealth(null);
-              }
-            } catch (e) {
-              console.error('❌ Gemini hair-health failed:', e);
-              setGeminiHealth(null);
-            }
+          if (hh.ok && hhJson?.success && hhJson?.data) {
+            setGeminiHealth(hhJson.data);
+            const fallbackAnalysis = buildFallbackAnalysisFromHairHealth(hhJson.data);
+            setHairAnalysis(fallbackAnalysis);
+            setAnalysisError(null);
+            console.log('✅ Hair analysis complete (Claude):', fallbackAnalysis);
           } else {
-            console.warn('⚠️ Analysis failed; Vision API not configured or returned error');
-            setHairAnalysis({});
+            const msg =
+              hhJson?.message ||
+              hhJson?.error ||
+              `Could not analyze photo (${hh.status}). Please try again.`;
+            console.warn('⚠️ Analysis failed:', msg);
+            setHairAnalysis(null);
+            setGeminiHealth(null);
+            setAnalysisError(msg);
           }
         } catch (error) {
           console.error('❌ Analysis error:', error);
-          setHairAnalysis({});
+          const msg = error instanceof Error ? error.message : 'Could not analyze photo. Please try again.';
+          setHairAnalysis(null);
+          setGeminiHealth(null);
+          setAnalysisError(msg);
         } finally {
           setIsAnalyzing(false);
         }
@@ -685,7 +825,11 @@ export default function HairCarePage() {
           density: hairAnalysis.hairType?.density || hairAnalysis.density || 'thick',
           porosity: hairAnalysis.hairType?.porosity || hairAnalysis.porosity || 'low',
           elasticity: 'medium',
-          currentDamage: hairAnalysis.damage || [],
+          currentDamage: Array.isArray(hairAnalysis.damage?.damageTypes)
+            ? (hairAnalysis.damage.damageTypes as string[])
+            : Array.isArray(hairAnalysis.damage)
+              ? (hairAnalysis.damage as string[])
+              : [],
         },
         currentStyle: {
           name: hairAnalysis.detectedStyle?.style || 'Natural',
@@ -924,24 +1068,26 @@ export default function HairCarePage() {
               animate={{ opacity: 1, y: 0 }}
               className="flex min-h-0 w-full min-w-0 flex-1 flex-col"
             >
-              <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-3 sm:px-4 md:px-6 lg:px-8">
-                <div className="mb-2 flex items-start justify-between gap-4">
-                  <h1
-                    className="min-w-0 flex-1 text-3xl font-bold md:text-4xl"
-                    style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}
+              <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-3 pt-14 sm:px-4 sm:pt-16 md:px-6 md:pt-0 lg:px-8">
+                <div className="md:mx-auto md:w-full md:max-w-[560px]">
+                  <div className="mb-2 flex items-start justify-between gap-4">
+                    <h1
+                      className="min-w-0 flex-1 text-3xl font-bold md:text-4xl"
+                      style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}
+                    >
+                      How healthy is your hair?
+                    </h1>
+                  </div>
+                  <p
+                    className="mb-1 text-base md:mb-4"
+                    style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
-                    How Healthy is your Hair?
-                  </h1>
+                    Get immediate feedback with a quick selfie.
+                  </p>
                 </div>
-                <p
-                  className="mb-1 text-base md:mb-4"
-                  style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                >
-                  Get immediate feedback with a quick selfie.
-                </p>
                 <div className="flex min-h-0 flex-none flex-col justify-start md:flex-none md:justify-start">
                   <div
-                    className="mt-5 flex w-full max-h-[min(56rem,76dvh,calc(100dvh-8.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))] min-h-[25rem] flex-none flex-col overflow-hidden rounded-2xl pt-5 pb-5 pl-5 pr-0 sm:mt-6 sm:pt-6 sm:pb-6 sm:pl-6 sm:pr-0 md:mt-8 md:max-h-[min(58rem,68dvh,calc(100dvh-7.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))] md:min-h-[29rem] md:pt-7 md:pb-7 md:pl-7 md:pr-0"
+                    className="mt-16 flex w-full max-h-[min(76dvh,calc(100dvh-9.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))] flex-none flex-col overflow-hidden rounded-2xl pt-5 pb-5 pl-5 pr-0 sm:mt-20 sm:pt-6 sm:pb-6 sm:pl-6 sm:pr-0 md:mx-auto md:mt-14 md:aspect-square md:w-full md:max-w-[560px] md:max-h-none md:pt-7 md:pb-7 md:pl-7 md:pr-0"
                     style={{
                       background: '#FFFFFF',
                       border: '2px solid rgba(175, 85, 0, 0.25)',
@@ -1006,7 +1152,7 @@ export default function HairCarePage() {
                         className="mb-0.5 text-3xl font-bold md:text-4xl"
                         style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}
                       >
-                        How healthy is your hair
+                        How healthy is your hair?
                       </h1>
                       <p className="mb-0 text-base md:mb-2" style={metricLabelStyle}>
                         From this scan
@@ -1016,9 +1162,13 @@ export default function HairCarePage() {
                   </div>
                 )}
                 <div
-                  className={`relative flex min-h-0 w-full max-w-full flex-none flex-col overflow-hidden rounded-2xl pb-4 pt-3 sm:pb-5 sm:pt-4 md:pb-6 md:pt-4 ${
+                  className={`relative flex min-h-0 w-full max-w-full flex-none flex-col overflow-hidden rounded-2xl ${
                     analysisReady && hairAnalysis ? 'mt-2' : 'mt-5 sm:mt-6 md:mt-8'
-                  } max-h-[min(68dvh,calc(100dvh-7.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))] md:max-h-[min(62dvh,calc(100dvh-6rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))]`}
+                  } ${
+                    analysisReady && hairAnalysis
+                      ? 'hair-care-analysis-shell-enhanced'
+                      : 'max-h-[min(68dvh,calc(100dvh-7.5rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))))] md:max-h-[min(62dvh,calc(100dvh-6rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))))] lg:max-h-[min(58dvh,calc(100dvh-6rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))))]'
+                  }`}
                   style={{
                     background: '#FFFFFF',
                     border: '2px solid rgba(175, 85, 0, 0.25)',
@@ -1026,23 +1176,83 @@ export default function HairCarePage() {
                   }}
                 >
                   <div
-                    className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain pl-4 pr-0 sm:pl-5 sm:pr-0 md:pl-6 md:pr-0 md:gap-5"
+                    className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain p-4 sm:p-5 md:gap-5 md:p-6"
                     style={{ visibility: isAnalyzing || loading ? 'hidden' : 'visible' }}
                   >
-                    <div className="mx-auto w-full max-w-2xl space-y-4 pr-4 sm:pr-5 md:pr-6">
-                      {!analysisReady && <HairCareReferencePhoto src={hairImage} />}
+                    <div className="mx-auto w-full max-w-6xl space-y-4 pr-4 sm:pr-5 md:pr-6">
+                      {!analysisReady && <HairCareReferencePhoto src={hairImage} alignStart />}
+                    {analysisError ? (
+                      <div
+                        role="status"
+                        className="rounded-xl border-2 px-4 py-3 text-sm font-semibold"
+                        style={{
+                          background: '#fff1f2',
+                          borderColor: 'rgba(185, 28, 28, 0.35)',
+                          color: '#7f1d1d',
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                        }}
+                      >
+                        {analysisError}
+                      </div>
+                    ) : null}
                       {hairAnalysis && (
-                        <div className="space-y-3">
-                          {analysisReady && (
-                            <>
-                              <HairCareReferencePhoto
-                                src={hairImage}
-                                compact
-                                headingColor="#643100"
-                                bodyColor="#643100"
-                              />
-                            </>
-                          )}
+                        <div
+                          className={`grid gap-4 lg:gap-6 ${
+                            analysisReady && geminiHealth
+                              ? 'lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]'
+                              : 'lg:grid-cols-2'
+                          }`}
+                        >
+                          <div
+                            className={`space-y-4 ${
+                              analysisReady && geminiHealth ? 'lg:pl-6 lg:pt-4 xl:pl-8 xl:pt-5' : ''
+                            }`}
+                          >
+                          {analysisReady && geminiHealth ? (
+                            <RoutineAccordionSection
+                              title="Photo & hair characteristics"
+                              open
+                              onToggle={() => null}
+                              collapsible={false}
+                              headerStyle={{ background: 'rgba(255, 254, 225, 0.35)' }}
+                              bodyStyle={{ background: 'rgba(255, 254, 225, 0.43)' }}
+                              containerStyle={{ border: '1px solid rgba(175, 85, 0, 0.22)' }}
+                              titleStyle={{ fontFamily: 'Caprasimo, serif' }}
+                              titleClassName="text-sm font-bold uppercase tracking-wide sm:text-base"
+                            >
+                              <div className="grid grid-cols-1 gap-5 md:grid-cols-[200px,1fr] md:items-start">
+                                <div className="shrink-0 md:-mt-1">
+                                  <HairCareReferencePhoto
+                                    src={hairImage}
+                                    compact
+                                    headingColor="#643100"
+                                    bodyColor="#643100"
+                                    alignStart
+                                  />
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="flex flex-col gap-3">
+                                    <div>
+                                      <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>Porosity</p>
+                                      <p className="text-sm font-semibold capitalize" style={metricValueStyle}>{geminiHealth.porosity || 'Unknown'}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>Strand Thickness</p>
+                                      <p className="text-sm font-semibold capitalize" style={metricValueStyle}>{geminiHealth.strandThickness || 'Unknown'}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </RoutineAccordionSection>
+                          ) : analysisReady ? (
+                            <HairCareReferencePhoto
+                              src={hairImage}
+                              compact
+                              headingColor="#643100"
+                              bodyColor="#643100"
+                              alignStart
+                            />
+                          ) : null}
 
                             {/* Detected Style */}
                             {hairAnalysis.detectedStyle?.style && (
@@ -1063,39 +1273,24 @@ export default function HairCarePage() {
                               </div>
                             )}
 
-                          {/* Debug indicator - remove in production */}
-                          {process.env.NODE_ENV === 'development' && (
-                            <div className="rounded-lg p-2 text-xs" style={{ background: '#fee2e2', border: '1px solid #dc2626' }}>
-                              <p>Debug: geminiHealth = {geminiHealth ? '✅ Set' : '❌ Not set'}</p>
-                              <p>hairAnalysis keys: {Object.keys(hairAnalysis || {}).join(', ')}</p>
-                            </div>
-                          )}
+                          {/* Debug indicator removed */}
 
-                            {/* Hair Characteristics (Gemini) */}
-                            {geminiHealth && (
-                              <div className="rounded-lg p-4 space-y-3" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
-                                <p className="text-sm font-semibold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>Hair Characteristics</p>
-                                <div className="grid grid-cols-2 gap-3">
-                                  <div>
-                                    <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>Porosity</p>
-                                    <p className="text-sm font-semibold capitalize" style={metricValueStyle}>{geminiHealth.porosity || 'Unknown'}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>Strand Thickness</p>
-                                    <p className="text-sm font-semibold capitalize" style={metricValueStyle}>{geminiHealth.strandThickness || 'Unknown'}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>Length</p>
-                                    <p className="text-sm font-semibold capitalize" style={metricValueStyle}>{geminiHealth.length || 'Unknown'}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
+                            {/* Hair Characteristics moved beside the photo above */}
 
                             {/* Health Indicators (severity color-coded) */}
                             {geminiHealth && (
-                              <div className="rounded-lg p-4 space-y-3" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
-                                <p className="text-sm font-semibold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>Health Indicators</p>
+                              <RoutineAccordionSection
+                                title="Health indicators"
+                                open
+                                onToggle={() => null}
+                                collapsible={false}
+                                headerStyle={{ background: 'rgba(255, 254, 225, 0.35)' }}
+                                bodyStyle={{ background: 'rgba(255, 254, 225, 0.43)', paddingBottom: 'calc(2rem + 2px)' }}
+                                containerStyle={{ border: '1px solid rgba(175, 85, 0, 0.22)' }}
+                                bodyClassName="p-4 pb-8 sm:p-5 sm:pb-10 md:pb-12"
+                                titleStyle={{ fontFamily: 'Caprasimo, serif' }}
+                                titleClassName="text-sm font-bold uppercase tracking-wide sm:text-base"
+                              >
                                 <div className="grid grid-cols-2 gap-3">
                                   {[
                                     { label: 'Moisture', key: 'moistureLevel' },
@@ -1112,8 +1307,8 @@ export default function HairCarePage() {
                                         key={i}
                                         className="rounded-md p-2"
                                         style={{
-                                          background: 'rgba(193, 114, 8, 0.22)',
-                                          border: '1px solid rgba(193, 114, 8, 0.3)',
+                                          background: '#FFF4C2',
+                                          border: '1px solid #F8DD65',
                                         }}
                                       >
                                         <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>
@@ -1129,8 +1324,8 @@ export default function HairCarePage() {
                                     <div
                                       className="rounded-md p-2"
                                       style={{
-                                        background: 'rgba(193, 114, 8, 0.22)',
-                                        border: '1px solid rgba(193, 114, 8, 0.3)',
+                                        background: '#FFF4C2',
+                                        border: '1px solid #F8DD65',
                                       }}
                                     >
                                       <p className="text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>
@@ -1155,64 +1350,11 @@ export default function HairCarePage() {
                                     </div>
                                   )}
                                 </div>
-                              </div>
-                            )}
-
-                            {/* Recommendations */}
-                            {geminiHealth?.recommendations && (
-                              <div className="rounded-lg p-4" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
-                                <p className="text-sm font-semibold" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-                                  Recommendations
-                                </p>
-                                <div className="mt-3 space-y-3">
-                                  {Array.isArray(geminiHealth.recommendations.immediate) && (
-                                    <div>
-                                      <p className="text-xs mb-1" style={{ color: '#643100' }}>Immediate Actions</p>
-                                      <ul className="list-disc list-inside text-sm" style={{ color: '#643100' }}>
-                                        {geminiHealth.recommendations.immediate.map((r: string, i: number) => <li key={i}>{r}</li>)}
-                                      </ul>
-                                    </div>
-                                  )}
-                                  {Array.isArray(geminiHealth.recommendations.products) && (
-                                    <div>
-                                      <p className="text-xs mb-1" style={{ color: '#643100' }}>Product Suggestions</p>
-                                      <ul className="list-disc list-inside text-sm" style={{ color: '#643100' }}>
-                                        {geminiHealth.recommendations.products.map((r: string, i: number) => <li key={i}>{r}</li>)}
-                                      </ul>
-                                    </div>
-                                  )}
-                                  {Array.isArray(geminiHealth.recommendations.techniques) && (
-                                    <div>
-                                      <p className="text-xs mb-1" style={{ color: '#643100' }}>Techniques</p>
-                                      <ul className="list-disc list-inside text-sm" style={{ color: '#643100' }}>
-                                        {geminiHealth.recommendations.techniques.map((r: string, i: number) => <li key={i}>{r}</li>)}
-                                      </ul>
-                                    </div>
-                                  )}
-                                  {geminiHealth.recommendations.schedule && (
-                                    <div>
-                                      <p className="text-xs mb-1" style={{ color: '#643100' }}>Maintenance Schedule</p>
-                                      <p className="text-sm" style={{ color: '#643100' }}>{geminiHealth.recommendations.schedule}</p>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
+                              </RoutineAccordionSection>
                             )}
 
                             {/* Primary Metrics Grid */}
                             <div className="grid grid-cols-2 gap-3">
-                              {/* Length */}
-                              {(hairAnalysis.length || hairAnalysis.extractedCharacteristics?.length) && (
-                                <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
-                                  <p className="text-xs mb-1 font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>
-                                    Length
-                                  </p>
-                                  <p className="text-xl font-bold capitalize" style={metricValueStyle}>
-                                    {hairAnalysis.length?.length || hairAnalysis.extractedCharacteristics?.length || 'Unknown'}
-                                  </p>
-                                </div>
-                              )}
-
                               {/* Volume */}
                               {hairAnalysis.volume && (
                                 <div className="rounded-lg p-3" style={{ background: 'white', border: '2px solid rgba(175, 85, 0, 0.25)' }}>
@@ -1259,7 +1401,7 @@ export default function HairCarePage() {
                                 <p className="text-sm font-bold mb-2 capitalize" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
                                   Damage: {hairAnalysis.damage.severity}
                                 </p>
-                                {hairAnalysis.damage.damageTypes.length > 0 && (
+                                {Array.isArray(hairAnalysis.damage.damageTypes) && hairAnalysis.damage.damageTypes.length > 0 && (
                                   <div className="flex flex-wrap gap-2">
                                     {hairAnalysis.damage.damageTypes.map((type: string, i: number) => (
                                       <span key={i} className="text-xs px-2 py-1 rounded-full capitalize" style={{ background: 'white', color: '#643100', border: '1px solid rgba(175, 85, 0, 0.25)' }}>
@@ -1321,19 +1463,118 @@ export default function HairCarePage() {
                                 )}
                               </div>
                             )}
+                          </div>
+
+                          <div
+                            className={`h-full space-y-4 pb-2 md:pb-3 ${
+                              analysisReady && geminiHealth ? 'lg:pl-6 lg:pt-4 xl:pl-8 xl:pt-5' : ''
+                            }`}
+                          >
+                            {/* Recommendations */}
+                            <RoutineAccordionSection
+                              title="Recommendations"
+                              open
+                              onToggle={() => null}
+                              collapsible={false}
+                              className="flex h-full w-full flex-col"
+                              headerStyle={{ background: 'rgba(255, 254, 225, 0.35)' }}
+                              bodyStyle={{ background: 'rgba(255, 254, 225, 0.43)' }}
+                              containerStyle={{ border: '1px solid rgba(175, 85, 0, 0.22)', height: 'calc(100% - 12px)' }}
+                              bodyClassName="p-4 sm:p-5 flex-1 flex flex-col"
+                              titleStyle={{ fontFamily: 'Caprasimo, serif' }}
+                              titleClassName="text-sm font-bold uppercase tracking-wide sm:text-base"
+                            >
+                              <div className="flex-1 overflow-y-auto pr-1">
+                                {geminiHealth?.recommendations ? (
+                                  <div
+                                    className={`w-full space-y-5 ${analysisReady && geminiHealth ? '' : 'mx-auto max-w-xl'}`}
+                                  >
+                                    {Array.isArray(geminiHealth.recommendations.immediate) && (
+                                      <div>
+                                        <p
+                                          className="mb-2 text-sm font-bold tracking-wide sm:mb-3 sm:text-base"
+                                          style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}
+                                        >
+                                          Immediate Actions
+                                        </p>
+                                        <ul className="list-inside list-disc space-y-2 text-xs sm:text-sm" style={{ color: '#643100' }}>
+                                          {geminiHealth.recommendations.immediate.map((r: string, i: number) => (
+                                            <li key={i}>{toTitleCaseLine(r)}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+                                    {Array.isArray(geminiHealth.recommendations.products) && (
+                                      <div>
+                                        <p
+                                          className="mb-2 text-sm font-bold tracking-wide sm:mb-3 sm:text-base"
+                                          style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}
+                                        >
+                                          Product Suggestions
+                                        </p>
+                                        <ul className="list-inside list-disc space-y-2 text-xs sm:text-sm" style={{ color: '#643100' }}>
+                                          {geminiHealth.recommendations.products.map((r: string, i: number) => (
+                                            <li key={i}>{toTitleCaseLine(r)}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+                                    {Array.isArray(geminiHealth.recommendations.techniques) && (
+                                      <div>
+                                        <p
+                                          className="mb-2 text-sm font-bold tracking-wide sm:mb-3 sm:text-base"
+                                          style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}
+                                        >
+                                          Techniques
+                                        </p>
+                                        <ul className="list-inside list-disc space-y-2 text-xs sm:text-sm" style={{ color: '#643100' }}>
+                                          {geminiHealth.recommendations.techniques.map((r: string, i: number) => (
+                                            <li key={i}>{toTitleCaseLine(r)}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+                                    {/* Maintenance schedule removed (shown on dashboard instead) */}
+                                  </div>
+                                ) : (
+                                  <p
+                                    className="text-sm leading-snug"
+                                    style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                                  >
+                                    We&apos;re preparing personalised recommendations from your photo. If this takes too long, you can still generate your routine.
+                                  </p>
+                                )}
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={generateRoutine}
+                                disabled={!hairAnalysis || isAnalyzing || loading}
+                                className="mx-auto mt-2 flex w-full max-w-[16rem] items-center justify-center gap-2 rounded-full px-2.5 py-3 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-70 sm:max-w-xs sm:px-3 sm:py-4 md:text-base"
+                                style={{
+                                  background: '#643100',
+                                  color: '#FFFFFF',
+                                  border: '2px solid rgba(122, 53, 0, 0.25)',
+                                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                                }}
+                              >
+                                {loading ? 'Generating…' : 'Generate My Routine'}
+                              </button>
+                            </RoutineAccordionSection>
+                          </div>
                         </div>
                       )}
 
                       {/* Action Buttons - Only show when analysis is complete and not loading routine */}
                       {hairAnalysis && !isAnalyzing && !loading && (
-                        <div className="mt-8 flex gap-4">
+                        <div className="mt-8 flex justify-center">
                           <button
                             type="button"
                             onClick={() => {
                               clearScanAndSession();
                               setCurrentStep(2);
                             }}
-                            className="flex-1 rounded-xl bg-transparent px-6 py-3 text-sm font-semibold transition-opacity hover:opacity-80 sm:py-4 md:text-base"
+                            className="flex w-full max-w-[16rem] items-center justify-center gap-2 rounded-full px-2.5 py-3 text-sm font-semibold transition-all hover:opacity-90 sm:max-w-xs sm:px-3 sm:py-4 md:text-base"
                             style={{
                               color: '#643100',
                               border: '2px solid #643100',
@@ -1341,14 +1582,6 @@ export default function HairCarePage() {
                             }}
                           >
                             Upload Different Photo
-                          </button>
-                          <button
-                            type="button"
-                            onClick={generateRoutine}
-                            className="flex-1 rounded-xl px-6 py-3 text-sm font-semibold shadow-lg transition-all hover:shadow-xl sm:py-4 md:text-base"
-                            style={{ background: '#643100', color: '#FFFFFF', fontFamily: 'Bricolage Grotesque, sans-serif' }}
-                          >
-                            Generate My Routine
                           </button>
                         </div>
                       )}
@@ -1366,8 +1599,8 @@ export default function HairCarePage() {
             animate={{ opacity: 1, y: 0 }}
             className="flex min-h-0 w-full min-w-0 flex-1 flex-col"
           >
-            <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col px-1 sm:px-2 md:px-3">
-              <div className="mx-auto mb-1 w-full max-w-4xl shrink-0 px-1 text-left sm:mb-2 sm:px-2 md:mb-2 md:px-3">
+            <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col">
+              <div className="mx-auto mb-1 w-full max-w-4xl shrink-0 px-4 text-left sm:mb-2 sm:px-5 md:mb-2 md:px-6">
                 <h1
                   className="mb-1 min-w-0 text-3xl font-bold md:text-4xl"
                   style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}
@@ -1383,9 +1616,9 @@ export default function HairCarePage() {
               </div>
 
               <div
-                className={`relative flex min-h-0 w-full max-w-full flex-1 flex-col overflow-hidden rounded-2xl pt-3 sm:pt-4 md:pt-4 ${
-                  analysisReady && hairAnalysis ? 'mt-2 sm:mt-3' : 'mt-6 sm:mt-8 md:mt-10'
-                } max-h-[min(70dvh,calc(100dvh-7.75rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))] md:max-h-[min(63dvh,calc(100dvh-6.25rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)))]`}
+                className={`relative mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col overflow-hidden rounded-2xl ${
+                  analysisReady && hairAnalysis ? 'mt-1 sm:mt-2' : 'mt-4 sm:mt-6 md:mt-8'
+                } max-h-[min(64dvh,calc(100dvh-7.25rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))))] md:max-h-[min(58dvh,calc(100dvh-5.75rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))))] lg:max-h-[min(54dvh,calc(100dvh-5.75rem-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))))]`}
                 style={{
                   background: '#FFFFFF',
                   border: '2px solid rgba(175, 85, 0, 0.25)',
@@ -1393,64 +1626,90 @@ export default function HairCarePage() {
                 }}
               >
                 <div className="flex min-h-0 flex-1 flex-col">
-                  <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-4 pb-4 sm:px-5 md:px-6 md:gap-5">
+                  <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain p-4 sm:p-5 md:gap-5 md:p-6">
                     <div className="mx-auto w-full max-w-4xl space-y-4">
-                    <HairCareReferencePhoto
-                      src={hairImage}
-                      compact={analysisReady}
-                      headingColor="#643100"
-                      bodyColor="#643100"
-                    />
-
                     <div
-                      className="mt-4 overflow-hidden rounded-xl"
-                      style={{ border: '1px solid rgba(175, 85, 0, 0.22)' }}
+                      className="mt-2 overflow-hidden rounded-xl pt-4 pr-4 pb-6 pl-6 sm:pt-5 sm:pr-5 sm:pb-8 sm:pl-8"
+                      style={{
+                        background: '#643100',
+                        border: '1px solid rgba(122, 53, 0, 0.55)',
+                      }}
                     >
-                      <div
-                        className="px-4 py-3 sm:px-5 sm:py-4"
-                        style={{ background: 'rgba(255, 254, 225, 0.35)' }}
-                      >
-                        <span className="flex min-w-0 items-center gap-2 sm:gap-3">
-                          <TrendingUp size={22} className="shrink-0 sm:h-7 sm:w-7" style={{ color: '#643100' }} aria-hidden />
-                          <span className="text-lg font-bold sm:text-xl" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-                            You can expect
-                          </span>
-                        </span>
-                      </div>
-                      <div
-                        className="p-4 sm:p-5"
-                        style={{ background: 'rgba(255, 254, 225, 0.43)' }}
-                      >
-                        <div className="mb-4 grid gap-4 md:grid-cols-2 md:gap-6">
-                          <div>
-                            <p className="mb-1 text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>
-                              Timeline
-                            </p>
-                            <p className="text-lg font-semibold sm:text-xl" style={metricValueStyle}>
-                              {recommendation?.expectedResults?.timeline}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="mb-1 text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>
-                              Health improvement
-                            </p>
-                            <p className="text-lg font-semibold sm:text-xl" style={metricValueStyle}>
-                              +{recommendation?.expectedResults?.metrics?.healthImprovement}%
-                            </p>
-                          </div>
+                      <div className="grid grid-cols-1 gap-5 md:grid-cols-[200px,1fr] md:items-start">
+                        <div className="shrink-0 pt-3 sm:pt-4 md:pt-5">
+                          <HairCareReferencePhoto
+                            src={hairImage}
+                            compact
+                            alignStart
+                            headingColor="#FFFEE1"
+                            bodyColor="#FFFEE1"
+                          />
                         </div>
-                        <div>
-                          <p className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>
-                            Expected improvements
-                          </p>
-                          <ul className="space-y-2">
-                            {recommendation?.expectedResults?.improvements?.map((improvement, idx) => (
-                              <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                <CheckCircle size={18} className="mt-0.5 shrink-0" style={{ color: '#643100' }} aria-hidden />
-                                <span>{improvement}</span>
-                              </li>
-                            ))}
-                          </ul>
+
+                        <div className="min-w-0 pt-2 sm:pt-3 md:pt-4">
+                          <div className="mb-2 flex w-full items-center justify-start">
+                            <span
+                              className="text-lg font-bold uppercase tracking-wide sm:text-xl"
+                              style={{ color: '#FFFEE1', fontFamily: 'Caprasimo, serif' }}
+                            >
+                              You can expect
+                            </span>
+                          </div>
+                          <div className="mb-4 grid gap-4 md:grid-cols-2 md:gap-6">
+                            <div>
+                              <p
+                                className="mb-1 text-xs font-semibold uppercase tracking-wide opacity-90"
+                                style={{ color: '#FFFEE1', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                              >
+                                Timeline
+                              </p>
+                              <p
+                                className="text-lg font-semibold sm:text-xl"
+                                style={{ color: '#FFFEE1', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                              >
+                                {recommendation?.expectedResults?.timeline}
+                              </p>
+                            </div>
+                            <div>
+                              <p
+                                className="mb-1 text-xs font-semibold uppercase tracking-wide opacity-90"
+                                style={{ color: '#FFFEE1', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                              >
+                                Health improvement
+                              </p>
+                              <p
+                                className="text-lg font-semibold sm:text-xl"
+                                style={{ color: '#FFFEE1', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                              >
+                                +{recommendation?.expectedResults?.metrics?.healthImprovement}%
+                              </p>
+                            </div>
+                          </div>
+                          <div className="mt-6">
+                            <p
+                              className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-90"
+                              style={{ color: '#FFFEE1', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                            >
+                              Expected improvements
+                            </p>
+                            <ul className="space-y-2">
+                              {recommendation?.expectedResults?.improvements?.map((improvement, idx) => (
+                                <li
+                                  key={idx}
+                                  className="flex items-start gap-2 text-sm"
+                                  style={{ color: '#FFFEE1', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                                >
+                                  <CheckCircle
+                                    size={18}
+                                    className="mt-0.5 shrink-0"
+                                    style={{ color: '#FFFEE1' }}
+                                    aria-hidden
+                                  />
+                                  <span>{improvement}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1460,10 +1719,19 @@ export default function HairCarePage() {
                       title="Your routine steps"
                       icon={Calendar}
                       open={routineAccordionOpen.routine}
-                      onToggle={() => setRoutineAccordionOpen((s) => ({ ...s, routine: !s.routine }))}
+                      onToggle={() => {}}
+                      collapsible={false}
+                      titleStyle={{ fontFamily: 'Caprasimo, serif' }}
+                      titleClassName="text-sm font-bold uppercase tracking-wide sm:text-base"
                       bodyClassName="p-4 pt-3 sm:p-5 sm:pt-4"
+                      bodyStyle={{ background: 'rgba(255, 254, 225, 0.43)' }}
+                      headerStyle={{ background: 'rgba(255, 254, 225, 0.43)' }}
+                      showDivider={false}
                     >
-                    <div className="relative mb-6 flex h-10 w-full overflow-hidden rounded-full border-2 border-[#643100] bg-white sm:h-11">
+                    <div
+                      className="relative mb-8 flex h-10 w-full items-center justify-center overflow-hidden rounded-full border-2 border-[#643100] sm:h-11"
+                      style={{ background: 'rgba(255, 254, 225, 0.43)' }}
+                    >
                 <motion.div
                   aria-hidden
                   className="absolute inset-y-0 rounded-full bg-[#643100]"
@@ -1489,7 +1757,7 @@ export default function HairCarePage() {
                     }}
                   >
                     <span className="truncate text-center">
-                      {tab} · {recommendation?.personalizedRoutine?.[tab]?.length ?? 0}
+                      {tab}
                     </span>
                   </button>
                 ))}
@@ -1502,11 +1770,35 @@ export default function HairCarePage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
-                    className="flex h-full flex-col rounded-xl p-4 transition-shadow"
-                    style={{
-                      background: 'rgba(221, 129, 6, 0.2)',
-                      border: '1px solid rgba(221, 129, 6, 0.35)',
-                    }}
+                    className="flex h-full flex-col rounded-[32px] p-4 transition-shadow"
+                    style={(() => {
+                      // Match Dashboard routine card styling by cadence
+                      if (activeTab === 'daily') {
+                        return {
+                          background: '#FDF8E1',
+                          border: '1px solid #F8DD65',
+                          boxShadow: '0 10px 22px rgba(122, 53, 0, 0.08)',
+                        };
+                      }
+                      if (activeTab === 'weekly') {
+                        return {
+                          background: '#FFF4C2',
+                          border: '1px solid #F8DD65',
+                          boxShadow: '0 10px 22px rgba(122, 53, 0, 0.08)',
+                        };
+                      }
+                      if (activeTab === 'monthly') {
+                        return {
+                          background: '#FFEFA8',
+                          border: '1px solid #F8DD65',
+                          boxShadow: '0 10px 22px rgba(122, 53, 0, 0.08)',
+                        };
+                      }
+                      return {
+                        background: 'rgba(221, 129, 6, 0.2)',
+                        border: '1px solid rgba(221, 129, 6, 0.35)',
+                      };
+                    })()}
                   >
                     <div className="mb-3 flex items-start justify-between gap-2">
                       <div
@@ -1517,7 +1809,28 @@ export default function HairCarePage() {
                       </div>
                       <span
                         className="rounded-full px-2 py-0.5 text-xs font-semibold capitalize"
-                        style={{ background: '#603E12', color: '#FFFEE1', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                        style={(() => {
+                          const v = String(step.importance || '').toLowerCase();
+                          if (v === 'recommended') {
+                            return {
+                              background: '#FB8C1C',
+                              color: '#3B1C00',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                            };
+                          }
+                          if (v === 'essential') {
+                            return {
+                              background: '#C17208',
+                              color: '#FFFEE1',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                            };
+                          }
+                          return {
+                            background: '#603E12',
+                            color: '#FFFEE1',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                          };
+                        })()}
                       >
                         {step.importance}
                       </span>
@@ -1545,8 +1858,8 @@ export default function HairCarePage() {
                     <div
                       className="mb-3 flex-grow rounded-lg p-3"
                       style={{
-                        background: 'rgba(255, 255, 255, 0.42)',
-                        border: '1px solid rgba(221, 129, 6, 0.28)',
+                        background: '#FFFFFF',
+                        border: '1px solid rgba(175, 85, 0, 0.14)',
                       }}
                     >
                       <p className="mb-1 text-xs font-semibold uppercase tracking-wide opacity-80" style={routineStepCardTextStyle}>
@@ -1561,8 +1874,8 @@ export default function HairCarePage() {
                       <div
                         className="mt-auto flex items-start gap-2 rounded-lg p-2"
                         style={{
-                          background: 'rgba(255, 255, 255, 0.35)',
-                          border: '1px solid rgba(221, 129, 6, 0.28)',
+                          background: '#FFFFFF',
+                          border: '1px solid rgba(175, 85, 0, 0.14)',
                         }}
                       >
                         <Package className="mt-0.5 shrink-0" size={14} style={{ color: '#643100' }} aria-hidden />
@@ -1581,87 +1894,7 @@ export default function HairCarePage() {
               </div>
                     </RoutineAccordionSection>
 
-              <RoutineAccordionSection
-                className="mt-4"
-                title="Maintenance schedule"
-                icon={Clock}
-                open={routineAccordionOpen.maintenance}
-                onToggle={() => setRoutineAccordionOpen((s) => ({ ...s, maintenance: !s.maintenance }))}
-                bodyClassName="p-4 sm:p-5"
-              >
-                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                    <div
-                      className="flex flex-col rounded-xl p-3 sm:p-4"
-                      style={{
-                        background: 'rgba(221, 129, 6, 0.2)',
-                        border: '1px solid rgba(221, 129, 6, 0.35)',
-                      }}
-                    >
-                      <p
-                        className="mb-1 text-[10px] font-semibold uppercase leading-tight tracking-wide opacity-80 sm:text-xs"
-                        style={routineStepCardTextStyle}
-                      >
-                        Next deep condition
-                      </p>
-                      <p className="text-sm font-bold leading-snug sm:text-base" style={routineStepCardTextStyle}>
-                        {recommendation?.maintenanceSchedule?.nextDeepCondition?.toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div
-                      className="flex flex-col rounded-xl p-3 sm:p-4"
-                      style={{
-                        background: 'rgba(221, 129, 6, 0.2)',
-                        border: '1px solid rgba(221, 129, 6, 0.35)',
-                      }}
-                    >
-                      <p
-                        className="mb-1 text-[10px] font-semibold uppercase leading-tight tracking-wide opacity-80 sm:text-xs"
-                        style={routineStepCardTextStyle}
-                      >
-                        Next protein treatment
-                      </p>
-                      <p className="text-sm font-bold leading-snug sm:text-base" style={routineStepCardTextStyle}>
-                        {recommendation?.maintenanceSchedule?.nextProteinTreatment?.toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div
-                      className="flex flex-col rounded-xl p-3 sm:p-4"
-                      style={{
-                        background: 'rgba(221, 129, 6, 0.2)',
-                        border: '1px solid rgba(221, 129, 6, 0.35)',
-                      }}
-                    >
-                      <p
-                        className="mb-1 text-[10px] font-semibold uppercase leading-tight tracking-wide opacity-80 sm:text-xs"
-                        style={routineStepCardTextStyle}
-                      >
-                        Next trim
-                      </p>
-                      <p className="text-sm font-bold leading-snug sm:text-base" style={routineStepCardTextStyle}>
-                        {recommendation?.maintenanceSchedule?.nextTrim?.toLocaleDateString()}
-                      </p>
-                    </div>
-                    {recommendation?.maintenanceSchedule?.styleRefresh && (
-                      <div
-                        className="flex flex-col rounded-xl p-3 sm:p-4"
-                        style={{
-                          background: 'rgba(221, 129, 6, 0.2)',
-                          border: '1px solid rgba(221, 129, 6, 0.35)',
-                        }}
-                      >
-                        <p
-                          className="mb-1 text-[10px] font-semibold uppercase leading-tight tracking-wide opacity-80 sm:text-xs"
-                          style={routineStepCardTextStyle}
-                        >
-                          Style refresh
-                        </p>
-                        <p className="text-sm font-bold leading-snug sm:text-base" style={routineStepCardTextStyle}>
-                          {recommendation?.maintenanceSchedule?.styleRefresh?.toLocaleDateString()}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-              </RoutineAccordionSection>
+              {/* Maintenance schedule moved to dashboard */}
 
               {recommendation?.productRecommendations && recommendation?.productRecommendations?.essential?.length > 0 && (
                 <RoutineAccordionSection
@@ -1669,29 +1902,69 @@ export default function HairCarePage() {
                   title="Recommended products"
                   icon={Package}
                   open={routineAccordionOpen.products}
-                  onToggle={() => setRoutineAccordionOpen((s) => ({ ...s, products: !s.products }))}
-                  bodyClassName="p-4 sm:p-5"
+                  onToggle={() => {}}
+                  collapsible={false}
+                  titleStyle={{ fontFamily: 'Caprasimo, serif' }}
+                  titleClassName="text-sm font-bold uppercase tracking-wide sm:text-base"
+                  bodyClassName="px-4 pt-4 pb-2 sm:px-5 sm:pt-5 sm:pb-3"
+                  bodyStyle={{ background: 'rgba(255, 254, 225, 0.43)' }}
+                  headerStyle={{ background: 'rgba(255, 254, 225, 0.43)' }}
+                  showDivider={false}
                 >
-                    <div className="grid gap-4 md:grid-cols-3">
-                      {recommendation?.productRecommendations?.essential?.slice(0, 3).map((product, idx) => (
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <p
+                        className="text-xs font-semibold uppercase tracking-wide opacity-80"
+                        style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                      >
+                        Showing results from your catalog
+                      </p>
+                      {(() => {
+                        const hasUuid = recommendation.productRecommendations.essential.some(
+                          (p) => typeof p.id === 'string' && p.id.includes('-')
+                        );
+                        return hasUuid ? (
+                          <span
+                            className="shrink-0 rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                            style={{
+                              background: 'rgba(255, 254, 225, 0.65)',
+                              borderColor: 'rgba(175, 85, 0, 0.22)',
+                              color: '#643100',
+                              fontFamily: 'Bricolage Grotesque, sans-serif',
+                            }}
+                          >
+                            Supabase
+                          </span>
+                        ) : null;
+                      })()}
+                    </div>
+                    <div className="flex w-full items-stretch gap-4 overflow-x-auto overscroll-x-contain pr-1 [-webkit-overflow-scrolling:touch]">
+                      {recommendation?.productRecommendations?.essential?.slice(0, 6).map((product, idx) => (
                         <div
                           key={idx}
-                          className="rounded-xl p-5 transition-shadow"
+                          className="flex h-full min-h-[26rem] w-[280px] min-w-[280px] shrink-0 flex-col rounded-xl p-5 transition-shadow sm:min-h-[28rem] sm:w-[320px] sm:min-w-[320px]"
                           style={{ background: '#FFFFFF', border: '1px solid rgba(175, 85, 0, 0.2)' }}
                         >
-                          <div className="mb-3">
-                            <span
-                              className="inline-block rounded-full px-3 py-1 text-xs font-semibold"
-                              style={{
-                                background: 'rgba(100, 49, 0, 0.1)',
-                                color: '#643100',
-                                border: '1px solid rgba(175, 85, 0, 0.25)',
-                                fontFamily: 'Bricolage Grotesque, sans-serif',
-                              }}
-                            >
-                              Recommended
-                            </span>
-                        </div>
+                          <div
+                            className="mb-4 h-40 w-full shrink-0 overflow-hidden rounded-xl"
+                            style={{ background: 'rgba(100, 49, 0, 0.06)', border: '1px solid rgba(175, 85, 0, 0.14)' }}
+                          >
+                            {(() => {
+                              const img = resolveRecommendedProductImage(product as unknown as Record<string, unknown>);
+                              return img ? (
+                                <img
+                                  src={img}
+                                  alt={`${product.brand} ${product.name}`}
+                                  className="h-full w-full object-cover"
+                                  loading="lazy"
+                                  decoding="async"
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center">
+                                  <Package size={34} style={{ color: '#643100', opacity: 0.55 }} aria-hidden />
+                                </div>
+                              );
+                            })()}
+                          </div>
                           
                           <h3 className="mb-1 text-lg font-semibold" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             {product.brand}
@@ -1699,31 +1972,61 @@ export default function HairCarePage() {
                           <p className="mb-3 text-sm" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                             {product.name}
                           </p>
+
+                          <div className="mb-3 flex shrink-0 flex-wrap gap-2">
+                            <span
+                              className="rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                              style={{
+                                background: 'rgba(255, 254, 225, 0.55)',
+                                borderColor: 'rgba(175, 85, 0, 0.22)',
+                                color: '#643100',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                              }}
+                            >
+                              {product.category}
+                            </span>
+                            <span
+                              className="rounded-full border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                              style={{
+                                background: 'rgba(255, 254, 225, 0.55)',
+                                borderColor: 'rgba(175, 85, 0, 0.22)',
+                                color: '#643100',
+                                fontFamily: 'Bricolage Grotesque, sans-serif',
+                              }}
+                            >
+                              {product.pricing.currency} {product.pricing.amount.toLocaleString()}
+                            </span>
+                          </div>
                           
-                          <div className="mb-3 rounded-lg p-3" style={{ background: 'rgba(255, 254, 225, 0.43)', border: '1px solid rgba(175, 85, 0, 0.14)' }}>
-                            <p className="mb-1 text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>
-                              Why we recommend
-                            </p>
-                            <p className="text-sm leading-snug" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                              {product.purpose}
-                            </p>
-                      </div>
+                          <div className="flex min-h-0 flex-1 flex-col gap-3">
+                            <div
+                              className="rounded-lg p-3"
+                              style={{ background: '#FDF8E1', border: '1px solid #F8DD65' }}
+                            >
+                              <p className="mb-1 text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>
+                                Why we recommend
+                              </p>
+                              <p className="text-sm leading-snug" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                {product.purpose}
+                              </p>
+                            </div>
 
-                          <div className="mb-3">
-                            <p className="mb-1 text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>
-                              Key benefits
-                            </p>
-                        <ul className="space-y-1">
-                              {product.benefits.slice(0, 2).map((benefit, bidx) => (
-                                <li key={bidx} className="flex items-start gap-2 text-xs" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                                  <span className="text-[#643100]">•</span>
-                              <span>{benefit}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                            <div>
+                              <p className="mb-1 text-xs font-semibold uppercase tracking-wide opacity-80" style={metricLabelStyle}>
+                                Key benefits
+                              </p>
+                              <ul className="space-y-1">
+                                {product.benefits.slice(0, 2).map((benefit, bidx) => (
+                                  <li key={bidx} className="flex items-start gap-2 text-xs" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                                    <span className="text-[#643100]">•</span>
+                                    <span>{benefit}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
 
-                          <div className="flex flex-col gap-3 border-t border-[rgba(175,85,0,0.2)] pt-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="mt-auto flex flex-col gap-3 border-t border-[rgba(175,85,0,0.2)] pt-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                               <p className="text-lg font-bold tabular-nums" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                 {product.pricing.currency} {product.pricing.amount.toLocaleString()}
@@ -1731,7 +2034,7 @@ export default function HairCarePage() {
                               <p className="text-xs" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                                 {product.pricing.size}
                               </p>
-                        </div>
+                            </div>
                             <button
                               type="button"
                               className="w-full shrink-0 rounded-xl bg-transparent px-6 py-3 text-sm font-semibold transition-opacity hover:opacity-80 sm:w-auto sm:py-3 md:text-base"
@@ -1743,31 +2046,37 @@ export default function HairCarePage() {
                             >
                               Buy now
                             </button>
-                      </div>
-                    </div>
+                          </div>
+                        </div>
                   ))}
                 </div>
                 </RoutineAccordionSection>
               )}
 
               <RoutineAccordionSection
-                className="mt-4"
+                className="mt-2 sm:mt-3"
                 title="Hair care tips"
                 icon={Lightbulb}
                 open={routineAccordionOpen.tips}
-                onToggle={() => setRoutineAccordionOpen((s) => ({ ...s, tips: !s.tips }))}
+                onToggle={() => {}}
+                collapsible={false}
+                titleStyle={{ fontFamily: 'Caprasimo, serif' }}
+                titleClassName="text-sm font-bold uppercase tracking-wide sm:text-base"
                 bodyClassName="p-4 sm:p-5"
               >
-            <div className="grid gap-4 md:grid-cols-3 md:gap-6">
+            <div className="flex flex-col gap-4 md:flex-row md:flex-wrap md:items-stretch md:gap-6">
                       {/* Do's */}
-                      <div className="rounded-xl p-5 sm:p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(175, 85, 0, 0.2)' }}>
+                      <div
+                        className="flex w-full flex-col rounded-xl p-5 sm:p-6 md:basis-[calc(50%-0.75rem)]"
+                        style={{ background: 'rgba(255, 254, 225, 0.43)', border: '1px solid rgba(175, 85, 0, 0.2)' }}
+                      >
                 <div className="mb-4 flex items-center gap-2">
                           <CheckCircle size={22} className="shrink-0" style={{ color: '#643100' }} aria-hidden />
                           <h3 className="text-lg font-bold sm:text-xl" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
                             Do&apos;s
                           </h3>
                 </div>
-                <ul className="space-y-3">
+                <ul className="flex-1 space-y-3">
                   {recommendation?.tips?.dos?.map((tip, idx) => (
                             <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                               <CheckCircle size={16} className="mt-0.5 shrink-0" style={{ color: '#643100' }} aria-hidden />
@@ -1778,14 +2087,17 @@ export default function HairCarePage() {
               </div>
 
               {/* Don'ts */}
-                      <div className="rounded-xl p-5 sm:p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(175, 85, 0, 0.2)' }}>
+                      <div
+                        className="flex w-full flex-col rounded-xl p-5 sm:p-6 md:basis-[calc(50%-0.75rem)]"
+                        style={{ background: '#FFFFFF', border: '1px solid rgba(175, 85, 0, 0.2)' }}
+                      >
                 <div className="mb-4 flex items-center gap-2">
                           <AlertCircle size={22} className="shrink-0" style={{ color: '#643100' }} aria-hidden />
                           <h3 className="text-lg font-bold sm:text-xl" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
                             Don&apos;ts
                           </h3>
                 </div>
-                <ul className="space-y-3">
+                <ul className="flex-1 space-y-3">
                   {recommendation?.tips?.donts?.map((tip, idx) => (
                             <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
                               <AlertCircle size={16} className="mt-0.5 shrink-0" style={{ color: '#643100' }} aria-hidden />
@@ -1796,22 +2108,24 @@ export default function HairCarePage() {
               </div>
 
               {/* Pro Tips */}
-                      <div className="rounded-xl p-5 sm:p-6" style={routinePanelStyle}>
-                <div className="mb-4 flex items-center gap-2">
-                  <Lightbulb size={22} className="shrink-0" style={{ color: '#643100' }} aria-hidden />
-                          <h3 className="text-lg font-bold sm:text-xl" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
-                            Pro tips
-                          </h3>
+              {Array.isArray(recommendation?.tips?.proTips) && recommendation.tips.proTips.length > 0 ? (
+                <div className="flex w-full flex-col rounded-xl p-5 sm:p-6 md:basis-full" style={routinePanelStyle}>
+                  <div className="mb-4 flex items-center gap-2">
+                    <Lightbulb size={22} className="shrink-0" style={{ color: '#643100' }} aria-hidden />
+                    <h3 className="text-lg font-bold sm:text-xl" style={{ color: '#643100', fontFamily: 'Caprasimo, serif' }}>
+                      Pro tips
+                    </h3>
+                  </div>
+                  <ul className="flex-1 space-y-3">
+                    {recommendation.tips.proTips.map((tip, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+                        <Star size={16} className="mt-0.5 shrink-0" style={{ color: '#643100' }} aria-hidden />
+                        <span>{tip}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="space-y-3">
-                  {recommendation?.tips?.proTips?.map((tip, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#643100', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
-                              <Star size={16} className="mt-0.5 shrink-0" style={{ color: '#643100' }} aria-hidden />
-                      <span>{tip}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              ) : null}
                   </div>
               </RoutineAccordionSection>
                     </div>
@@ -1849,10 +2163,10 @@ export default function HairCarePage() {
                           clearScanAndSession();
                           setCurrentStep(2);
                         }}
-                        className="min-h-[3rem] min-w-0 flex-1 rounded-xl bg-transparent px-4 py-3 text-sm font-semibold transition-opacity hover:opacity-80 sm:px-6 sm:py-4 md:text-base"
+                        className="min-h-[44px] min-w-0 flex-1 rounded-full bg-transparent px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-80 sm:px-5 sm:py-3 md:text-base"
                         style={{
-                          color: '#643100',
-                          border: '2px solid #643100',
+                          color: DASHBOARD_TEXT_COLOR,
+                          border: `2px solid ${DASHBOARD_TEXT_COLOR}`,
                           fontFamily: 'Bricolage Grotesque, sans-serif',
                         }}
                       >
@@ -1861,8 +2175,13 @@ export default function HairCarePage() {
                       <button
                         type="button"
                         onClick={saveRoutine}
-                        className="min-h-[3rem] min-w-0 flex-1 rounded-xl px-4 py-3 text-sm font-semibold shadow-lg transition-all hover:shadow-xl sm:px-6 sm:py-4 md:text-base"
-                        style={{ background: '#643100', color: '#FFFFFF', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                        className="min-h-[44px] min-w-0 flex-1 rounded-full px-4 py-2.5 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90 sm:px-5 sm:py-3 md:text-base"
+                        style={{
+                          background: '#643100',
+                          color: '#FFFEE1',
+                          border: '2px solid rgba(122, 53, 0, 0.25)',
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                        }}
                       >
                         Save my routine
                       </button>
@@ -1878,8 +2197,12 @@ export default function HairCarePage() {
 
       {isAnalyzing && analysisLoadingPhase === 'bust' && (
         <OpeningSequence
-          phasePreset="route"
+          phasePreset="full"
           backgroundColor={APP_PAGE_BACKGROUND}
+          bustScaleMul={1.1}
+          cameraPullbackMul={1}
+          continuous
+          holdUntilUnmount
           onComplete={() => setAnalysisLoadingPhase('text')}
         />
       )}

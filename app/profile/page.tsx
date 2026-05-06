@@ -3,12 +3,15 @@
 import { useState, useLayoutEffect, useEffect, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Edit2, Save, X, ArrowRight, Calendar, Trash2, FileText, Plus, Heart, History } from 'lucide-react';
+import { ChevronLeft, Edit2, Save, X, ArrowRight, Calendar, Trash2, FileText, Plus, Heart, History, User } from 'lucide-react';
 import BottomNav from '@/app/components/BottomNav';
 import HairCareReferencePhoto from '@/app/components/HairCareReferencePhoto';
 import OpeningSequence from '@/components/OpeningSequence';
-import { APP_PAGE_BACKGROUND } from '@/lib/app-theme';
+import { APP_PAGE_BACKGROUND, DASHBOARD_CARD_TEXT } from '@/lib/app-theme';
 import { normalizeUserProfile, PROFILE_VERSION, type UserProfile, type SavedRoutine } from '@/types/userProfile';
+
+/** Same as `DASHBOARD_CONTAINER_TEXT` on `app/dashboard/page.tsx` — routine cards + body copy. */
+const PROFILE_DASH_TEXT = '#7A3500';
 
 const LOCATIONS = ['Kenya', 'Nigeria', 'South Africa', 'Ghana', 'Uganda', 'Tanzania', 'Other'];
 
@@ -116,12 +119,13 @@ function buildProfileFromStorage(): UserProfile | null {
 }
 
 /** Match page title “Your Profile”: Caprasimo + brand brown */
-const titleSerif = { fontFamily: 'Caprasimo, serif', color: '#B26805' } as const;
-const bodySans = { fontFamily: 'Bricolage Grotesque, sans-serif', color: '#B26805' } as const;
+const titleSerif = { fontFamily: 'Caprasimo, serif', color: DASHBOARD_CARD_TEXT } as const;
+const bodySans = { fontFamily: 'Bricolage Grotesque, sans-serif', color: DASHBOARD_CARD_TEXT } as const;
 
 export default function Profile() {
   const router = useRouter();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(() => buildProfileFromStorage());
+  const [showScanPrompt, setShowScanPrompt] = useState(false);
   const [editingSection, setEditingSection] = useState<EditingSection>(null);
   const [editedProfile, setEditedProfile] = useState<UserProfile | null>(null);
   const [expandedRoutine, setExpandedRoutine] = useState<string | null>(null);
@@ -172,10 +176,18 @@ export default function Profile() {
     loadProfile();
   }, [router]);
 
+  // Loader UI is handled by `app/profile/loading.tsx` so we don't stack multiple overlays.
+
   useEffect(() => {
     const onFocus = () => loadProfile();
     window.addEventListener('focus', onFocus);
     return () => window.removeEventListener('focus', onFocus);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    setShowScanPrompt(params.get('prompt') === 'scan');
   }, []);
 
   const updateEditedProfile = (updates: Partial<UserProfile>) => {
@@ -277,9 +289,13 @@ export default function Profile() {
   if (!profile) {
     return (
       <OpeningSequence
-        phasePreset="route"
+        phasePreset="full"
         backgroundColor={APP_PAGE_BACKGROUND}
         holdUntilUnmount
+        bustScaleMul={1.1}
+        cameraPullbackMul={1}
+        loadingLabel="Preparing your profile"
+        continuous
       />
     );
   }
@@ -287,19 +303,29 @@ export default function Profile() {
   const p = profile;
   const ep = editedProfile;
 
-  const row = (label: string, value: ReactNode) => (
-    <div className="flex flex-wrap gap-x-2 text-[15px] leading-snug" style={bodySans}>
+  const row = (label: string, value: ReactNode, textColor: string = DASHBOARD_CARD_TEXT) => (
+    <div
+      className="flex flex-wrap gap-x-2 text-[15px] leading-snug"
+      style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: textColor }}
+    >
       <span className="font-semibold">{label}</span>
       <span className="font-semibold">:</span>
       <span className="font-normal">{value}</span>
     </div>
   );
 
-  const subCardClass = 'rounded-2xl p-4 md:p-5';
-  const subCardStyle = {
-    background: '#FFFCF3',
-    border: '1px solid rgba(178, 104, 5, 0.25)',
+  /** Inner tiles: dashboard Daily strip pale yellow (`app/dashboard/page.tsx`). */
+  const profilePaleCardSurface = {
+    background: '#FDF8E1',
+    border: '1px solid #F8DD65',
+    boxShadow: '0 10px 22px rgba(122, 53, 0, 0.08)',
   } as const;
+  const profileWhiteCardClass = 'rounded-xl p-5';
+  const profileWhiteCardStyle = profilePaleCardSurface;
+
+  /** Same surface as other profile cards; larger radius for hair block. */
+  const hairProfileDailyClass =
+    'relative mt-5 w-full rounded-[32px] px-5 pb-6 pt-5 md:px-7 md:pb-6 md:pt-6';
 
   return (
     <div className="flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden bg-transparent">
@@ -307,32 +333,70 @@ export default function Profile() {
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
       `}</style>
       <BottomNav />
-      <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col overflow-hidden px-4 pb-[max(6rem,calc(4.75rem+env(safe-area-inset-bottom,0px)))] pt-14 md:px-4 md:pb-8 md:pt-32">
-        <header className="mb-3 flex shrink-0 items-center justify-between gap-4 pb-5 md:mb-4 md:pb-7">
+      <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col overflow-hidden px-4 pb-[max(7.5rem,calc(5.75rem+env(safe-area-inset-bottom,0px)))] pt-[calc(2rem+env(safe-area-inset-top))] lg:px-4 lg:pb-8 lg:pt-36">
+        <header className="mb-2 flex shrink-0 items-center justify-between gap-3 pb-2 lg:mb-4 lg:gap-4 lg:pb-6">
           <button
             type="button"
             onClick={() => router.back()}
             className="-ml-2 shrink-0 rounded-full p-2 transition-opacity hover:opacity-70 md:-ml-1"
             aria-label="Go back"
-            style={{ color: '#B26805' }}
+            style={{ color: DASHBOARD_CARD_TEXT }}
           >
             <ChevronLeft className="h-8 w-8 md:h-9 md:w-9" strokeWidth={2.25} />
           </button>
           <h1
             className="min-w-0 flex-1 text-right text-3xl font-bold md:text-4xl"
-            style={{ fontFamily: 'Caprasimo, serif', color: '#B26805' }}
+            style={{ fontFamily: 'Caprasimo, serif', color: DASHBOARD_CARD_TEXT }}
           >
             Your Profile
           </h1>
         </header>
 
+        {showScanPrompt && (
+          <div
+            className="mb-3 shrink-0 rounded-xl p-5 lg:mb-5"
+            style={{
+              background: '#FB8C1C',
+              border: '1px solid rgba(178, 104, 5, 0.25)',
+            }}
+          >
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div className="min-w-0">
+                <div className="text-lg font-bold md:text-xl" style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Caprasimo, serif' }}>
+                  Next step: scan your hair
+                </div>
+                <div
+                  className="mt-1 text-sm leading-relaxed"
+                  style={{ color: DASHBOARD_CARD_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                >
+                  To generate your routine and product recommendations, scan a photo of your hair.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => router.push('/hair-care?mode=analyze')}
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 md:shrink-0"
+                style={{
+                  background: '#B26805',
+                  color: '#FFFEE1',
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                }}
+              >
+                Scan now
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
+
+          </div>
+        )}
+
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-2xl p-5 md:p-6 max-h-[min(70dvh,calc(100dvh-10.5rem))] md:max-h-[min(74dvh,calc(100dvh-11rem))]"
+          className="flex min-h-0 min-w-0 w-full flex-1 flex-col overflow-hidden rounded-2xl p-4 max-lg:max-h-none max-lg:pt-3.5 lg:max-h-[min(74dvh,calc(100dvh-13rem))] lg:p-6"
           style={{
             background: '#FFFFFF',
-            border: '2px solid rgba(175, 85, 0, 0.25)',
+            border: '2px solid rgba(122, 53, 0, 0.25)',
           }}
         >
           <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
@@ -345,7 +409,7 @@ export default function Profile() {
                       type="button"
                       onClick={saveProfile}
                       className="rounded-lg p-2"
-                      style={{ color: '#B26805' }}
+                      style={{ color: DASHBOARD_CARD_TEXT }}
                       aria-label="Save"
                     >
                       <Save className="h-5 w-5" />
@@ -354,7 +418,7 @@ export default function Profile() {
                       type="button"
                       onClick={cancelEdit}
                       className="rounded-lg p-2"
-                      style={{ color: '#B26805' }}
+                      style={{ color: DASHBOARD_CARD_TEXT }}
                       aria-label="Cancel"
                     >
                       <X className="h-5 w-5" />
@@ -365,7 +429,7 @@ export default function Profile() {
                     type="button"
                     onClick={() => startEdit('personal')}
                     className="rounded-lg p-2 transition-opacity hover:opacity-70 disabled:opacity-40"
-                    style={{ color: '#B26805' }}
+                    style={{ color: DASHBOARD_CARD_TEXT }}
                     disabled={editingSection !== null}
                     aria-label="Edit personal information"
                   >
@@ -446,39 +510,52 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Your Hair Profile */}
-            <div className={`${subCardClass} relative mt-5`} style={subCardStyle}>
-              <div className="absolute right-3 top-3 flex items-center gap-1 md:right-4 md:top-4">
+            {/* Your Hair Profile — same surface as dashboard Daily card; header matches “How healthy…” row */}
+            <div className={hairProfileDailyClass} style={profilePaleCardSurface}>
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                <h3 className="flex min-w-0 items-center gap-2 text-base font-bold md:text-lg" style={titleSerif}>
+                  <User className="h-5 w-5 shrink-0" aria-hidden />
+                  Your Hair Profile
+                </h3>
                 {editingSection === 'hair' ? (
-                  <>
-                    <button type="button" onClick={saveProfile} className="rounded-lg p-2" style={{ color: '#B26805' }} aria-label="Save">
-                      <Save className="h-5 w-5" />
+                  <div className="flex shrink-0 items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={saveProfile}
+                      className="text-sm font-semibold underline decoration-[rgba(122,53,0,0.35)] underline-offset-2 transition-opacity hover:opacity-80"
+                      style={{ color: PROFILE_DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    >
+                      Save
                     </button>
-                    <button type="button" onClick={cancelEdit} className="rounded-lg p-2" style={{ color: '#B26805' }} aria-label="Cancel">
-                      <X className="h-5 w-5" />
+                    <button
+                      type="button"
+                      onClick={cancelEdit}
+                      className="text-sm font-semibold underline decoration-[rgba(122,53,0,0.35)] underline-offset-2 transition-opacity hover:opacity-80"
+                      style={{ color: PROFILE_DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                    >
+                      Cancel
                     </button>
-                  </>
+                  </div>
                 ) : (
                   <button
                     type="button"
                     onClick={() => startEdit('hair')}
-                    className="rounded-lg p-2 hover:opacity-70 disabled:opacity-40"
-                    style={{ color: '#B26805' }}
                     disabled={editingSection !== null}
-                    aria-label="Edit hair profile"
+                    className="shrink-0 text-sm font-semibold underline decoration-[rgba(122,53,0,0.35)] underline-offset-2 transition-opacity hover:opacity-80 disabled:opacity-40"
+                    style={{ color: PROFILE_DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
                   >
-                    <Edit2 className="h-5 w-5" />
+                    Edit
                   </button>
                 )}
               </div>
-              <h3 className="mb-4 pr-12 text-base font-bold md:text-lg" style={titleSerif}>
-                Your Hair Profile
-              </h3>
 
               {editingSection === 'hair' && ep ? (
-                <div className="space-y-4">
+                <div className="mt-4 space-y-4">
                   <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-80" style={bodySans}>
+                    <p
+                      className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-80"
+                      style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: PROFILE_DASH_TEXT }}
+                    >
                       Type
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -491,7 +568,8 @@ export default function Profile() {
                           style={{
                             borderColor: ep.hairType === t.id ? '#B26805' : 'rgba(178, 104, 5,0.2)',
                             background: ep.hairType === t.id ? 'rgba(178, 104, 5,0.08)' : 'transparent',
-                            ...bodySans,
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            color: PROFILE_DASH_TEXT,
                           }}
                         >
                           {t.label}
@@ -500,7 +578,10 @@ export default function Profile() {
                     </div>
                   </div>
                   <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-80" style={bodySans}>
+                    <p
+                      className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-80"
+                      style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: PROFILE_DASH_TEXT }}
+                    >
                       Porosity
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -513,7 +594,8 @@ export default function Profile() {
                           style={{
                             borderColor: ep.hairPorosity === t.id ? '#B26805' : 'rgba(178, 104, 5,0.2)',
                             background: ep.hairPorosity === t.id ? 'rgba(178, 104, 5,0.08)' : 'transparent',
-                            ...bodySans,
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            color: PROFILE_DASH_TEXT,
                           }}
                         >
                           {t.label}
@@ -522,7 +604,10 @@ export default function Profile() {
                     </div>
                   </div>
                   <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-80" style={bodySans}>
+                    <p
+                      className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-80"
+                      style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: PROFILE_DASH_TEXT }}
+                    >
                       Length
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -535,7 +620,8 @@ export default function Profile() {
                           style={{
                             borderColor: ep.hairLength === t.id ? '#B26805' : 'rgba(178, 104, 5,0.2)',
                             background: ep.hairLength === t.id ? 'rgba(178, 104, 5,0.08)' : 'transparent',
-                            ...bodySans,
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            color: PROFILE_DASH_TEXT,
                           }}
                         >
                           {t.label}
@@ -544,7 +630,10 @@ export default function Profile() {
                     </div>
                   </div>
                   <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-80" style={bodySans}>
+                    <p
+                      className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-80"
+                      style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: PROFILE_DASH_TEXT }}
+                    >
                       Density
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -557,7 +646,8 @@ export default function Profile() {
                           style={{
                             borderColor: ep.hairDensity === t.id ? '#B26805' : 'rgba(178, 104, 5,0.2)',
                             background: ep.hairDensity === t.id ? 'rgba(178, 104, 5,0.08)' : 'transparent',
-                            ...bodySans,
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            color: PROFILE_DASH_TEXT,
                           }}
                         >
                           {t.label}
@@ -566,14 +656,21 @@ export default function Profile() {
                     </div>
                   </div>
                   <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-80" style={bodySans}>
+                    <p
+                      className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-80"
+                      style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: PROFILE_DASH_TEXT }}
+                    >
                       Location
                     </p>
                     <select
                       value={ep.location || ''}
                       onChange={(e) => updateEditedProfile({ location: e.target.value || undefined })}
                       className="w-full rounded-xl border px-3 py-2 text-sm"
-                      style={{ borderColor: 'rgba(178, 104, 5, 0.25)', ...bodySans }}
+                      style={{
+                        borderColor: 'rgba(178, 104, 5, 0.25)',
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        color: PROFILE_DASH_TEXT,
+                      }}
                     >
                       <option value="">Select</option>
                       {LOCATIONS.map((loc) => (
@@ -584,7 +681,10 @@ export default function Profile() {
                     </select>
                   </div>
                   <div>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-80" style={bodySans}>
+                    <p
+                      className="mb-2 text-xs font-semibold uppercase tracking-wide opacity-80"
+                      style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: PROFILE_DASH_TEXT }}
+                    >
                       Climate
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -597,7 +697,8 @@ export default function Profile() {
                           style={{
                             borderColor: ep.climate === t.id ? '#B26805' : 'rgba(178, 104, 5,0.2)',
                             background: ep.climate === t.id ? 'rgba(178, 104, 5,0.08)' : 'transparent',
-                            ...bodySans,
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            color: PROFILE_DASH_TEXT,
                           }}
                         >
                           {t.label}
@@ -607,24 +708,27 @@ export default function Profile() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {row('Type', p.hairType?.toLowerCase() ?? '—')}
-                  {row('Porosity', p.hairPorosity ? p.hairPorosity.charAt(0).toUpperCase() + p.hairPorosity.slice(1) : '—')}
-                  {row('Length', p.hairLength ? p.hairLength.charAt(0).toUpperCase() + p.hairLength.slice(1) : '—')}
-                  {row('Density', p.hairDensity ? p.hairDensity.charAt(0).toUpperCase() + p.hairDensity.slice(1) : '—')}
-                  {row('Location', p.location || '—')}
-                  {row('Climate', formatClimate(p))}
+                <div className="mt-4 space-y-2">
+                  {row('Type', p.hairType?.toLowerCase() ?? '—', PROFILE_DASH_TEXT)}
+                  {row('Porosity', p.hairPorosity ? p.hairPorosity.charAt(0).toUpperCase() + p.hairPorosity.slice(1) : '—', PROFILE_DASH_TEXT)}
+                  {row('Length', p.hairLength ? p.hairLength.charAt(0).toUpperCase() + p.hairLength.slice(1) : '—', PROFILE_DASH_TEXT)}
+                  {row('Density', p.hairDensity ? p.hairDensity.charAt(0).toUpperCase() + p.hairDensity.slice(1) : '—', PROFILE_DASH_TEXT)}
+                  {row('Location', p.location || '—', PROFILE_DASH_TEXT)}
+                  {row('Climate', formatClimate(p), PROFILE_DASH_TEXT)}
                 </div>
               )}
             </div>
 
             {p.hairHealthSnapshot && (
-              <div className={`${subCardClass} mt-4`} style={subCardStyle}>
+              <div className={`${profileWhiteCardClass} mt-4`} style={profileWhiteCardStyle}>
                 <h3 className="mb-3 flex items-center gap-2 text-base font-bold md:text-lg" style={titleSerif}>
                   <Heart className="h-5 w-5 shrink-0" aria-hidden />
                   How healthy is your hair
                 </h3>
-                <p className="mb-3 text-xs opacity-80" style={bodySans}>
+                <p
+                  className="mb-3 text-xs opacity-80"
+                  style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: PROFILE_DASH_TEXT }}
+                >
                   Matches your most recent Hair care session (dashboard metrics use the same snapshot)
                   {p.hairHealthSnapshot.analyzedAt
                     ? ` · ${new Date(p.hairHealthSnapshot.analyzedAt).toLocaleDateString(undefined, {
@@ -638,27 +742,27 @@ export default function Profile() {
                   <HairCareReferencePhoto
                     src={p.hairHealthSnapshot.referenceImageDataUrl}
                     compact
-                    headingColor="#B26805"
-                    bodyColor="#B26805"
+                    headingColor={PROFILE_DASH_TEXT}
+                    bodyColor={PROFILE_DASH_TEXT}
                   />
                 </div>
                 <div className="space-y-2">
-                  {row('Health score', `${p.hairHealthSnapshot.healthScore}/100`)}
+                  {row('Health score', `${p.hairHealthSnapshot.healthScore}/100`, PROFILE_DASH_TEXT)}
                   {p.hairHealthSnapshot.overallQuality != null &&
-                    row('Overall quality', `${p.hairHealthSnapshot.overallQuality}/100`)}
+                    row('Overall quality', `${p.hairHealthSnapshot.overallQuality}/100`, PROFILE_DASH_TEXT)}
                   {p.hairHealthSnapshot.hairTypeDetected &&
-                    row('Type (detected)', p.hairHealthSnapshot.hairTypeDetected)}
+                    row('Type (detected)', p.hairHealthSnapshot.hairTypeDetected, PROFILE_DASH_TEXT)}
                   {p.hairHealthSnapshot.curlPattern &&
-                    row('Curl pattern', p.hairHealthSnapshot.curlPattern)}
-                  {p.hairHealthSnapshot.porosity && row('Porosity (scan)', p.hairHealthSnapshot.porosity)}
-                  {p.hairHealthSnapshot.density && row('Density (scan)', p.hairHealthSnapshot.density)}
-                  {p.hairHealthSnapshot.length && row('Length (scan)', p.hairHealthSnapshot.length)}
+                    row('Curl pattern', p.hairHealthSnapshot.curlPattern, PROFILE_DASH_TEXT)}
+                  {p.hairHealthSnapshot.porosity && row('Porosity (scan)', p.hairHealthSnapshot.porosity, PROFILE_DASH_TEXT)}
+                  {p.hairHealthSnapshot.density && row('Density (scan)', p.hairHealthSnapshot.density, PROFILE_DASH_TEXT)}
+                  {p.hairHealthSnapshot.length && row('Length (scan)', p.hairHealthSnapshot.length, PROFILE_DASH_TEXT)}
                   {p.hairHealthSnapshot.moistureLevel &&
-                    row('Moisture', p.hairHealthSnapshot.moistureLevel.replace(/-/g, ' '))}
-                  {p.hairHealthSnapshot.scalpHealth && row('Scalp', p.hairHealthSnapshot.scalpHealth)}
+                    row('Moisture', p.hairHealthSnapshot.moistureLevel.replace(/-/g, ' '), PROFILE_DASH_TEXT)}
+                  {p.hairHealthSnapshot.scalpHealth && row('Scalp', p.hairHealthSnapshot.scalpHealth, PROFILE_DASH_TEXT)}
                   {p.hairHealthSnapshot.damageSeverity &&
                     p.hairHealthSnapshot.damageSeverity !== 'none' &&
-                    row('Damage', p.hairHealthSnapshot.damageSeverity)}
+                    row('Damage', p.hairHealthSnapshot.damageSeverity, PROFILE_DASH_TEXT)}
                 </div>
                 <button
                   type="button"
@@ -666,7 +770,7 @@ export default function Profile() {
                   className="mt-4 w-full rounded-xl py-3 text-sm font-semibold"
                   style={{
                     background: 'rgba(178, 104, 5,0.1)',
-                    color: '#B26805',
+                    color: PROFILE_DASH_TEXT,
                     fontFamily: 'Bricolage Grotesque, sans-serif',
                   }}
                 >
@@ -676,12 +780,15 @@ export default function Profile() {
             )}
 
             {p.hairCareHistory && p.hairCareHistory.length > 0 ? (
-              <div className={`${subCardClass} mt-4`} style={subCardStyle}>
+              <div className={`${profileWhiteCardClass} mt-4`} style={profileWhiteCardStyle}>
                 <h3 className="mb-3 flex items-center gap-2 text-base font-bold md:text-lg" style={titleSerif}>
                   <History className="h-5 w-5 shrink-0" aria-hidden />
                   Past hair scans
                 </h3>
-                <p className="mb-3 text-xs opacity-80" style={bodySans}>
+                <p
+                  className="mb-3 text-xs opacity-80"
+                  style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: PROFILE_DASH_TEXT }}
+                >
                   Open any previous scan or routine in Hair care.
                 </p>
                 <ul className="max-h-52 space-y-2 overflow-y-auto">
@@ -690,14 +797,15 @@ export default function Profile() {
                       <button
                         type="button"
                         onClick={() => router.push(`/hair-care?scan=${encodeURIComponent(h.id)}`)}
-                        className="w-full rounded-xl border px-3 py-2.5 text-left text-sm transition-colors hover:opacity-90"
+                        className="w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors hover:brightness-[1.03]"
                         style={{
-                          borderColor: 'rgba(178, 104, 5,0.2)',
-                          background: 'rgba(178, 104, 5,0.04)',
-                          ...bodySans,
+                          borderColor: 'rgba(248, 221, 101, 0.9)',
+                          background: '#FFF4C2',
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          color: PROFILE_DASH_TEXT,
                         }}
                       >
-                        <span className="font-semibold" style={{ color: '#B26805' }}>
+                        <span className="font-medium" style={{ color: PROFILE_DASH_TEXT }}>
                           {new Date(h.scannedAt).toLocaleDateString(undefined, {
                             month: 'short',
                             day: 'numeric',
@@ -715,14 +823,14 @@ export default function Profile() {
             ) : null}
 
             {/* Your Goals */}
-            <div className={`${subCardClass} relative mt-4`} style={subCardStyle}>
+            <div className={`${profileWhiteCardClass} relative mt-4`} style={profileWhiteCardStyle}>
               <div className="absolute right-3 top-3 flex items-center gap-1 md:right-4 md:top-4">
                 {editingSection === 'goals' ? (
                   <>
-                    <button type="button" onClick={saveProfile} className="rounded-lg p-2" style={{ color: '#B26805' }} aria-label="Save">
+                    <button type="button" onClick={saveProfile} className="rounded-lg p-2" style={{ color: PROFILE_DASH_TEXT }} aria-label="Save">
                       <Save className="h-5 w-5" />
                     </button>
-                    <button type="button" onClick={cancelEdit} className="rounded-lg p-2" style={{ color: '#B26805' }} aria-label="Cancel">
+                    <button type="button" onClick={cancelEdit} className="rounded-lg p-2" style={{ color: PROFILE_DASH_TEXT }} aria-label="Cancel">
                       <X className="h-5 w-5" />
                     </button>
                   </>
@@ -731,7 +839,7 @@ export default function Profile() {
                     type="button"
                     onClick={() => startEdit('goals')}
                     className="rounded-lg p-2 hover:opacity-70 disabled:opacity-40"
-                    style={{ color: '#B26805' }}
+                    style={{ color: PROFILE_DASH_TEXT }}
                     disabled={editingSection !== null}
                     aria-label="Edit goals"
                   >
@@ -754,7 +862,8 @@ export default function Profile() {
                       style={{
                         borderColor: ep.hairGoals.includes(goal.id) ? '#B26805' : 'rgba(178, 104, 5,0.2)',
                         background: ep.hairGoals.includes(goal.id) ? 'rgba(178, 104, 5,0.06)' : 'transparent',
-                        ...bodySans,
+                        fontFamily: 'Bricolage Grotesque, sans-serif',
+                        color: PROFILE_DASH_TEXT,
                       }}
                     >
                       <span>{goal.emoji}</span>
@@ -766,12 +875,19 @@ export default function Profile() {
                 <ul className="space-y-2">
                   {p.hairGoals.length ? (
                     p.hairGoals.map((g) => (
-                      <li key={g} className="text-[15px] font-normal" style={bodySans}>
+                      <li
+                        key={g}
+                        className="text-[15px] font-normal"
+                        style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: PROFILE_DASH_TEXT }}
+                      >
                         {goalLineDisplay(g, hairGoalOptions)}
                       </li>
                     ))
                   ) : (
-                    <li className="text-sm opacity-70" style={bodySans}>
+                    <li
+                      className="text-sm opacity-70"
+                      style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: PROFILE_DASH_TEXT }}
+                    >
                       No goals selected yet.
                     </li>
                   )}
@@ -780,12 +896,12 @@ export default function Profile() {
             </div>
 
             {p.lastBooking && (
-              <div className="mt-6 border-t border-[rgba(178, 104, 5,0.1)] pt-6">
+              <div className={`${profileWhiteCardClass} mt-4`} style={profileWhiteCardStyle}>
                 <h3 className="mb-3 flex items-center gap-2 text-base font-bold" style={titleSerif}>
                   <Calendar className="h-5 w-5 shrink-0" />
                   Latest booking
                 </h3>
-                <div className="space-y-1 text-sm" style={bodySans}>
+                <div className="space-y-1 text-sm" style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: PROFILE_DASH_TEXT }}>
                   <p>
                     <span className="font-semibold">Style:</span> {p.lastBooking.style.replace(/-/g, ' ')}
                   </p>
@@ -808,7 +924,7 @@ export default function Profile() {
               </div>
             )}
 
-            <div className="mt-6 border-t border-[rgba(178, 104, 5,0.1)] pt-6">
+            <div className={`${profileWhiteCardClass} mt-4`} style={profileWhiteCardStyle}>
               <div className="mb-3 flex items-center justify-between gap-2">
                 <h3 className="flex items-center gap-2 text-base font-bold" style={titleSerif}>
                   <FileText className="h-5 w-5 shrink-0" />
@@ -818,7 +934,7 @@ export default function Profile() {
                   type="button"
                   onClick={() => router.push('/hair-care')}
                   className="flex shrink-0 items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold"
-                  style={{ background: 'rgba(178, 104, 5,0.1)', color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+                  style={{ background: 'rgba(178, 104, 5,0.1)', color: PROFILE_DASH_TEXT, fontFamily: 'Bricolage Grotesque, sans-serif' }}
                 >
                   <Plus className="h-4 w-4" />
                   New
@@ -826,7 +942,10 @@ export default function Profile() {
               </div>
 
               {!p.savedRoutines || p.savedRoutines.length === 0 ? (
-                <p className="py-4 text-center text-sm" style={bodySans}>
+                <p
+                  className="py-4 text-center text-sm"
+                  style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: PROFILE_DASH_TEXT }}
+                >
                   No saved routines yet.
                 </p>
               ) : (
@@ -834,11 +953,14 @@ export default function Profile() {
                   {p.savedRoutines.map((routine: SavedRoutine) => (
                     <div
                       key={routine.id}
-                      className="rounded-xl border p-3"
-                      style={{ borderColor: 'rgba(178, 104, 5, 0.15)', background: '#FFFEF8' }}
+                      className="rounded-xl border p-3 shadow-[0_4px_14px_rgba(122,53,0,0.06)]"
+                      style={{ borderColor: '#F8DD65', background: '#FFF9CF' }}
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <p className="text-xs" style={{ ...bodySans, opacity: 0.85 }}>
+                        <p
+                          className="text-xs"
+                          style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: PROFILE_DASH_TEXT, opacity: 0.85 }}
+                        >
                           {new Date(routine.createdAt).toLocaleDateString('en', {
                             month: 'short',
                             day: 'numeric',
@@ -849,7 +971,7 @@ export default function Profile() {
                           type="button"
                           onClick={() => deleteRoutine(routine.id)}
                           className="p-1"
-                          style={{ color: '#B26805' }}
+                          style={{ color: PROFILE_DASH_TEXT }}
                           title="Delete"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -861,7 +983,11 @@ export default function Profile() {
                         placeholder="Notes…"
                         rows={2}
                         className="mt-2 w-full rounded-lg border px-2 py-1.5 text-xs"
-                        style={{ borderColor: 'rgba(178, 104, 5,0.2)', ...bodySans }}
+                        style={{
+                          borderColor: 'rgba(175, 85, 0, 0.2)',
+                          fontFamily: 'Bricolage Grotesque, sans-serif',
+                          color: PROFILE_DASH_TEXT,
+                        }}
                       />
                       <div className="mt-2 flex gap-2">
                         <button
@@ -869,8 +995,9 @@ export default function Profile() {
                           onClick={() => setExpandedRoutine(expandedRoutine === routine.id ? null : routine.id)}
                           className="flex-1 rounded-lg py-2 text-xs font-semibold"
                           style={{
-                            border: '1px solid rgba(178, 104, 5,0.25)',
-                            ...bodySans,
+                            border: '1px solid rgba(175, 85, 0, 0.25)',
+                            fontFamily: 'Bricolage Grotesque, sans-serif',
+                            color: PROFILE_DASH_TEXT,
                           }}
                         >
                           {expandedRoutine === routine.id ? 'Hide' : 'Details'}

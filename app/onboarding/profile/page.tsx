@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Circle, Globe, Cloud } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Circle, Globe, Cloud } from 'lucide-react';
 import FormCard from '@/app/components/FormCard';
 import { normalizeUserProfile, PROFILE_VERSION, type UserProfile } from '@/types/userProfile';
+import OpeningSequence from '@/components/OpeningSequence';
 
 const TOTAL_STEPS = 6;
 const HAIR_GOALS: { label: string; emoji: string }[] = [
@@ -51,6 +52,7 @@ function PorosityIcon({ className, style }: { className?: string; style?: React.
 export default function OnboardingProfile() {
   const router = useRouter();
   const [step, setStep] = useState(0);
+  const [saving, setSaving] = useState(false);
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [email, setEmail] = useState('');
@@ -86,8 +88,12 @@ export default function OnboardingProfile() {
     if (location.trim()) profile.location = location;
     if (phone.trim()) profile.phone = phone.trim();
 
+    setSaving(true);
     localStorage.setItem('nywele-user-profile', JSON.stringify(profile));
-    router.push('/dashboard');
+    // Let the intro animation play visibly before navigating.
+    window.setTimeout(() => {
+      router.push('/dashboard');
+    }, 3500);
   };
 
   const canProceed = () => {
@@ -100,11 +106,21 @@ export default function OnboardingProfile() {
   };
 
   const handleNext = () => {
+    if (saving) return;
     if (step === TOTAL_STEPS - 1) {
       saveAndFinish();
     } else {
       setStep((s) => s + 1);
     }
+  };
+
+  const handleBack = () => {
+    if (saving) return;
+    if (step > 0) {
+      setStep((s) => Math.max(0, s - 1));
+      return;
+    }
+    router.push('/onboarding');
   };
 
   return (
@@ -113,83 +129,108 @@ export default function OnboardingProfile() {
         @import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Bricolage+Grotesque:wght@400;500;600&display=swap');
       `}</style>
 
+      {saving ? (
+        <OpeningSequence
+          phasePreset="full"
+          holdUntilUnmount
+          continuous
+          bustScaleMul={1.1}
+          cameraPullbackMul={1}
+          loadingLabel="Compiling your profile"
+        />
+      ) : null}
+
       <div className="flex flex-1 flex-col justify-center py-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] md:py-10">
         <div className="min-h-0 overflow-y-auto overscroll-contain">
-          <div className="mx-auto flex w-full max-w-[428px] flex-col justify-center">
+          <div className="mx-auto mt-10 flex w-full max-w-[428px] flex-col justify-center md:mt-14">
             <h1
-              className="mb-2 text-3xl font-bold md:text-4xl"
+              className="mb-1 text-3xl font-bold md:text-4xl"
               style={{ color: '#B26805', fontFamily: 'Caprasimo, serif' }}
             >
               Set up Your Profile
             </h1>
-            <p className="mb-6" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
+            <p className="mb-4" style={{ color: '#B26805', fontFamily: 'Bricolage Grotesque, sans-serif' }}>
               Fill in the short form below to get the best out of our service!
             </p>
 
-            <FormCard progress={progress} className="flex flex-col">
+            <FormCard
+              progress={progress}
+              className="flex flex-col h-[min(62dvh,36rem)] min-h-[min(62dvh,36rem)] max-h-[min(62dvh,36rem)]"
+            >
           {step === 0 && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#573203' }}>
-                  Name
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
-                  className="w-full px-4 py-3 rounded-xl border border-[#CE935F] focus:ring-2 focus:ring-[#AF5500] focus:border-transparent outline-none"
-                  style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#573203' }}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#573203' }}>
-                  Age
-                </label>
-                <input
-                  type="number"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  placeholder="Your age"
-                  className="w-full px-4 py-3 rounded-xl border border-[#CE935F] focus:ring-2 focus:ring-[#AF5500] focus:border-transparent outline-none"
-                  style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#573203' }}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#573203' }}>
-                  Email (Optional)
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="email@example.com"
-                  className="w-full px-4 py-3 rounded-xl border border-[#CE935F] focus:ring-2 focus:ring-[#AF5500] focus:border-transparent outline-none"
-                  style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#573203' }}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: '#573203' }}>
-                  Phone (Optional)
-                </label>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Your phone number"
-                  className="w-full px-4 py-3 rounded-xl border border-[#CE935F] focus:ring-2 focus:ring-[#AF5500] focus:border-transparent outline-none"
-                  style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#573203' }}
-                />
+            <div className="-mt-3">
+              <h2 className="text-xl font-bold mb-0" style={{ color: '#573203' }}>
+                What are your details?
+              </h2>
+              <p
+                className="text-sm mb-4 leading-relaxed"
+                style={{ color: '#573203', fontFamily: 'Bricolage Grotesque, sans-serif' }}
+              >
+                You can always update the information later.
+              </p>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#573203' }}>
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Your name"
+                    className="w-full px-4 py-3 rounded-xl border border-[#CE935F] focus:ring-2 focus:ring-[#AF5500] focus:border-transparent outline-none"
+                    style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#573203' }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#573203' }}>
+                    Age
+                  </label>
+                  <input
+                    type="number"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                    placeholder="Your age"
+                    className="w-full px-4 py-3 rounded-xl border border-[#CE935F] focus:ring-2 focus:ring-[#AF5500] focus:border-transparent outline-none"
+                    style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#573203' }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#573203' }}>
+                    Email (Optional)
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="email@example.com"
+                    className="w-full px-4 py-3 rounded-xl border border-[#CE935F] focus:ring-2 focus:ring-[#AF5500] focus:border-transparent outline-none"
+                    style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#573203' }}
+                  />
+                </div>
+                <div className="pb-8">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#573203' }}>
+                    Phone (Optional)
+                  </label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="Your phone number"
+                    className="w-full px-4 py-3 rounded-xl border border-[#CE935F] focus:ring-2 focus:ring-[#AF5500] focus:border-transparent outline-none"
+                    style={{ fontFamily: 'Bricolage Grotesque, sans-serif', color: '#573203' }}
+                  />
+                </div>
               </div>
             </div>
           )}
 
           {step === 1 && (
             <div>
-              <h2 className="text-xl font-bold mb-2" style={{ color: '#573203' }}>
+              <h2 className="text-xl font-bold mb-0.5" style={{ color: '#573203' }}>
                 What&apos;s your hair type?
               </h2>
-              <p className="text-sm mb-10" style={{ color: '#573203' }}>(Don&apos;t worry, we&apos;ll confirm with photo analysis)</p>
+              <p className="text-sm mb-6" style={{ color: '#573203' }}>(Don&apos;t worry, we&apos;ll confirm with photo analysis)</p>
               <div className="grid grid-cols-2 gap-4">
                 {HAIR_TYPES.map((t) => (
                   <button
@@ -230,10 +271,10 @@ export default function OnboardingProfile() {
 
           {step === 2 && (
             <div>
-              <h2 className="text-xl font-bold mb-2" style={{ color: '#573203' }}>
-                What is your hair Porosity?
+              <h2 className="text-xl font-bold mb-1" style={{ color: '#573203' }}>
+                What is your hair porosity?
               </h2>
-              <p className="text-sm mb-10" style={{ color: '#573203' }}>(Don&apos;t worry, we&apos;ll confirm with photo analysis)</p>
+              <p className="text-sm mb-5" style={{ color: '#573203' }}>(Don&apos;t worry, we&apos;ll confirm with photo analysis)</p>
               <div className="grid grid-cols-2 gap-4">
                 {POROSITY_OPTIONS.map((opt) => (
                   <button
@@ -272,10 +313,10 @@ export default function OnboardingProfile() {
 
           {step === 3 && (
             <div>
-              <h2 className="text-xl font-bold mb-2" style={{ color: '#573203' }}>
+              <h2 className="text-xl font-bold mb-1" style={{ color: '#573203' }}>
                 What is your Hair Density?
               </h2>
-              <p className="text-sm mb-10" style={{ color: '#573203' }}>(Don&apos;t worry, we&apos;ll confirm with photo analysis)</p>
+              <p className="text-sm mb-5" style={{ color: '#573203' }}>(Don&apos;t worry, we&apos;ll confirm with photo analysis)</p>
               <div className="grid grid-cols-2 gap-4">
                 {DENSITY_OPTIONS.map((opt) => (
                   <button
@@ -346,9 +387,9 @@ export default function OnboardingProfile() {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <Globe className="w-5 h-5" style={{ color: '#AF5500' }} />
-                  <label className="text-sm font-medium" style={{ color: '#573203' }}>
-                    Where are you Located?
-                  </label>
+                  <h2 className="text-xl font-bold" style={{ color: '#573203' }}>
+                    Where are you located?
+                  </h2>
                 </div>
                 <select
                   value={location}
@@ -369,9 +410,9 @@ export default function OnboardingProfile() {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <Cloud className="w-5 h-5" style={{ color: '#AF5500' }} />
-                  <label className="text-sm font-medium" style={{ color: '#573203' }}>
+                  <h2 className="text-xl font-bold" style={{ color: '#573203' }}>
                     What climate are you in?
-                  </label>
+                  </h2>
                 </div>
                 <select
                   value={climate}
@@ -393,7 +434,20 @@ export default function OnboardingProfile() {
           )}
             </FormCard>
 
-            <div className="mt-6 flex justify-end">
+            <div className="mt-6 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-xl px-5 py-3 font-semibold transition-all hover:bg-[rgba(175,85,0,0.06)]"
+                style={{
+                  color: '#573203',
+                  fontFamily: 'Bricolage Grotesque, sans-serif',
+                }}
+                aria-label={step > 0 ? 'Go back to previous step' : 'Go back to onboarding'}
+              >
+                <ArrowLeft className="h-5 w-5" aria-hidden />
+                Back
+              </button>
               <button
                 onClick={handleNext}
                 disabled={!canProceed()}

@@ -570,10 +570,14 @@ export default function HowItWorks() {
             title="Features that follow from the decisions"
             description="Every feature maps back to a research finding or a product decision, nothing was added because it seemed useful in the abstract."
           />
-          <div className="mx-auto mb-8 grid max-w-5xl gap-7 md:mb-12 md:gap-8">
+          <div className="mt-4 mb-8 flex flex-col gap-7 md:mt-6 md:mb-12 md:gap-8">
             {whatWeBuilt.map((feature, index) => {
               const Icon = feature.icon;
               const imageOnRight = index % 2 === 0;
+              const floatAlignClass =
+                index % 2 === 0
+                  ? 'lg:mr-auto lg:ml-0'
+                  : 'lg:ml-auto lg:mr-0';
               const imageBackground =
                 feature.name === 'AI hair analysis'
                   ? "bg-[url('/images/hair-analysis-image.png')] bg-cover bg-[position:center_60%]"
@@ -588,7 +592,7 @@ export default function HowItWorks() {
                   className={[
                     'flex flex-col overflow-hidden rounded-[24px] bg-[#FFFEE1] shadow-[0_6px_18px_rgba(87,50,3,0.14)]',
                     ['AI hair analysis', 'Style check', 'Product compatibility'].includes(feature.name)
-                      ? 'mx-auto max-w-4xl'
+                      ? `w-full max-w-4xl ${floatAlignClass}`
                       : '',
                   ]
                     .filter(Boolean)
@@ -809,7 +813,7 @@ export default function HowItWorks() {
         {/* ── CTA ── */}
         <section className="pb-3 text-center md:pb-6">
           <Link
-            href="/hair-care"
+            href="/intro"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-[#B26805] px-7 py-3 text-base font-semibold text-[#FFFEE1] shadow-[0_10px_30px_rgba(87,50,3,0.16)] transition-opacity hover:opacity-90"
             style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}
           >

@@ -30,6 +30,19 @@ export default function OnboardingPrompt() {
   }, []);
 
   useEffect(() => {
+    // Debug / testing helper: visit `/onboarding?reset=1` to clear local profile.
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('reset') !== '1') return;
+    try {
+      localStorage.removeItem('nywele-user-profile');
+    } catch {
+      /* ignore */
+    }
+    router.replace('/onboarding');
+  }, [router]);
+
+  useEffect(() => {
     const img = new Image();
     const done = () => setIntroContentHoldPending(false);
     img.onload = done;
@@ -128,7 +141,7 @@ export default function OnboardingPrompt() {
         <div ref={headingRef} className="opacity-0 relative">
           {/* Invisible placeholder to reserve space and prevent layout shift */}
           <div className="invisible" aria-hidden>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6" style={{ fontFamily: 'Caprasimo, serif' }}>
+            <h1 className="text-4xl md:text-5xl font-bold mb-2" style={{ fontFamily: 'Caprasimo, serif' }}>
               {LINE1}
             </h1>
             <p className="text-lg md:text-xl mb-8 leading-relaxed" style={{ fontFamily: 'Bricolage Grotesque, sans-serif' }}>
@@ -138,7 +151,7 @@ export default function OnboardingPrompt() {
           {/* Visible typewriter text, absolutely positioned over placeholder */}
           <div className="absolute inset-0">
             <h1
-              className="text-4xl md:text-5xl font-bold mb-6"
+              className="text-4xl md:text-5xl font-bold mb-2"
               style={{ color: '#AF5500', fontFamily: 'Caprasimo, serif' }}
             >
               {line1Display}
@@ -163,7 +176,7 @@ export default function OnboardingPrompt() {
         <div className="text-center">
           <button
             ref={buttonRef}
-            onClick={() => router.push('/onboarding/features')}
+            onClick={() => router.push('/onboarding/profile')}
             className="w-full py-3 px-5 rounded-full font-semibold text-base transition-all hover:shadow-lg opacity-0"
             style={{
               background: 'transparent',

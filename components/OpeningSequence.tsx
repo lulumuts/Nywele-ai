@@ -33,6 +33,16 @@ import {
   setIntroContentHoldPending,
 } from '@/lib/intro-crossfade';
 
+/**
+ * Singleton enforcement for loaders:
+ * If multiple routes mount <OpeningSequence /> at the same time (dashboard redirect → profile loader),
+ * we only keep the most recently mounted instance visible. This prevents duplicated "Loading"
+ * labels and occasional white/blank flashes caused by stacked fixed overlays.
+ */
+const OPENING_SEQUENCE_ACTIVE_EVENT = 'nywele-opening-sequence-active' as const;
+let openingSequenceNextToken = 0;
+let openingSequenceActiveToken: number | null = null;
+
 if (typeof window !== 'undefined') {
   queueMicrotask(() => {
     void MeshoptDecoder.ready;
@@ -54,7 +64,7 @@ const OPENING_LOOK_AT_Y = 0.38;
  * Extra bust scale for `phasePreset === 'full'` only (root intro + `/test-opening-sequence`).
  * `route` (profile, hair-care loaders) keeps the original `0.85` normalization.
  */
-const FULL_INTRO_BUST_SCALE_MUL = 1.22 as const;
+const FULL_INTRO_BUST_SCALE_MUL = 1.18 as const;
 /** Nudge camera back when the full-intro bust is scaled up so framing stays balanced. */
 const FULL_INTRO_CAMERA_PULLBACK = 1.06 as const;
 /** Typed on the root intro after the bust reveal only (`phasePreset === 'full'`). */
@@ -179,8 +189,18 @@ export type OpeningSequenceProps = {
   onFadeUiStart?: () => void;
   /** Shell uses shared `.nywele-cream-grid-surface` (cream + grid); kept for API compatibility. */
   backgroundColor?: string;
+  /** Background surface variant. `cream` matches app grid, `black` is used for loading overlays on dark screens. */
+  surfaceVariant?: 'cream' | 'black';
   /** Longer phases for root splash; `route` is shorter in-app loaders. */
   phasePreset?: 'full' | 'route';
+  /** Override footer label (defaults to "Loading"). */
+  loadingLabel?: string;
+  /** Extra multiplier applied to the bust scale. */
+  bustScaleMul?: number;
+  /** Extra multiplier applied to full-preset camera pullback (1 = unchanged). */
+  cameraPullbackMul?: number;
+  /** Keep the bust reveal effect moving continuously during hold. */
+  continuous?: boolean;
   /**
    * Root splash only: type out `INTRO_TAGLINE` after reveal. Omit elsewhere — footer shows "Loading"
    * until the bust sequence advances (no stray tagline on profile / hair-care loaders).
@@ -200,15 +220,26 @@ export type OpeningSequenceProps = {
 export default function OpeningSequence({
   onComplete,
   onFadeUiStart,
+  surfaceVariant = 'cream',
   phasePreset = 'full',
+  loadingLabel,
+  bustScaleMul = 1,
+  cameraPullbackMul = 1,
+  continuous = false,
   enableIntroTagline = false,
   holdUntilUnmount = false,
   holdStatusContent,
 }: OpeningSequenceProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
+  const instanceTokenRef = useRef<number>(0);
+  if (instanceTokenRef.current === 0) {
+    openingSequenceNextToken += 1;
+    instanceTokenRef.current = openingSequenceNextToken;
+  }
   const [visible, setVisible] = useState(true);
   const [openingAssetLoading, setOpeningAssetLoading] = useState(true);
+  const [singletonActive, setSingletonActive] = useState(true);
   /** Full intro: set when WebGL hold begins (after reveal); triggers typewriter. */
   const [introTaglineStarted, setIntroTaglineStarted] = useState(false);
   const [introTypedTagline, setIntroTypedTagline] = useState('');
@@ -223,6 +254,49 @@ export default function OpeningSequence({
   const triggerDone = useCallback(() => {
     setVisible(false);
     onCompleteRef.current?.();
+  }, []);
+
+  // Ensure only one OpeningSequence instance is active at a time.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const token = instanceTokenRef.current;
+
+    const setFromDetail = (nextToken: number | null) => {
+      setSingletonActive(nextToken === token);
+    };
+
+    openingSequenceActiveToken = token;
+    window.dispatchEvent(
+      new CustomEvent(OPENING_SEQUENCE_ACTIVE_EVENT, { detail: { token } }),
+    );
+
+    const onActive = (e: Event) => {
+      const detail = e as CustomEvent<{ token: number | null }>;
+      setFromDetail(detail.detail.token);
+    };
+
+    window.addEventListener(
+      OPENING_SEQUENCE_ACTIVE_EVENT,
+      onActive as EventListener,
+    );
+
+    // Initialize.
+    setSingletonActive(openingSequenceActiveToken === token);
+
+    return () => {
+      window.removeEventListener(
+        OPENING_SEQUENCE_ACTIVE_EVENT,
+        onActive as EventListener,
+      );
+      if (openingSequenceActiveToken === token) {
+        openingSequenceActiveToken = null;
+        window.dispatchEvent(
+          new CustomEvent(OPENING_SEQUENCE_ACTIVE_EVENT, {
+            detail: { token: null },
+          }),
+        );
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -249,6 +323,7 @@ export default function OpeningSequence({
   }, [enableIntroTagline, phasePreset, introTaglineStarted]);
 
   useEffect(() => {
+    if (!singletonActive) return;
     const mount = mountRef.current;
     if (!mount) return;
 
@@ -308,7 +383,7 @@ export default function OpeningSequence({
      * Opaque cream while the GLB loads so post passes (scan / vignette) are visible — transparent
      * clear makes an empty scene invisible and reads as “text-only” loading.
      */
-    renderer.setClearColor(0xFFFEE1, 1);
+    renderer.setClearColor(surfaceVariant === 'black' ? 0x000000 : 0xFFFEE1, 1);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     /** Balanced so orange stays saturated; nudged up for more “lit” mesh vs cream plate. */
@@ -627,7 +702,7 @@ export default function OpeningSequence({
         const groupScale =
           normalizedScale *
           (phasePreset === 'full'
-            ? routeScaleMul * FULL_INTRO_BUST_SCALE_MUL
+            ? routeScaleMul * FULL_INTRO_BUST_SCALE_MUL * bustScaleMul
             : routeScaleMul);
 
         try {
@@ -647,7 +722,7 @@ export default function OpeningSequence({
         group.position.y += 0.3;
         scene.add(group);
         if (phasePreset === 'full') {
-          camera.position.multiplyScalar(FULL_INTRO_CAMERA_PULLBACK);
+          camera.position.multiplyScalar(FULL_INTRO_CAMERA_PULLBACK * cameraPullbackMul);
           camera.lookAt(0, OPENING_LOOK_AT_Y, 0);
         }
         renderer.setClearColor(0x000000, 0);
@@ -845,6 +920,13 @@ export default function OpeningSequence({
               }
             }
         } else if (phase === 'hold') {
+          if (continuous) {
+            const cyc = (Math.sin(timeSec * 1.25) + 1) / 2;
+            const clipY = THREE.MathUtils.lerp(bottomY, topY, cyc);
+            wireOverlays.forEach((m) => {
+              m._mat.uniforms.uClipY.value = clipY;
+            });
+          }
           const waitingForContent =
             phasePreset !== 'route' && getIntroContentHoldPending();
           if (
@@ -911,7 +993,8 @@ export default function OpeningSequence({
           scanPass.uniforms.vignette.value = LOOK.vignetteStrength;
         }
         camera.getWorldPosition(cameraWorldPos);
-        const scanTarget = phase === 'reveal' || phase === 'hide' ? 1 : 0;
+        const scanTarget =
+          phase === 'reveal' || phase === 'hide' || (continuous && phase === 'hold') ? 1 : 0;
         displayScanStrength = smoothToward(
           displayScanStrength,
           scanTarget,
@@ -989,9 +1072,9 @@ export default function OpeningSequence({
         }
       });
     };
-  }, [enableIntroTagline, phasePreset, triggerDone, holdUntilUnmount]);
+  }, [enableIntroTagline, phasePreset, triggerDone, holdUntilUnmount, singletonActive]);
 
-  if (!visible) return null;
+  if (!visible || !singletonActive) return null;
 
   /** Bust uses upper viewport so status copy can sit below. */
   const useHoldStatusLayout = Boolean(holdStatusContent);
@@ -1002,7 +1085,7 @@ export default function OpeningSequence({
     <div
       ref={shellRef}
       data-nywele-opening-sequence=""
-      className="nywele-cream-grid-surface"
+      className={surfaceVariant === 'cream' ? 'nywele-cream-grid-surface' : undefined}
       style={{
         position: 'fixed',
         inset: 0,
@@ -1010,6 +1093,7 @@ export default function OpeningSequence({
         isolation: 'isolate',
         opacity: 1,
         minHeight: '100dvh',
+        backgroundColor: surfaceVariant === 'black' ? '#000' : undefined,
       }}
       aria-busy={openingAssetLoading}
     >
@@ -1121,7 +1205,7 @@ export default function OpeningSequence({
               }}
               aria-live="polite"
             >
-              Loading
+              {(loadingLabel || 'Loading').toUpperCase()}
             </div>
           )
         ) : null}

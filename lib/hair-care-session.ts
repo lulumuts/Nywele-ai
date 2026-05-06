@@ -5,10 +5,12 @@
 import type { HairCareRecommendation } from '@/lib/hairCare';
 
 export const HAIR_CARE_SESSION_KEY = 'nywele-hair-care-session';
-export const HAIR_CARE_SESSION_VERSION = 1;
+export const HAIR_CARE_SESSION_VERSION = 2;
 
 export interface HairCareSessionPayload {
   version: number;
+  /** Used to prevent restoring another user's session on shared devices. */
+  profileEmail?: string | null;
   hairImageDataUrl: string | null;
   hairAnalysis: Record<string, unknown> | null;
   geminiHealth: Record<string, unknown> | null;
@@ -55,6 +57,7 @@ export function loadHairCareSession(): HairCareSessionPayload | null {
 }
 
 export function saveHairCareSession(data: {
+  profileEmail?: string | null;
   hairImageDataUrl: string | null;
   hairAnalysis: unknown;
   geminiHealth: unknown | null;
@@ -69,6 +72,7 @@ export function saveHairCareSession(data: {
 
   const buildPayload = (img: string | null): HairCareSessionPayload => ({
     version: HAIR_CARE_SESSION_VERSION,
+    profileEmail: data.profileEmail?.trim().toLowerCase() || null,
     hairImageDataUrl: img,
     hairAnalysis: data.hairAnalysis as Record<string, unknown>,
     geminiHealth: (data.geminiHealth as Record<string, unknown> | null) ?? null,
